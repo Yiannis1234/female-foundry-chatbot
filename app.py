@@ -31,7 +31,9 @@ def get_openai_client():
     # Fallback API key for immediate use
     if not api_key:
         api_key = "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"
-    return OpenAI(api_key=api_key) if api_key else None
+    if api_key:
+        return OpenAI(api_key=api_key, timeout=30.0)
+    return None
 
 openai_client = get_openai_client()
 
@@ -52,13 +54,15 @@ def load_logs():
         return []
 
 def save_log(entry):
-    logs = load_logs()
-    logs.append(entry)
+    # Try to save log, but don't fail if we can't write to file (e.g., on Streamlit Cloud)
     try:
+        logs = load_logs()
+        logs.append(entry)
         with open(LOGS_PATH, "w", encoding="utf-8") as f:
             json.dump(logs, f, indent=2)
     except Exception as e:
-        st.error(f"Could not save log: {e}")
+        # Silently fail - file writing is optional, logs are in session state anyway
+        pass
 
 # Scoring function
 def score_entry(entry, message):
@@ -114,8 +118,14 @@ def generate_answer(message, entries):
         content = response.choices[0].message.content.strip()
         return content or "I could not formulate a response right now. Would you like me to escalate this to a team member?"
     except Exception as e:
-        st.error(f"LLM request failed: {e}")
-        return "I ran into a technical issue while contacting the AI service. Let me connect you with a human teammate instead."
+        error_msg = str(e)
+        # Don't show full error to user, just log it
+        if "api_key" in error_msg.lower() or "authentication" in error_msg.lower():
+            return "⚠️ API key issue detected. Please check your OpenAI API key in Streamlit Secrets."
+        elif "rate limit" in error_msg.lower():
+            return "⏳ Rate limit reached. Please try again in a moment."
+        else:
+            return f"I ran into a technical issue: {error_msg[:100]}. Please try again or contact support."
 
 # UI
 st.title("💬 Female Foundry Chatbot MVP")
@@ -134,40 +144,47 @@ with chat_container:
 
 # Chat input
 if prompt := st.chat_input("Ask me about the Index, privacy, or how to join the community..."):
-    # Add user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    
-    # Generate response
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            relevant_entries = find_relevant_entries(prompt)
-            answer = generate_answer(prompt, relevant_entries)
-            sources = [{"id": e["entry"]["id"], "title": e["entry"]["title"]} for e in relevant_entries]
+    try:
+        # Add user message
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        # Generate response
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                relevant_entries = find_relevant_entries(prompt)
+                answer = generate_answer(prompt, relevant_entries)
+                sources = [{"id": e["entry"]["id"], "title": e["entry"]["title"]} for e in relevant_entries]
+                
+                st.markdown(answer)
+                if sources:
+                    st.caption(f"Sources: {', '.join(s['title'] for s in sources)}")
             
-            st.markdown(answer)
-            if sources:
-                st.caption(f"Sources: {', '.join(s['title'] for s in sources)}")
-        
-        # Log conversation
-        log_entry = {
-            "id": str(uuid.uuid4()),
-            "userId": "anonymous",
-            "message": prompt,
-            "answer": answer,
-            "matchedEntries": [{"id": e["entry"]["id"], "score": e["score"]} for e in relevant_entries],
-            "timestamp": datetime.now().isoformat()
-        }
-        save_log(log_entry)
-        st.session_state.logs.append(log_entry)
-        
-        # Add assistant message to history
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": answer,
-            "sources": sources
-        })
+            # Log conversation (non-blocking)
+            try:
+                log_entry = {
+                    "id": str(uuid.uuid4()),
+                    "userId": "anonymous",
+                    "message": prompt,
+                    "answer": answer,
+                    "matchedEntries": [{"id": e["entry"]["id"], "score": e["score"]} for e in relevant_entries],
+                    "timestamp": datetime.now().isoformat()
+                }
+                save_log(log_entry)
+                st.session_state.logs.append(log_entry)
+            except Exception:
+                pass  # Logging is optional
+            
+            # Add assistant message to history
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": answer,
+                "sources": sources
+            })
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.info("Please try again or refresh the page.")
 
 # Sidebar with info
 with st.sidebar:
