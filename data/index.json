@@ -1,0 +1,31 @@
+[
+  {
+    "id": "faq-001",
+    "title": "What is the Female Innovation Index?",
+    "question": "What does the Female Innovation Index do?",
+    "answer": "The Female Innovation Index benchmarks innovation initiatives led by women-founded companies and highlights emerging trends across European ecosystems.",
+    "tags": ["about", "overview"]
+  },
+  {
+    "id": "faq-002",
+    "title": "How does the chatbot handle personal data?",
+    "question": "What happens to my data if I use the chatbot?",
+    "answer": "Conversations are stored securely for quality assurance and deleted after 90 days unless you opt in to ongoing support. We never sell personal data.",
+    "tags": ["privacy", "data"]
+  },
+  {
+    "id": "faq-003",
+    "title": "How can I join the community?",
+    "question": "I want to join the Female Foundry community. What should I do?",
+    "answer": "Submit the membership form on our website and our team will schedule a welcome call within five business days.",
+    "tags": ["membership", "next steps"]
+  },
+  {
+    "id": "faq-004",
+    "title": "Support channel when chatbot cannot help",
+    "question": "What if the chatbot cannot answer my question?",
+    "answer": "If the chatbot cannot assist, it will offer to escalate your request to the Female Foundry support inbox. You will receive a human response within one business day.",
+    "tags": ["support", "escalation"]
+  }
+]
+
