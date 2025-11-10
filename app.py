@@ -11,8 +11,39 @@ from datetime import datetime
 st.set_page_config(
     page_title="Female Foundry Chatbot",
     page_icon="💬",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"  # Collapse sidebar on mobile
 )
+
+# Custom CSS for mobile chat input visibility
+st.markdown("""
+<style>
+    /* Ensure chat input is visible on mobile */
+    @media (max-width: 768px) {
+        .stApp {
+            padding-bottom: 100px !important;
+        }
+        .stChatInput {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 999 !important;
+            background: white !important;
+            padding: 10px !important;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+        }
+        /* Add padding to main content so it doesn't get hidden behind fixed input */
+        .main .block-container {
+            padding-bottom: 120px !important;
+        }
+        /* Make sidebar collapsible on mobile */
+        .stSidebar {
+            position: relative !important;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Initialize session state
 if "messages" not in st.session_state:
