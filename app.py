@@ -18,28 +18,58 @@ st.set_page_config(
 # Custom CSS for mobile chat input visibility
 st.markdown("""
 <style>
-    /* Ensure chat input is visible on mobile */
+    /* Ensure chat input is visible on mobile - positioned higher */
     @media (max-width: 768px) {
+        /* Fix the chat input container */
+        .stChatInputContainer {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 10px !important;
+            right: 10px !important;
+            z-index: 9999 !important;
+            background: white !important;
+            padding: 10px !important;
+            border-radius: 25px !important;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
+            max-width: calc(100% - 20px) !important;
+        }
+        
+        /* Ensure the input itself is visible */
+        .stChatInput > div {
+            width: 100% !important;
+        }
+        
+        /* Add padding to main content so messages don't get hidden */
+        .main .block-container {
+            padding-bottom: 140px !important;
+        }
+        
+        /* Make sure the app container has proper spacing */
         .stApp {
             padding-bottom: 100px !important;
         }
-        .stChatInput {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            z-index: 999 !important;
-            background: white !important;
-            padding: 10px !important;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
+        
+        /* Hide sidebar on mobile by default */
+        .stSidebar {
+            display: none !important;
         }
-        /* Add padding to main content so it doesn't get hidden behind fixed input */
+        
+        /* Ensure chat messages are scrollable */
+        [data-testid="stVerticalBlock"] {
+            padding-bottom: 100px !important;
+        }
+    }
+    
+    /* For very small screens (phones in portrait) */
+    @media (max-width: 480px) {
+        .stChatInputContainer {
+            bottom: 10px !important;
+            left: 5px !important;
+            right: 5px !important;
+            max-width: calc(100% - 10px) !important;
+        }
         .main .block-container {
             padding-bottom: 120px !important;
-        }
-        /* Make sidebar collapsible on mobile */
-        .stSidebar {
-            position: relative !important;
         }
     }
 </style>
