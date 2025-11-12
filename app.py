@@ -299,7 +299,10 @@ def find_relevant_entries(message, limit=3):
         for entry in index
     ]
     scored.sort(key=lambda x: x["score"], reverse=True)
-    return [x for x in scored[:limit] if x["score"] > 0]
+    top = [x for x in scored[:limit] if x["score"] > 0]
+    if top and top[0]["score"] < 0.2:
+        return []
+    return top
 
 def build_prompt(message, entries):
     context = "\n\n".join(
