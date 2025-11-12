@@ -331,21 +331,18 @@ def generate_answer(message, entries, retries=2):
     def fallback_answer():
         if entries:
             best_entry = entries[0]["entry"]
-            return (
-                f"{best_entry['answer']}\n\n_Source: {best_entry['title']}_\n\n"
-                "Need more? Try asking about Deep Tech, AI, or the month-by-month VC data in the Dealroom sheet."
-            )
-        else:
-            return (
-                "Here’s a quick snapshot from the Female Innovation Index 2025:\n"
-                "• Female-founded startups raised €5.76B across 1,305 deals in Europe during 2024 (1,196 companies, ~12% of total VC).\n"
-                "• Deep Tech represents about 33% of that capital; AI subsectors like data/AI show significant traction.\n"
-                "• Survey highlights: access to funding and slow adoption of technology remain the top innovation inhibitors.\n\n"
-                "Let me know which area you’d like to dig into next—funding by country, sector breakdowns, or growth-stage trends."
-            )
+            return f"{best_entry['answer']}\n\n_Source: {best_entry['title']}_"
+        return None
 
     if not openai_client:
-        return fallback_answer()
+        fallback = fallback_answer()
+        if fallback:
+            return fallback
+        return (
+            "I don’t have that specific metric in my context. You can ask me about headline statistics (e.g. total funding for female-founded "
+            "startups, deep tech or AI sectors, growth-stage trends, IPO activity) or request datasets from the Dealroom order sheet such as "
+            "DR_FF_C_1 or DR_MC_C_5."
+        )
 
     for attempt in range(retries + 1):
         try:
@@ -358,14 +355,21 @@ def generate_answer(message, entries, retries=2):
             content = response.choices[0].message.content.strip()
             if content:
                 return content
-            return "I could not formulate a response right now. Would you like me to escalate this to a team member?"
+            return (
+                "I don’t have that specific metric in my context. You can ask me about headline statistics (e.g. total funding for female-founded "
+                "startups, deep tech or AI sectors, fundraising challenges) or request datasets from the Dealroom order sheet such as "
+                "DR_FF_C_1 or DR_MC_C_5."
+            )
         except Exception as e:
             error_msg = str(e).lower()
             if "api_key" in error_msg or "authentication" in error_msg or "invalid" in error_msg:
-                if entries:
-                    best = entries[0]["entry"]
-                    return f"{best['answer']}\n\n_Source: {best['title']}_\n\n_Note: Using FAQ fallback due to API issue._"
-                return fallback_answer()
+                fallback = fallback_answer()
+                if fallback:
+                    return fallback
+                return (
+                    "I don’t have that specific metric in my context. You can ask me about headline statistics (e.g. total funding for female-founded "
+                    "startups, deep tech or AI sectors) or request Dealroom datasets such as DR_FF_C_1."
+                )
             elif "rate limit" in error_msg or "timeout" in error_msg:
                 if attempt < retries:
                     import time
@@ -373,7 +377,13 @@ def generate_answer(message, entries, retries=2):
                     continue
                 return "⏳ Rate limit reached. Please try again in a moment."
 
-    return fallback_answer()
+    fallback = fallback_answer()
+    if fallback:
+        return fallback
+    return (
+        "I don’t have that specific metric in my context. You can ask me about headline statistics (e.g. total funding for female-founded startups, "
+        "deep tech or AI sectors, IPO counts) or request Dealroom datasets such as DR_FF_C_1 or DR_MC_C_5."
+    )
 
 # UI
 st.title("💬 Female Foundry Chatbot MVP")
