@@ -59,8 +59,15 @@
     "id": "headline_female_founders_2024",
     "title": "Headline statistics on European female founders (2024)",
     "question": "Give me overall statistics about European female founders from the Innovation Index.",
+    "altQuestions": [
+      "share some data about female founders",
+      "give me information about women founders in europe",
+      "what are the headline numbers for female founders",
+      "provide stats on female founders",
+      "tell me the top figures about female founders"
+    ],
     "answer": "According to the Female Innovation Index 2025 edition:\n• Female-founded startups in Europe raised €5.76B across 1,305 deals in 2024, covering 1,196 companies. That equals roughly 12% of total European VC deployed that year.\n• Deep tech accounts for about one-third of the capital raised by female founders—roughly 33% of 2024 VC into women-led startups.\n• When mixed-gender founding teams are counted, women-linked startups capture ~12% of all funding; the familiar “2%” statistic refers only to all-female founding teams.\n• The Index aggregates 1,200+ survey responses and tracks 145,000+ companies, offering a comprehensive view across stages, sectors, and geographies.",
-    "tags": ["female founders", "funding share", "2024", "headline stats"]
+    "tags": ["female founders", "funding share", "2024", "headline stats", "women founders"]
   }
 ]
 
