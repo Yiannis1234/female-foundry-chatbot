@@ -325,14 +325,20 @@ def build_prompt(message, entries):
 def generate_answer(message, entries, retries=2):
     """Generate answer with retry logic and fallback to FAQ matching."""
     def fallback_answer():
-        if not entries:
+        if entries:
+            best_entry = entries[0]["entry"]
             return (
-                "I don’t have an exact figure for that question, but the Female Innovation Index reports that "
-                "female-founded startups in Europe raised €5.76B across 1,305 deals in 2024, covering 1,196 companies, "
-                "and roughly one-third of that capital (about 33%) went to Deep Tech ventures. Let me know if you'd like details by sector or stage."
+                f"{best_entry['answer']}\n\n_Source: {best_entry['title']}_\n\n"
+                "Need more? Try asking about Deep Tech, AI, or the month-by-month VC data in the Dealroom sheet."
             )
-        best = entries[0]["entry"]
-        return f"{best['answer']}\n\n_Source: {best['title']}_"
+        else:
+            return (
+                "Here’s a quick snapshot from the Female Innovation Index 2025:\n"
+                "• Female-founded startups raised €5.76B across 1,305 deals in Europe during 2024 (1,196 companies, ~12% of total VC).\n"
+                "• Deep Tech represents about 33% of that capital; AI subsectors like data/AI show significant traction.\n"
+                "• Survey highlights: access to funding and slow adoption of technology remain the top innovation inhibitors.\n\n"
+                "Let me know which area you’d like to dig into next—funding by country, sector breakdowns, or growth-stage trends."
+            )
 
     if not openai_client:
         return fallback_answer()
