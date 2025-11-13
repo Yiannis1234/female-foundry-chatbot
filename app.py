@@ -36,6 +36,14 @@ st.markdown(
             align-items: flex-end;
             min-height: 100vh;
         }
+        [data-testid="stVerticalBlock"] {
+            gap: 0 !important;
+        }
+        [data-testid="element-container"] {
+            padding: 0 !important;
+            margin: 0 !important;
+            background: transparent !important;
+        }
         [data-testid="stAppViewContainer"] > .main > div {
             width: 100%;
         }
@@ -47,15 +55,17 @@ st.markdown(
             margin-bottom: 24px !important;
             margin-top: auto !important;
             padding: 0 !important;
+            background: transparent !important;
         }
         div[data-testid="stVerticalBlock"], div[data-testid="element-container"] { width: 100%; }
         .chat-wrapper {
             width: 100%;
-            border-radius: 22px;
-            border: 1px solid #dde1f7;
-            background: #ffffff;
-            box-shadow: 0 24px 48px rgba(45, 37, 89, 0.14);
-            padding: 1.35rem 1.2rem 1.25rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(160deg, rgba(255,255,255,0.92) 0%, rgba(247,243,255,0.98) 35%, rgba(245,244,255,1) 70%, rgba(255,243,252,0.98) 100%);
+            box-shadow: 0 30px 54px rgba(54, 43, 120, 0.18);
+            padding: 1.4rem 1.3rem 1.15rem;
+            backdrop-filter: blur(12px);
         }
         .chat-wrapper.history {
             border-radius: 22px 22px 0 0;
@@ -70,8 +80,8 @@ st.markdown(
         .chat-wrapper.buttons {
             border-radius: 0 0 22px 22px;
             border-top: 1px solid rgba(221, 225, 247, 0.85);
-            box-shadow: 0 18px 36px rgba(45, 37, 89, 0.12);
-            background: rgba(255, 255, 255, 0.96);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+            background: linear-gradient(170deg, rgba(248,246,255,0.98) 0%, rgba(255,246,253,0.94) 100%);
             backdrop-filter: blur(8px);
             padding-bottom: 1.05rem;
             display: flex;
@@ -110,9 +120,17 @@ st.markdown(
             color: #302862;
         }
         .bot-bubble {
-            background: #fff;
-            border: 1px solid #e4e6f4;
+            background: linear-gradient(135deg, #ffffff 0%, #f1efff 100%);
+            border: 1px solid rgba(122, 77, 255, 0.18);
             color: #262b3f;
+        }
+        .chat-controls-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6b54e3;
+            margin-bottom: 0.45rem;
         }
         .chat-wrapper.buttons div[data-testid="stButton"] {
             width: 100%;
@@ -124,18 +142,19 @@ st.markdown(
         .chat-wrapper.buttons div[data-testid="stButton"] > button {
             width: 100%;
             text-align: left;
-            padding: 0.75rem 0.9rem;
-            border-radius: 12px;
-            border: 1px solid #d8dafa;
-            background: #f5f4ff;
-            color: #2c1f6c;
+            padding: 0.78rem 0.95rem;
+            border-radius: 13px;
+            border: none;
+            background: linear-gradient(135deg, #7b5cff 0%, #ff69c8 100%);
+            color: #ffffff;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
+            font-size: 0.96rem;
+            box-shadow: 0 12px 20px rgba(123, 92, 255, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         div[data-testid="stButton"] > button:hover {
-            border-color: #b4b7f3;
-            background: #ebe9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 24px rgba(123, 92, 255, 0.32);
         }
         .chat-wrapper.buttons div[data-testid="textInputRoot"] {
             margin-bottom: 0.55rem;
@@ -143,8 +162,8 @@ st.markdown(
         .chat-wrapper.buttons div[data-testid="textInputRoot"] input {
             border-radius: 12px;
             border: 1px solid rgba(120, 96, 255, 0.45);
-            background: linear-gradient(135deg, #f6f3ff 0%, #fef7ff 100%);
-            padding: 0.7rem 0.85rem;
+            background: linear-gradient(135deg, #f6f3ff 0%, rgba(255, 246, 253, 0.95) 100%);
+            padding: 0.72rem 0.9rem;
             font-size: 0.95rem;
             color: #2c1f6c;
             transition: border 0.2s ease, box-shadow 0.2s ease;
@@ -265,6 +284,18 @@ if st.session_state["chat_open"]:
 
     with button_container:
         st.markdown('<div class="chat-wrapper buttons">', unsafe_allow_html=True)
+
+        titles = {
+            "intro": "Ready to begin?",
+            "ask_name": "Tell me a bit about you",
+            "menu_primary": "Pick a path to explore",
+            "menu_secondary": "Drill deeper",
+            "show_info": "Here’s what I found",
+        }
+        st.markdown(
+            f'<div class="chat-controls-title">{titles.get(st.session_state["stage"], "Continue")}</div>',
+            unsafe_allow_html=True,
+        )
 
         if st.session_state["stage"] == "intro":
             if st.button("I’m ready"):
