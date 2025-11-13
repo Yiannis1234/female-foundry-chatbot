@@ -17,16 +17,124 @@ st.set_page_config(page_title="Female Foundry Chatbot", page_icon="🤖", layout
 st.markdown(
     """
     <style>
-        body {font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9ff; color: #111826;}
-        .chat-wrapper {max-width: 420px; margin: 0 auto; padding: 2.5rem 1.5rem;}
-        .logo {font-weight: 800; font-size: 1.4rem; letter-spacing: 0.12em;}
-        .chat-bubble {padding: 0.8rem 1rem; border-radius: 1.1rem; margin-bottom: 0.6rem; max-width: 100%;}
-        .user-bubble {background: #ecebff; margin-left: auto;}
-        .bot-bubble {background: #fff; border: 1px solid #e4e6f2;}
-        .option-button {display: block; width: 100%; text-align: left; padding: 0.8rem; border-radius: 0.8rem;
-            background: linear-gradient(135deg, #7b4dff, #ff60b2); color: #fff; font-weight: 600; border: none;}
-        .option-button:hover {opacity: 0.9;}
-        .footer {font-size: 0.75rem; color: #7d8090; text-align: center; margin-top: 1rem;}
+        :root, body, [data-testid="stAppViewContainer"] {
+            background: linear-gradient(180deg, #f5f4ff 0%, #eff4ff 100%) !important;
+            color: #111826;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .stApp > header, .stApp > footer { display: none; }
+        section[data-testid="stSidebar"] { display: none !important; }
+        .appview-container .main {
+            background: transparent;
+            padding: 0;
+        }
+        .appview-container .main .block-container {
+            max-width: 360px;
+            width: 360px;
+            margin: 0 32px 32px auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: calc(100vh - 64px);
+        }
+        div[data-testid="stVerticalBlock"], div[data-testid="element-container"] {
+            width: 100%;
+        }
+        .chat-wrapper {
+            width: 100%;
+            border-radius: 22px;
+            border: 1px solid #dde1f7;
+            background: #ffffff;
+            box-shadow: 0 24px 48px rgba(45, 37, 89, 0.14);
+            padding: 1.35rem 1.2rem 1.25rem;
+        }
+        .chat-wrapper.history {
+            border-radius: 22px 22px 0 0;
+            margin-bottom: -0.15rem;
+        }
+        .chat-wrapper.buttons {
+            border-radius: 0 0 22px 22px;
+            border-top: 1px solid rgba(221, 225, 247, 0.85);
+            box-shadow: 0 18px 36px rgba(45, 37, 89, 0.12);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+        }
+        .logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 0.12em;
+            color: #332b64;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .logo::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fd6dc2 0%, #7a4dff 100%);
+            display: inline-block;
+        }
+        .chat-bubble {
+            padding: 0.75rem 0.95rem;
+            border-radius: 1.05rem;
+            margin-bottom: 0.6rem;
+            max-width: 100%;
+            font-size: 0.95rem;
+            line-height: 1.45rem;
+        }
+        .user-bubble {
+            background: linear-gradient(135deg, #ede9ff 0%, #fdf1ff 100%);
+            margin-left: auto;
+            color: #302862;
+        }
+        .bot-bubble {
+            background: #fff;
+            border: 1px solid #e4e6f4;
+            color: #262b3f;
+        }
+        div[data-testid="stButton"] {
+            width: 100%;
+        }
+        div[data-testid="stButton"] > button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid #d8dafa;
+            background: #f5f4ff;
+            color: #2c1f6c;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        div[data-testid="stButton"] > button:hover {
+            border-color: #b4b7f3;
+            background: #ebe9ff;
+        }
+        div[data-testid="textInputRoot"] input {
+            border-radius: 12px;
+            border: 1px solid #d8dafa;
+            background: #ffffff;
+            padding: 0.65rem 0.75rem;
+            font-size: 0.95rem;
+        }
+        div[data-testid="textInputRoot"] label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2c1f6c;
+        }
+        .footer {
+            font-size: 0.72rem;
+            color: #7d8090;
+            text-align: right;
+            margin-right: 2.5rem;
+            margin-top: -0.4rem;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -40,7 +148,7 @@ chat_container = st.container()
 button_container = st.container()
 
 with chat_container:
-    st.markdown('<div class="chat-wrapper">', unsafe_allow_html=True)
+    st.markdown('<div class="chat-wrapper history">', unsafe_allow_html=True)
     st.markdown('<div class="logo">FEMALE FOUNDRY</div>', unsafe_allow_html=True)
 
     if st.session_state["chat_log"]:
@@ -54,7 +162,7 @@ with chat_container:
         )
 
 with button_container:
-    st.markdown('<div class="chat-wrapper">', unsafe_allow_html=True)
+    st.markdown('<div class="chat-wrapper buttons">', unsafe_allow_html=True)
 
     if st.session_state["stage"] == "intro":
         if st.button("I’m ready"):
