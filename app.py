@@ -163,8 +163,12 @@ st.markdown(
         .chat-launcher {
             position: fixed;
             right: 32px;
-            bottom: 32px;
+            bottom: 108px;
             z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
         }
         .chat-launcher div[data-testid="stButton"] {
             margin: 0 !important;
@@ -191,6 +195,17 @@ st.markdown(
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        @media (max-width: 640px) {
+            [data-testid="stAppViewContainer"] .block-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin-right: 16px !important;
+            }
+            .chat-launcher {
+                right: 18px;
+                bottom: 86px;
+            }
+        }
         .footer {
             font-size: 0.72rem;
             color: #7d8090;
@@ -205,6 +220,10 @@ st.markdown(
 
 if "chat_open" not in st.session_state:
     st.session_state["chat_open"] = False
+
+if "chat_seen" not in st.session_state:
+    st.session_state["chat_open"] = True
+    st.session_state["chat_seen"] = True
 
 if "stage" not in st.session_state:
     st.session_state["stage"] = "intro"
