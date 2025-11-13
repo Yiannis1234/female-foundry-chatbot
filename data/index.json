@@ -110,6 +110,45 @@
     ],
     "answer": "The 2025 Female Innovation Index tracks 1,196 female-founded startups that raised capital in Europe during 2024. These 1,196 companies closed 1,305 deals worth €5.76B—about 12% of total European VC. The dataset covers 145,000+ companies overall, so the female-founder count can be refined further by sector or country using the Dealroom export.",
     "tags": ["female founders", "company count", "2024", "statistics"]
+  },
+  {
+    "id": "ff_site_overview",
+    "title": "Female Foundry website overview",
+    "question": "What does the Female Foundry homepage highlight?",
+    "altQuestions": [
+      "what is on femalefoundry.co",
+      "what does the female foundry site showcase",
+      "tell me about the female foundry homepage",
+      "what initiatives are featured on the site"
+    ],
+    "answer": "The Female Foundry homepage positions the organisation as “nurturing AI visionaries of tomorrow,” showcasing its AI incubator in partnership with Google Cloud. The hero section features bold motion graphics with two key buttons: “Visit AI Visionaries” and “Join Female Foundry.” Beneath, the page introduces the ecosystem pillars—Community (7,000+ members), Female Innovation Index (1,215 founders and investors surveyed; 145,038 European companies analysed), Sunday Newsletter, AI Hustle sessions, and Campaigns—each with succinct descriptions and call-to-action links.",
+    "tags": ["website", "overview", "navigation", "AI Visionaries", "ecosystem"]
+  },
+  {
+    "id": "ff_site_navigation",
+    "title": "Key actions on femalefoundry.co",
+    "question": "How can I navigate the Female Foundry site to get involved?",
+    "altQuestions": [
+      "how do i join female foundry from the website",
+      "where do i sign up for the newsletter",
+      "how to navigate femalefoundry.co",
+      "what links are on the female foundry homepage"
+    ],
+    "answer": "From femalefoundry.co you can:\n• Join the community by clicking “Join the Community” in the Community section (highlighting the 7,000+ founders, investors, and operators in the network).\n• Explore the Female Innovation Index via the “Explore” button, leading to the 2025 edition of the dataset.\n• Read or subscribe to the Sunday Newsletter by selecting “Read,” keeping up with venture news and fundraising tips.\n• Reserve a slot in the monthly AI Hustle sessions through the “Sign Up” CTA, which offers one-hour clinics with Agata Nowicka for up to three founders.\n• Watch Campaigns that celebrate female founders using the “Watch” CTA. The footer also links to the Shop as well as partners, careers, and privacy policy pages.",
+    "tags": ["website", "navigation", "community", "newsletter", "AI Hustle", "campaigns"]
+  },
+  {
+    "id": "ff_site_contact",
+    "title": "Female Foundry contact and location details",
+    "question": "What contact information does the Female Foundry site provide?",
+    "altQuestions": [
+      "what is female foundry contact info",
+      "where is female foundry located",
+      "how do i email female foundry",
+      "female foundry address"
+    ],
+    "answer": "The footer lists the main contact hub as 11 Welbeck Street, W1G 9XZ, London. The general email inbox is HELLO@FEMALEFOUNDRY.CO. The footer also links to the Female Foundry Shop, About, Partners, Careers, and the privacy policy.",
+    "tags": ["website", "contact", "location", "email", "address"]
   }
 ]
 
