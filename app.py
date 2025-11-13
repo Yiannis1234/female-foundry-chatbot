@@ -32,7 +32,7 @@ st.markdown(
             background: transparent !important;
             padding: 0 !important;
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-start;
             align-items: flex-end;
             min-height: 100vh;
         }
@@ -50,8 +50,8 @@ st.markdown(
         [data-testid="stAppViewContainer"] .block-container {
             max-width: 360px !important;
             width: 360px !important;
-            margin-left: auto !important;
-            margin-right: 28px !important;
+            margin-left: 28px !important;
+            margin-right: auto !important;
             margin-bottom: 24px !important;
             margin-top: auto !important;
             padding: 0 !important;
@@ -176,7 +176,7 @@ st.markdown(
         }
         .chat-launcher {
             position: fixed;
-            right: 32px;
+            left: 32px;
             bottom: 108px;
             z-index: 999;
             display: flex;
@@ -213,10 +213,10 @@ st.markdown(
             [data-testid="stAppViewContainer"] .block-container {
                 max-width: 100% !important;
                 width: 100% !important;
-                margin-right: 16px !important;
+                margin-left: 16px !important;
             }
             .chat-launcher {
-                right: 18px;
+                left: 18px;
                 bottom: 86px;
             }
         }
