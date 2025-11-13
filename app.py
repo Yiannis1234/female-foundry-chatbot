@@ -17,30 +17,38 @@ st.set_page_config(page_title="Female Foundry Chatbot", page_icon="🤖", layout
 st.markdown(
     """
     <style>
-        :root, body, [data-testid="stAppViewContainer"] {
+        :root, body {
             background: linear-gradient(180deg, #f5f4ff 0%, #eff4ff 100%) !important;
             color: #111826;
             font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
         }
+        [data-testid="stAppViewContainer"] {
+            background: transparent !important;
+            padding: 0 !important;
+        }
         .stApp > header, .stApp > footer { display: none; }
         section[data-testid="stSidebar"] { display: none !important; }
-        .appview-container .main {
-            background: transparent;
-            padding: 0;
-        }
-        .appview-container .main .block-container {
-            max-width: 360px;
-            width: 360px;
-            margin: 0 32px 32px auto;
-            padding: 0;
+        [data-testid="stAppViewContainer"] > .main {
+            background: transparent !important;
+            padding: 0 !important;
             display: flex;
-            flex-direction: column;
             justify-content: flex-end;
-            min-height: calc(100vh - 64px);
+            align-items: flex-end;
+            min-height: 100vh;
         }
-        div[data-testid="stVerticalBlock"], div[data-testid="element-container"] {
+        [data-testid="stAppViewContainer"] > .main > div {
             width: 100%;
         }
+        [data-testid="stAppViewContainer"] .block-container {
+            max-width: 360px !important;
+            width: 360px !important;
+            margin-left: auto !important;
+            margin-right: 28px !important;
+            margin-bottom: 28px !important;
+            margin-top: auto !important;
+            padding: 0 !important;
+        }
+        div[data-testid="stVerticalBlock"], div[data-testid="element-container"] { width: 100%; }
         .chat-wrapper {
             width: 100%;
             border-radius: 22px;
@@ -51,7 +59,9 @@ st.markdown(
         }
         .chat-wrapper.history {
             border-radius: 22px 22px 0 0;
-            margin-bottom: -0.15rem;
+            margin-bottom: -0.25rem;
+            max-height: 320px;
+            overflow-y: auto;
         }
         .chat-wrapper.buttons {
             border-radius: 0 0 22px 22px;
@@ -59,6 +69,7 @@ st.markdown(
             box-shadow: 0 18px 36px rgba(45, 37, 89, 0.12);
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(8px);
+            padding-bottom: 1.2rem;
         }
         .logo {
             font-weight: 800;
@@ -133,7 +144,7 @@ st.markdown(
             color: #7d8090;
             text-align: right;
             margin-right: 2.5rem;
-            margin-top: -0.4rem;
+            margin-top: 0.8rem;
         }
     </style>
     """,
@@ -160,6 +171,7 @@ with chat_container:
             '<div class="chat-bubble bot-bubble">Hi! I’m the Female Foundry assistant. Shall we get started?</div>',
             unsafe_allow_html=True,
         )
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with button_container:
     st.markdown('<div class="chat-wrapper buttons">', unsafe_allow_html=True)
