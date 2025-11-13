@@ -60,81 +60,79 @@ st.markdown(
         div[data-testid="stVerticalBlock"], div[data-testid="element-container"] { width: 100%; }
         .chat-wrapper {
             width: 100%;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: linear-gradient(160deg, rgba(255,255,255,0.92) 0%, rgba(247,243,255,0.98) 35%, rgba(245,244,255,1) 70%, rgba(255,243,252,0.98) 100%);
-            box-shadow: 0 30px 54px rgba(54, 43, 120, 0.18);
-            padding: 1.4rem 1.3rem 1.15rem;
-            backdrop-filter: blur(12px);
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e6e8fb;
+            box-shadow: 0 18px 40px rgba(40, 34, 104, 0.16);
         }
         .chat-wrapper.history {
-            border-radius: 22px 22px 0 0;
-            margin-bottom: -0.25rem;
+            border-radius: 20px 20px 0 0;
+            border-bottom: 1px solid #eef0ff;
+            margin-bottom: 0;
             max-height: 320px;
             overflow-y: auto;
-            padding-bottom: 0.6rem;
+            padding: 1.05rem 1.15rem 0.7rem;
             display: flex;
             flex-direction: column;
-            gap: 0.45rem;
+            gap: 0.5rem;
         }
         .chat-wrapper.buttons {
-            border-radius: 0 0 22px 22px;
-            border-top: 1px solid rgba(221, 225, 247, 0.85);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
-            background: linear-gradient(170deg, rgba(248,246,255,0.98) 0%, rgba(255,246,253,0.94) 100%);
-            backdrop-filter: blur(8px);
-            padding-bottom: 1.05rem;
+            border-radius: 0 0 20px 20px;
+            border-top: none;
+            margin-top: -1px;
+            padding: 0.85rem 1.15rem 1.05rem;
+            background: #ffffff;
             display: flex;
             flex-direction: column;
         }
         .logo {
-            font-weight: 800;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1.02rem;
             letter-spacing: 0.12em;
-            color: #332b64;
+            color: #2b1f63;
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.65rem;
             display: flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.4rem;
         }
         .logo::before {
             content: "";
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #fd6dc2 0%, #7a4dff 100%);
-            display: inline-block;
+            background: #8d6bff;
         }
         .chat-bubble {
             padding: 0.75rem 0.95rem;
-            border-radius: 1.05rem;
-            margin-bottom: 0.6rem;
+            border-radius: 12px;
             max-width: 100%;
             font-size: 0.95rem;
-            line-height: 1.45rem;
+            line-height: 1.5rem;
+            background: #f7f8ff;
+            color: #2c314b;
+            border: 1px solid rgba(126, 120, 220, 0.12);
         }
         .user-bubble {
-            background: linear-gradient(135deg, #ede9ff 0%, #fdf1ff 100%);
+            background: #ece8ff;
+            border-color: rgba(126, 120, 220, 0.3);
             margin-left: auto;
-            color: #302862;
+            color: #2b2262;
         }
         .bot-bubble {
-            background: linear-gradient(135deg, #ffffff 0%, #f1efff 100%);
-            border: 1px solid rgba(122, 77, 255, 0.18);
-            color: #262b3f;
+            background: #f7f8ff;
         }
         .chat-controls-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #6b54e3;
-            margin-bottom: 0.45rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            color: #2b2262;
+            margin-bottom: 0.55rem;
         }
         .chat-wrapper.buttons div[data-testid="stButton"] {
             width: 100%;
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.4rem;
         }
         .chat-wrapper.buttons div[data-testid="stButton"]:last-child {
             margin-bottom: 0;
@@ -142,42 +140,39 @@ st.markdown(
         .chat-wrapper.buttons div[data-testid="stButton"] > button {
             width: 100%;
             text-align: left;
-            padding: 0.78rem 0.95rem;
-            border-radius: 13px;
-            border: none;
-            background: linear-gradient(135deg, #7b5cff 0%, #ff69c8 100%);
-            color: #ffffff;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid #d6d9f9;
+            background: #f4f4ff;
+            color: #2b2262;
             font-weight: 600;
-            font-size: 0.96rem;
-            box-shadow: 0 12px 20px rgba(123, 92, 255, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 0.95rem;
+            transition: all 0.15s ease;
         }
         div[data-testid="stButton"] > button:hover {
+            border-color: #b8bcf3;
+            background: #ebe9ff;
             transform: translateY(-1px);
-            box-shadow: 0 16px 24px rgba(123, 92, 255, 0.32);
         }
         .chat-wrapper.buttons div[data-testid="textInputRoot"] {
             margin-bottom: 0.55rem;
         }
         .chat-wrapper.buttons div[data-testid="textInputRoot"] input {
             border-radius: 12px;
-            border: 1px solid rgba(120, 96, 255, 0.45);
-            background: linear-gradient(135deg, #f6f3ff 0%, rgba(255, 246, 253, 0.95) 100%);
-            padding: 0.72rem 0.9rem;
+            border: 1px solid #d9dcf9;
+            background: #ffffff;
+            padding: 0.68rem 0.88rem;
             font-size: 0.95rem;
-            color: #2c1f6c;
+            color: #2b2262;
             transition: border 0.2s ease, box-shadow 0.2s ease;
         }
         .chat-wrapper.buttons div[data-testid="textInputRoot"] label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #2c1f6c;
             display: none;
         }
         .chat-wrapper.buttons div[data-testid="textInputRoot"] input:focus {
             outline: none;
-            border-color: rgba(120, 96, 255, 0.9);
-            box-shadow: 0 0 0 3px rgba(122, 77, 255, 0.18);
+            border-color: #acb0f3;
+            box-shadow: 0 0 0 3px rgba(172, 176, 243, 0.28);
         }
         .chat-launcher {
             position: fixed;
@@ -193,14 +188,14 @@ st.markdown(
             margin: 0 !important;
         }
         .chat-launcher div[data-testid="stButton"] > button {
-            width: 64px;
-            height: 64px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(135deg, #7a4dff, #fd6dc2);
+            background: linear-gradient(135deg, #7762ff, #a879ff);
             color: #fff;
-            font-size: 1.6rem;
-            box-shadow: 0 18px 36px rgba(45, 37, 89, 0.22);
+            font-size: 1.5rem;
+            box-shadow: 0 18px 32px rgba(45, 37, 89, 0.23);
         }
         .chat-launcher div[data-testid="stButton"] > button:hover {
             filter: brightness(1.08);
@@ -239,10 +234,6 @@ st.markdown(
 
 if "chat_open" not in st.session_state:
     st.session_state["chat_open"] = False
-
-if "chat_seen" not in st.session_state:
-    st.session_state["chat_open"] = True
-    st.session_state["chat_seen"] = True
 
 if "stage" not in st.session_state:
     st.session_state["stage"] = "intro"
@@ -287,9 +278,9 @@ if st.session_state["chat_open"]:
 
         titles = {
             "intro": "Ready to begin?",
-            "ask_name": "Tell me a bit about you",
-            "menu_primary": "Pick a path to explore",
-            "menu_secondary": "Drill deeper",
+            "ask_name": "Tell me your name",
+            "menu_primary": "Choose what to explore",
+            "menu_secondary": "Fine-tune your choice",
             "show_info": "Here’s what I found",
         }
         st.markdown(
