@@ -465,6 +465,26 @@ select {
   text-decoration: underline;
 }
 
+.chat-footer-links {
+  padding: 0.85rem 1.15rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: #676a8c;
+}
+
+.chat-footer-links a {
+  color: #7c63ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.chat-footer-links a:hover {
+  text-decoration: underline;
+}
+
 .chat-toggle {
   position: fixed;
   right: 32px;
