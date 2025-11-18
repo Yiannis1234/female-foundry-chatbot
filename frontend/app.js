@@ -45,14 +45,24 @@ function ensureMessageVisible(node) {
 
 function scrollToBottom() {
   if (!messagesEl) return;
-  // Use multiple attempts to ensure we scroll to the very bottom
-  setTimeout(() => {
+  // Force scroll to bottom with multiple attempts to ensure it works
+  const scroll = () => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
-    // Double-check after a brief delay to ensure we're at the bottom
+  };
+  
+  // Immediate scroll
+  scroll();
+  
+  // Scroll after DOM update
+  requestAnimationFrame(() => {
+    scroll();
+    // Scroll again after a brief delay to catch any late rendering
     setTimeout(() => {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      scroll();
+      // Final check
+      setTimeout(scroll, 100);
     }, 50);
-  }, 50);
+  });
 }
 
 function createMessageShell(role) {
@@ -174,9 +184,16 @@ async function sendMessage(text) {
     
     // Hide typing indicator (with minimum display time), then show messages
     hideTypingIndicator(() => {
-      appendMessages(data.messages || []);
-      renderOptions(data.options || []);
-      updatePlaceholder(data.stage);
+      // Small delay to ensure typing indicator is fully removed
+      setTimeout(() => {
+        appendMessages(data.messages || []);
+        renderOptions(data.options || []);
+        updatePlaceholder(data.stage);
+        // Force scroll after messages are added
+        setTimeout(() => {
+          scrollToBottom();
+        }, 200);
+      }, 50);
     });
   } catch (err) {
     console.error(err);
@@ -200,11 +217,17 @@ function addMessage(role, content) {
   }
   messagesEl.appendChild(wrapper);
   
-  // For both user and bot messages, scroll to bottom so they're always visible
-  // This ensures messages appear at the bottom of visible area, not requiring scroll up
-  setTimeout(() => {
-    scrollToBottom();
-  }, 100);
+  // Wait for message to be fully rendered, then scroll to bottom
+  // Use multiple animation frames to ensure DOM is ready
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      scrollToBottom();
+      // Additional scroll after content is fully rendered
+      setTimeout(() => {
+        scrollToBottom();
+      }, 150);
+    });
+  });
 }
 
 function renderOptions(options) {
