@@ -307,7 +307,7 @@ select {
   border-radius: 30px;
   border: 1px solid rgba(123, 99, 255, 0.12);
   box-shadow: 0 25px 60px rgba(15, 12, 40, 0.25);
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(12px);
