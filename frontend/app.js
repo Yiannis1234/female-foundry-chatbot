@@ -11,6 +11,52 @@ const closeBtn = document.getElementById("chatClose");
 
 let sessionId = null;
 let isSending = false;
+let typingMessageEl = null;
+
+function scrollMessageIntoView(node) {
+  if (!node) return;
+  requestAnimationFrame(() => {
+    const offset = Math.max(node.offsetTop - 16, 0);
+    if (typeof messagesEl.scrollTo === "function") {
+      messagesEl.scrollTo({ top: offset, behavior: "smooth" });
+    } else {
+      messagesEl.scrollTop = offset;
+    }
+  });
+}
+
+function createMessageShell(role) {
+  const wrapper = document.createElement("div");
+  wrapper.className = `chat-message ${role}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = `avatar ${role}`;
+  avatar.textContent = role === "bot" ? "FF" : "You";
+  wrapper.appendChild(avatar);
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  wrapper.appendChild(bubble);
+
+  return { wrapper, bubble };
+}
+
+function showTypingIndicator() {
+  if (typingMessageEl) return;
+  const { wrapper, bubble } = createMessageShell("bot");
+  wrapper.classList.add("typing");
+  bubble.innerHTML =
+    '<span class="typing-dots"><span></span><span></span><span></span></span>';
+  typingMessageEl = wrapper;
+  messagesEl.appendChild(wrapper);
+  scrollMessageIntoView(wrapper);
+}
+
+function hideTypingIndicator() {
+  if (!typingMessageEl) return;
+  typingMessageEl.remove();
+  typingMessageEl = null;
+}
 
 function updatePlaceholder(stage) {
   if (stage === "ask_name") {
@@ -26,6 +72,7 @@ async function createSession() {
   const data = await res.json();
   sessionId = data.session_id;
   clearMessages();
+  hideTypingIndicator();
   appendMessages(data.messages || []);
   renderOptions(data.options || []);
   updatePlaceholder(data.stage);
@@ -41,6 +88,7 @@ async function resetSession() {
   if (!res.ok) throw new Error("Failed to reset session");
   const data = await res.json();
   clearMessages();
+  hideTypingIndicator();
   appendMessages(data.messages || []);
   renderOptions(data.options || []);
   updatePlaceholder(data.stage);
@@ -58,6 +106,7 @@ async function sendMessage(text) {
   inputEl.focus();
 
   isSending = true;
+  showTypingIndicator();
   try {
     const res = await fetch(`${API_BASE}/chat`, {
       method: "POST",
@@ -66,11 +115,13 @@ async function sendMessage(text) {
     });
     if (!res.ok) throw new Error("Chat request failed");
     const data = await res.json();
+    hideTypingIndicator();
     appendMessages(data.messages || []);
     renderOptions(data.options || []);
     updatePlaceholder(data.stage);
   } catch (err) {
     console.error(err);
+    hideTypingIndicator();
     addMessage("bot", "Something went wrong. Try again in a moment.");
   } finally {
     isSending = false;
@@ -82,19 +133,14 @@ function appendMessages(messages) {
 }
 
 function addMessage(role, content) {
-  const wrapper = document.createElement("div");
-  wrapper.className = `chat-message ${role}`;
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
+  const { wrapper, bubble } = createMessageShell(role);
   if (role === "bot") {
     bubble.innerHTML = content;
   } else {
     bubble.textContent = content;
   }
-  wrapper.appendChild(bubble);
   messagesEl.appendChild(wrapper);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollMessageIntoView(wrapper);
 }
 
 function renderOptions(options) {
@@ -113,6 +159,7 @@ function renderOptions(options) {
 function clearMessages() {
   messagesEl.innerHTML = "";
   optionsEl.innerHTML = "";
+  typingMessageEl = null;
 }
 
 function openChat() {
