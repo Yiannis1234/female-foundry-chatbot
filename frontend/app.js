@@ -216,22 +216,24 @@ function addMessage(role, content) {
   }
   messagesEl.appendChild(wrapper);
   
-  // For bot messages, scroll to show the FF avatar at the top
+  // For bot messages, scroll so the START of the message (FF avatar) is at the TOP
   // For user messages, scroll to bottom
   if (role === "bot") {
-    // Wait for message to render, then scroll to show FF avatar at top
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const messageTop = wrapper.offsetTop;
-        const containerPadding = 20;
-        // Scroll so the message (with FF avatar) appears at the top
-        messagesEl.scrollTop = messageTop - containerPadding;
-        // Double-check after a brief delay
+    // Wait for message to fully render, then scroll to show START at TOP
+    setTimeout(() => {
+      const messageTop = wrapper.offsetTop;
+      const containerPadding = 16; // Match the padding of chat-scroll
+      // Scroll so the message START (FF avatar) is at the very top of visible area
+      messagesEl.scrollTop = messageTop - containerPadding;
+      
+      // Force multiple scroll attempts to ensure it works
+      setTimeout(() => {
+        messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
         setTimeout(() => {
           messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
-        }, 100);
-      });
-    });
+        }, 50);
+      }, 50);
+    }, 150);
   } else {
     scrollToBottom();
   }
