@@ -44,9 +44,24 @@ function ensureMessageVisible(node) {
 }
 
 function scrollToBottom() {
-  // NO SCROLLING - container grows to fit content, no scroll needed
-  // This function is kept for compatibility but does nothing
-  return;
+  if (!messagesEl) return;
+  // Auto-scroll to bottom smoothly
+  const scroll = () => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  };
+  
+  // Immediate scroll
+  scroll();
+  
+  // Scroll after DOM updates
+  requestAnimationFrame(() => {
+    scroll();
+    setTimeout(() => {
+      scroll();
+      // Final check after content is fully rendered
+      setTimeout(scroll, 100);
+    }, 50);
+  });
 }
 
 function createMessageShell(role) {
@@ -80,10 +95,11 @@ function showTypingIndicator() {
   messagesEl.appendChild(wrapper);
   typingStartTime = Date.now();
   
-  // Force visibility - no scrolling needed
+  // Force visibility and auto-scroll
   requestAnimationFrame(() => {
     wrapper.style.display = "flex";
     wrapper.style.opacity = "1";
+    scrollToBottom();
   });
 }
 
@@ -172,7 +188,10 @@ async function sendMessage(text) {
         appendMessages(data.messages || []);
         renderOptions(data.options || []);
         updatePlaceholder(data.stage);
-        // NO SCROLLING - container grows automatically
+        // Auto-scroll after messages are added
+        setTimeout(() => {
+          scrollToBottom();
+        }, 150);
       }, 50);
     });
   } catch (err) {
@@ -196,7 +215,8 @@ function addMessage(role, content) {
     bubble.textContent = content;
   }
   messagesEl.appendChild(wrapper);
-  // NO SCROLLING - container grows to fit all messages automatically
+  // Auto-scroll to bottom so new messages are always visible
+  scrollToBottom();
 }
 
 function renderOptions(options) {

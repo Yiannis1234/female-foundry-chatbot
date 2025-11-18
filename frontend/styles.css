@@ -302,7 +302,7 @@ select {
 
 .chat-card {
   width: 420px;
-  max-height: 90vh;
+  max-height: 680px;
   background: linear-gradient(180deg, #fef9ff 0%, #ffffff 120%);
   border-radius: 30px;
   border: 1px solid rgba(123, 99, 255, 0.12);
@@ -405,15 +405,16 @@ select {
 }
 
 .chat-scroll {
-  /* NO SCROLLING - container grows to fit all content */
-  overflow: visible;
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 1.25rem 1.6rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   background: transparent;
-  /* Let it grow naturally */
-  flex: 0 1 auto;
+  scroll-behavior: smooth;
+  flex: 1 1 auto;
   min-height: 0;
 }
 
