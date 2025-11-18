@@ -12,16 +12,35 @@ const closeBtn = document.getElementById("chatClose");
 let sessionId = null;
 let isSending = false;
 let typingMessageEl = null;
+let typingStartTime = null;
+const MIN_TYPING_DISPLAY_TIME = 1000; // Minimum 1 second to see typing indicator
 
 function ensureMessageVisible(node) {
   if (!node || !messagesEl) return;
   // Wait for DOM to fully render, then scroll to show message at top
   setTimeout(() => {
+    // Get the message position relative to the scroll container
+    const messageRect = node.getBoundingClientRect();
+    const containerRect = messagesEl.getBoundingClientRect();
     const messageTop = node.offsetTop;
-    const containerPadding = 16;
-    // Scroll so the message top is visible at the top of the container
-    messagesEl.scrollTop = messageTop - containerPadding;
-  }, 50);
+    const containerPadding = 20;
+    
+    // Calculate scroll position to show message at top of visible area
+    const targetScroll = messageTop - containerPadding;
+    
+    // Scroll to show the message
+    messagesEl.scrollTop = targetScroll;
+    
+    // Double-check after a brief delay to ensure it's visible
+    setTimeout(() => {
+      const currentMessageTop = node.getBoundingClientRect().top;
+      const currentContainerTop = messagesEl.getBoundingClientRect().top;
+      // If message is not visible at top, scroll again
+      if (currentMessageTop > currentContainerTop + 30) {
+        messagesEl.scrollTop = node.offsetTop - containerPadding;
+      }
+    }, 100);
+  }, 100);
 }
 
 function scrollToBottom() {
@@ -60,6 +79,7 @@ function showTypingIndicator() {
     '<span class="typing-dots"><span></span><span></span><span></span></span>';
   typingMessageEl = wrapper;
   messagesEl.appendChild(wrapper);
+  typingStartTime = Date.now();
   
   // Force visibility and scroll to show it
   requestAnimationFrame(() => {
@@ -69,10 +89,24 @@ function showTypingIndicator() {
   });
 }
 
-function hideTypingIndicator() {
-  if (!typingMessageEl) return;
-  typingMessageEl.remove();
-  typingMessageEl = null;
+function hideTypingIndicator(callback) {
+  if (!typingMessageEl) {
+    if (callback) callback();
+    return;
+  }
+  
+  // Ensure typing indicator is visible for minimum time
+  const elapsed = typingStartTime ? Date.now() - typingStartTime : 0;
+  const remainingTime = Math.max(0, MIN_TYPING_DISPLAY_TIME - elapsed);
+  
+  setTimeout(() => {
+    if (typingMessageEl) {
+      typingMessageEl.remove();
+      typingMessageEl = null;
+      typingStartTime = null;
+    }
+    if (callback) callback();
+  }, remainingTime);
 }
 
 function updatePlaceholder(stage) {
@@ -132,13 +166,13 @@ async function sendMessage(text) {
     });
     if (!res.ok) throw new Error("Chat request failed");
     const data = await res.json();
-    hideTypingIndicator();
-    // Small delay to ensure typing indicator is removed and DOM is ready
-    setTimeout(() => {
+    
+    // Hide typing indicator (with minimum display time), then show messages
+    hideTypingIndicator(() => {
       appendMessages(data.messages || []);
       renderOptions(data.options || []);
       updatePlaceholder(data.stage);
-    }, 150);
+    });
   } catch (err) {
     console.error(err);
     hideTypingIndicator();
@@ -161,18 +195,16 @@ function addMessage(role, content) {
   }
   messagesEl.appendChild(wrapper);
   
-  // Wait for message to render, then ensure it's visible
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      if (role === "bot") {
-        // For bot messages, scroll so the top of the message is visible
-        ensureMessageVisible(wrapper);
-      } else {
-        // For user messages, scroll to bottom
-        scrollToBottom();
-      }
-    });
-  });
+  // Wait for message to fully render, then ensure it's visible
+  if (role === "bot") {
+    // For bot messages, scroll so the top of the message is visible at top of container
+    setTimeout(() => {
+      ensureMessageVisible(wrapper);
+    }, 200);
+  } else {
+    // For user messages, scroll to bottom
+    scrollToBottom();
+  }
 }
 
 function renderOptions(options) {
