@@ -13,25 +13,22 @@ let sessionId = null;
 let isSending = false;
 let typingMessageEl = null;
 
-function scrollToShowMessage(node) {
+function ensureMessageVisible(node) {
   if (!node || !messagesEl) return;
-  // Wait for DOM to update, then scroll to show the message at the top
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      // Get the position of the message relative to the scroll container
-      const messageTop = node.offsetTop;
-      const containerPadding = 20; // Padding from top
-      // Scroll so the message appears at the top of visible area
-      messagesEl.scrollTop = messageTop - containerPadding;
-    });
-  });
+  // Wait for DOM to fully render, then scroll to show message at top
+  setTimeout(() => {
+    const messageTop = node.offsetTop;
+    const containerPadding = 16;
+    // Scroll so the message top is visible at the top of the container
+    messagesEl.scrollTop = messageTop - containerPadding;
+  }, 50);
 }
 
 function scrollToBottom() {
   if (!messagesEl) return;
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
-  });
+  }, 50);
 }
 
 function createMessageShell(role) {
@@ -51,19 +48,25 @@ function createMessageShell(role) {
 }
 
 function showTypingIndicator() {
+  // Remove any existing typing indicator first
   if (typingMessageEl) {
-    // Make sure it's visible
-    typingMessageEl.style.display = "flex";
-    return;
+    typingMessageEl.remove();
+    typingMessageEl = null;
   }
+  
   const { wrapper, bubble } = createMessageShell("bot");
   wrapper.classList.add("typing");
   bubble.innerHTML =
     '<span class="typing-dots"><span></span><span></span><span></span></span>';
   typingMessageEl = wrapper;
   messagesEl.appendChild(wrapper);
-  // Scroll to show typing indicator
-  scrollToBottom();
+  
+  // Force visibility and scroll to show it
+  requestAnimationFrame(() => {
+    wrapper.style.display = "flex";
+    wrapper.style.opacity = "1";
+    scrollToBottom();
+  });
 }
 
 function hideTypingIndicator() {
@@ -130,12 +133,12 @@ async function sendMessage(text) {
     if (!res.ok) throw new Error("Chat request failed");
     const data = await res.json();
     hideTypingIndicator();
-    // Small delay to ensure typing indicator is removed before adding messages
+    // Small delay to ensure typing indicator is removed and DOM is ready
     setTimeout(() => {
       appendMessages(data.messages || []);
       renderOptions(data.options || []);
       updatePlaceholder(data.stage);
-    }, 100);
+    }, 150);
   } catch (err) {
     console.error(err);
     hideTypingIndicator();
@@ -157,13 +160,19 @@ function addMessage(role, content) {
     bubble.textContent = content;
   }
   messagesEl.appendChild(wrapper);
-  // For bot messages, scroll to show the top of the message
-  // For user messages, just scroll to bottom
-  if (role === "bot") {
-    scrollToShowMessage(wrapper);
-  } else {
-    scrollToBottom();
-  }
+  
+  // Wait for message to render, then ensure it's visible
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (role === "bot") {
+        // For bot messages, scroll so the top of the message is visible
+        ensureMessageVisible(wrapper);
+      } else {
+        // For user messages, scroll to bottom
+        scrollToBottom();
+      }
+    });
+  });
 }
 
 function renderOptions(options) {

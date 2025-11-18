@@ -414,6 +414,8 @@ select {
   gap: 1rem;
   background: transparent;
   scroll-behavior: smooth;
+  /* Ensure smooth scrolling and proper rendering */
+  -webkit-overflow-scrolling: touch;
 }
 
 .chat-scroll::-webkit-scrollbar {
@@ -475,14 +477,17 @@ select {
   opacity: 1 !important;
   transform: none !important;
   animation: none !important;
+  display: flex !important;
+  visibility: visible !important;
 }
 
 .chat-message.typing .bubble {
   background: #f2f0ff;
-  border: 1px solid rgba(123, 99, 255, 0.25);
-  min-height: 40px;
-  display: flex;
+  border: 1px solid rgba(123, 99, 255, 0.35);
+  min-height: 44px;
+  display: flex !important;
   align-items: center;
+  padding: 0.95rem 1.2rem;
 }
 
 .bubble {
@@ -495,19 +500,21 @@ select {
 }
 
 .typing-dots {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   gap: 8px;
   padding: 4px 0;
+  visibility: visible !important;
 }
 
 .typing-dots span {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #7c63ff;
   animation: typing 1.4s infinite ease-in-out;
-  display: block;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .typing-dots span:nth-child(1) { animation-delay: 0s; }
@@ -516,12 +523,12 @@ select {
 
 @keyframes typing {
   0%, 60%, 100% { 
-    opacity: 0.3; 
-    transform: translateY(0px) scale(0.8); 
+    opacity: 0.4; 
+    transform: translateY(0px) scale(0.9); 
   }
   30% { 
     opacity: 1; 
-    transform: translateY(-4px) scale(1); 
+    transform: translateY(-5px) scale(1.1); 
   }
 }
 
