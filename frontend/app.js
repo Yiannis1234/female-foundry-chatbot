@@ -215,8 +215,26 @@ function addMessage(role, content) {
     bubble.textContent = content;
   }
   messagesEl.appendChild(wrapper);
-  // Auto-scroll to bottom so new messages are always visible
-  scrollToBottom();
+  
+  // For bot messages, scroll to show the FF avatar at the top
+  // For user messages, scroll to bottom
+  if (role === "bot") {
+    // Wait for message to render, then scroll to show FF avatar at top
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const messageTop = wrapper.offsetTop;
+        const containerPadding = 20;
+        // Scroll so the message (with FF avatar) appears at the top
+        messagesEl.scrollTop = messageTop - containerPadding;
+        // Double-check after a brief delay
+        setTimeout(() => {
+          messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
+        }, 100);
+      });
+    });
+  } else {
+    scrollToBottom();
+  }
 }
 
 function renderOptions(options) {
