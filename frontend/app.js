@@ -13,15 +13,24 @@ let sessionId = null;
 let isSending = false;
 let typingMessageEl = null;
 
-function scrollMessageIntoView(node) {
-  if (!node) return;
+function scrollToShowMessage(node) {
+  if (!node || !messagesEl) return;
+  // Wait for DOM to update, then scroll to show the message at the top
   requestAnimationFrame(() => {
-    const offset = Math.max(node.offsetTop - 16, 0);
-    if (typeof messagesEl.scrollTo === "function") {
-      messagesEl.scrollTo({ top: offset, behavior: "smooth" });
-    } else {
-      messagesEl.scrollTop = offset;
-    }
+    requestAnimationFrame(() => {
+      // Get the position of the message relative to the scroll container
+      const messageTop = node.offsetTop;
+      const containerPadding = 20; // Padding from top
+      // Scroll so the message appears at the top of visible area
+      messagesEl.scrollTop = messageTop - containerPadding;
+    });
+  });
+}
+
+function scrollToBottom() {
+  if (!messagesEl) return;
+  requestAnimationFrame(() => {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   });
 }
 
@@ -42,14 +51,19 @@ function createMessageShell(role) {
 }
 
 function showTypingIndicator() {
-  if (typingMessageEl) return;
+  if (typingMessageEl) {
+    // Make sure it's visible
+    typingMessageEl.style.display = "flex";
+    return;
+  }
   const { wrapper, bubble } = createMessageShell("bot");
   wrapper.classList.add("typing");
   bubble.innerHTML =
     '<span class="typing-dots"><span></span><span></span><span></span></span>';
   typingMessageEl = wrapper;
   messagesEl.appendChild(wrapper);
-  scrollMessageIntoView(wrapper);
+  // Scroll to show typing indicator
+  scrollToBottom();
 }
 
 function hideTypingIndicator() {
@@ -116,9 +130,12 @@ async function sendMessage(text) {
     if (!res.ok) throw new Error("Chat request failed");
     const data = await res.json();
     hideTypingIndicator();
-    appendMessages(data.messages || []);
-    renderOptions(data.options || []);
-    updatePlaceholder(data.stage);
+    // Small delay to ensure typing indicator is removed before adding messages
+    setTimeout(() => {
+      appendMessages(data.messages || []);
+      renderOptions(data.options || []);
+      updatePlaceholder(data.stage);
+    }, 100);
   } catch (err) {
     console.error(err);
     hideTypingIndicator();
@@ -140,7 +157,13 @@ function addMessage(role, content) {
     bubble.textContent = content;
   }
   messagesEl.appendChild(wrapper);
-  scrollMessageIntoView(wrapper);
+  // For bot messages, scroll to show the top of the message
+  // For user messages, just scroll to bottom
+  if (role === "bot") {
+    scrollToShowMessage(wrapper);
+  } else {
+    scrollToBottom();
+  }
 }
 
 function renderOptions(options) {
