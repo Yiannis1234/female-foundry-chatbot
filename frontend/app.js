@@ -44,25 +44,9 @@ function ensureMessageVisible(node) {
 }
 
 function scrollToBottom() {
-  if (!messagesEl) return;
-  // Force scroll to bottom with multiple attempts to ensure it works
-  const scroll = () => {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  };
-  
-  // Immediate scroll
-  scroll();
-  
-  // Scroll after DOM update
-  requestAnimationFrame(() => {
-    scroll();
-    // Scroll again after a brief delay to catch any late rendering
-    setTimeout(() => {
-      scroll();
-      // Final check
-      setTimeout(scroll, 100);
-    }, 50);
-  });
+  // NO SCROLLING - container grows to fit content, no scroll needed
+  // This function is kept for compatibility but does nothing
+  return;
 }
 
 function createMessageShell(role) {
@@ -96,11 +80,10 @@ function showTypingIndicator() {
   messagesEl.appendChild(wrapper);
   typingStartTime = Date.now();
   
-  // Force visibility and scroll to show it
+  // Force visibility - no scrolling needed
   requestAnimationFrame(() => {
     wrapper.style.display = "flex";
     wrapper.style.opacity = "1";
-    scrollToBottom();
   });
 }
 
@@ -189,10 +172,7 @@ async function sendMessage(text) {
         appendMessages(data.messages || []);
         renderOptions(data.options || []);
         updatePlaceholder(data.stage);
-        // Force scroll after messages are added
-        setTimeout(() => {
-          scrollToBottom();
-        }, 200);
+        // NO SCROLLING - container grows automatically
       }, 50);
     });
   } catch (err) {
@@ -216,18 +196,7 @@ function addMessage(role, content) {
     bubble.textContent = content;
   }
   messagesEl.appendChild(wrapper);
-  
-  // Wait for message to be fully rendered, then scroll to bottom
-  // Use multiple animation frames to ensure DOM is ready
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      scrollToBottom();
-      // Additional scroll after content is fully rendered
-      setTimeout(() => {
-        scrollToBottom();
-      }, 150);
-    });
-  });
+  // NO SCROLLING - container grows to fit all messages automatically
 }
 
 function renderOptions(options) {
