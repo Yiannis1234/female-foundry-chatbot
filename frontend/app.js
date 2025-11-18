@@ -45,8 +45,13 @@ function ensureMessageVisible(node) {
 
 function scrollToBottom() {
   if (!messagesEl) return;
+  // Use multiple attempts to ensure we scroll to the very bottom
   setTimeout(() => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
+    // Double-check after a brief delay to ensure we're at the bottom
+    setTimeout(() => {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }, 50);
   }, 50);
 }
 
@@ -195,16 +200,11 @@ function addMessage(role, content) {
   }
   messagesEl.appendChild(wrapper);
   
-  // Wait for message to fully render, then ensure it's visible
-  if (role === "bot") {
-    // For bot messages, scroll so the top of the message is visible at top of container
-    setTimeout(() => {
-      ensureMessageVisible(wrapper);
-    }, 200);
-  } else {
-    // For user messages, scroll to bottom
+  // For both user and bot messages, scroll to bottom so they're always visible
+  // This ensures messages appear at the bottom of visible area, not requiring scroll up
+  setTimeout(() => {
     scrollToBottom();
-  }
+  }, 100);
 }
 
 function renderOptions(options) {
