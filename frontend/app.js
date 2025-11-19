@@ -188,10 +188,7 @@ async function sendMessage(text) {
         appendMessages(data.messages || []);
         renderOptions(data.options || []);
         updatePlaceholder(data.stage);
-        // Auto-scroll after messages are added
-        setTimeout(() => {
-          scrollToBottom();
-        }, 150);
+        // Note: appendMessages will handle scrolling to start of bot messages
       }, 50);
     });
   } catch (err) {
@@ -220,20 +217,30 @@ function addMessage(role, content) {
   // For user messages, scroll to bottom
   if (role === "bot") {
     // Wait for message to fully render, then scroll to show START at TOP
-    setTimeout(() => {
-      const messageTop = wrapper.offsetTop;
-      const containerPadding = 16; // Match the padding of chat-scroll
-      // Scroll so the message START (FF avatar) is at the very top of visible area
-      messagesEl.scrollTop = messageTop - containerPadding;
-      
-      // Force multiple scroll attempts to ensure it works
-      setTimeout(() => {
-        messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const messageTop = wrapper.offsetTop;
+        const containerPadding = 20; // Match the padding of chat-scroll
+        // Scroll so the message START (FF avatar) is at the very top of visible area
+        messagesEl.scrollTop = messageTop - containerPadding;
+        
+        // Force multiple scroll attempts to ensure it works
         setTimeout(() => {
           messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
+          setTimeout(() => {
+            messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
+            // Final check - ensure FF avatar is visible at top
+            setTimeout(() => {
+              const rect = wrapper.getBoundingClientRect();
+              const containerRect = messagesEl.getBoundingClientRect();
+              if (rect.top > containerRect.top + 10) {
+                messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
+              }
+            }, 50);
+          }, 50);
         }, 50);
-      }, 50);
-    }, 150);
+      });
+    });
   } else {
     scrollToBottom();
   }
