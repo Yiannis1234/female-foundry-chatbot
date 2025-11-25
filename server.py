@@ -17,33 +17,33 @@ with DATA_PATH.open("r", encoding="utf-8") as f:
     CONTENT = json.load(f)
 
 PRIMARY_OPTIONS = [
-    "VC & Funding Insights",
-    "Female Foundry Programs",
-    "Community & Stories",
-    "Contact & Partners",
+    "What is the Female Innovation Index?",
+    "I want to dive into the Index data",
+    "I want to learn about the team",
+    "I want to learn about Methodology",
+    "I want to learn about Female Foundry",
 ]
 
 SECONDARY_OPTIONS: Dict[str, List[str]] = {
-    "VC & Funding Insights": ["Headline metrics", "Deep Tech & AI", "Using the Index"],
-    "Female Foundry Programs": ["AI Visionaries", "AI Hustle", "Sunday Newsletter"],
-    "Community & Stories": ["Join the community", "Campaigns", "Shop"],
-    "Contact & Partners": ["Contact", "Partners", "Media coverage"],
+    "What is the Female Innovation Index?": [],
+    "I want to dive into the Index data": ["Headline metrics", "Deep Tech & AI", "Using the Index"],
+    "I want to learn about the team": [],
+    "I want to learn about Methodology": [],
+    "I want to learn about Female Foundry": ["AI Visionaries", "AI Hustle", "Sunday Newsletter"],
 }
 
 PRIMARY_KEYWORDS: Dict[str, str] = {
-    "funding": "VC & Funding Insights",
-    "vc": "VC & Funding Insights",
-    "investment": "VC & Funding Insights",
-    "program": "Female Foundry Programs",
-    "incubator": "Female Foundry Programs",
-    "ai hustle": "Female Foundry Programs",
-    "visionaries": "Female Foundry Programs",
-    "community": "Community & Stories",
-    "stories": "Community & Stories",
-    "shop": "Community & Stories",
-    "contact": "Contact & Partners",
-    "partner": "Contact & Partners",
-    "press": "Contact & Partners",
+    "index": "What is the Female Innovation Index?",
+    "what is": "What is the Female Innovation Index?",
+    "data": "I want to dive into the Index data",
+    "stats": "I want to dive into the Index data",
+    "numbers": "I want to dive into the Index data",
+    "team": "I want to learn about the team",
+    "people": "I want to learn about the team",
+    "methodology": "I want to learn about Methodology",
+    "how": "I want to learn about Methodology",
+    "female foundry": "I want to learn about Female Foundry",
+    "about": "I want to learn about Female Foundry",
 }
 
 SECONDARY_KEYWORDS: Dict[str, str] = {
@@ -52,23 +52,29 @@ SECONDARY_KEYWORDS: Dict[str, str] = {
     "metrics": "Headline metrics",
     "deep tech": "Deep Tech & AI",
     "ai": "Deep Tech & AI",
-    "index": "Using the Index",
-    "ai visionaries": "AI Visionaries",
+    "using": "Using the Index",
     "visionaries": "AI Visionaries",
-    "ai hustle": "AI Hustle",
     "hustle": "AI Hustle",
     "newsletter": "Sunday Newsletter",
-    "join the community": "Join the community",
-    "community": "Join the community",
-    "campaign": "Campaigns",
-    "shop": "Shop",
-    "contact": "Contact",
-    "email": "Contact",
-    "partner": "Partners",
-    "media": "Media coverage",
 }
 
 INFO_MAP: Dict[str, str] = {
+    "What is the Female Innovation Index?": (
+        "The Female Innovation Index is an annual analysis of over 150,000 European companies. "
+        "It tracks funding, growth, and trends in female-led innovation across the continent."
+    ),
+    "I want to learn about the team": (
+        "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
+        "<a href='https://www.femalefoundry.co/team' target='_blank' class='chat-link-btn'>Meet the Team</a>"
+    ),
+    "I want to learn about Methodology": (
+        "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
+        "<a href='https://www.femalefoundry.co/' target='_blank' class='chat-link-btn'>Visit Female Foundry Website</a>"
+    ),
+    "I want to learn about Female Foundry": (
+        "Female Foundry is a network of over 7,000 founders, investors, and operators. We run programs like AI Visionaries and AI Hustle.<br><br>"
+        "<a href='https://www.femalefoundry.co/' target='_blank' class='chat-link-btn'>Learn more about Female Foundry</a>"
+    ),
     "Headline metrics": (
         "• €5.76B raised by female-founded startups in Europe during 2024 (1,305 deals across 1,196 companies).\n"
         "• Represents roughly 12% of all European VC; deep tech attracts about one-third of that capital.\n"
@@ -77,7 +83,7 @@ INFO_MAP: Dict[str, str] = {
     "Deep Tech & AI": (
         "• Deep tech companies capture roughly one-third of the capital raised by female-founded startups.\n"
         "• Data & AI founders cite funding (67 mentions) and slow adoption (47) as top bottlenecks.\n"
-        "• Health & life-science founders echo funding, adoption, and economic uncertainty challenges—filter Dealroom tags for precise counts."
+        "• Health & life-science founders echo funding, adoption, and economic uncertainty challenges."
     ),
     "Using the Index": (
         "• Use Dealroom exports DR_FF_C_1 (female-founded VC) and DR_MC_C_5 (monthly capital) for charts.\n"
@@ -99,36 +105,6 @@ INFO_MAP: Dict[str, str] = {
         "• Use the homepage ‘Read’ button to browse the latest edition or subscribe.\n"
         "• Designed for female founders, operators, and allies tracking European venture."
     ),
-    "Join the community": (
-        "• 7,000+ founders, investors, and operators focused on female-led innovation.\n"
-        "• Click ‘Join the Community’ to request access to intros, events, and resources.\n"
-        "• Members tap curated deal flow, mentor sessions, and partner offers."
-    ),
-    "Campaigns": (
-        "• ‘Celebrating female founders’ spotlights stories you can feature or amplify.\n"
-        "• Use the ‘Watch all’ CTA to stream short films and social assets.\n"
-        "• Great for investor updates, internal culture decks, or event content."
-    ),
-    "Shop": (
-        "• Female Foundry Shop offers identity assets, merch, and partner gifting ideas.\n"
-        "• Linked from the site footer—ships worldwide with limited drops.\n"
-        "• Popular for event swag, partner onboarding, or community giveaways."
-    ),
-    "Contact": (
-        "• Email HELLO@FEMALEFOUNDRY.CO for partnerships or press.\n"
-        "• HQ: 11 Welbeck Street, W1G 9XZ, London (by appointment).\n"
-        "• Footer also links to About, Partners, Careers, and Privacy Policy."
-    ),
-    "Partners": (
-        "• Explore corporate and ecosystem partners via the footer link.\n"
-        "• Collaboration areas include scouting, thought leadership, and program support.\n"
-        "• Submit interest through the partner form for a follow-up call."
-    ),
-    "Media coverage": (
-        "• Featured in FT Adviser, Maddyness, tech.eu, UKTN, Sifted, Startups Magazine, TFN, and more.\n"
-        "• Logos appear above the partner grid for easy export to decks.\n"
-        "• Cite coverage to boost credibility with LPs, corporates, or press."
-    ),
 }
 
 
@@ -145,6 +121,7 @@ class SessionResponse(BaseModel):
 
 
 def format_bot_message(text: str) -> str:
+    # Split by newlines to handle bullet points, but respect <br> tags in HTML strings
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     if not lines:
         return ""
@@ -155,11 +132,14 @@ def format_bot_message(text: str) -> str:
         for line in lines:
             if line[:1] in {"•", "-", "*"}:
                 line = line[1:].strip()
-            cleaned.append(html.escape(line))
+            # We trust the content from INFO_MAP, so we don't escape it here.
+            # Dynamic user input should be escaped BEFORE calling this function.
+            cleaned.append(line)
         items = "".join(f"<li>{line}</li>" for line in cleaned)
         return f"<ul class='bot-list'>{items}</ul>"
 
-    return html.escape(lines[0])
+    # For single lines (which may contain HTML like <br> or <a>), return as-is.
+    return lines[0]
 
 
 class SessionState:
@@ -252,7 +232,9 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
     state.history.append(("user", trimmed))
 
     if state.stage == "ask_name":
-        state.visitor_name = trimmed.title()
+        # Escape user input to prevent XSS since we removed auto-escaping in format_bot_message
+        safe_name = html.escape(trimmed.title())
+        state.visitor_name = safe_name
         state.stage = "menu_primary"
         responses = [
             format_bot_message(f"Nice to meet you, {state.visitor_name}! Choose what you’d like to explore:"),
@@ -264,11 +246,16 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
         if not match:
             keyword_hit = keyword_match(trimmed, PRIMARY_KEYWORDS)
             if keyword_hit:
-                state.primary_choice = keyword_hit
-                state.stage = "menu_secondary"
-                options = SECONDARY_OPTIONS[keyword_hit]
-                responses = [format_bot_message(f"Great! Let’s drill into {keyword_hit}. Pick a specific topic:")]
-                return respond(state, responses, options)
+                # Check if keyword hit is a branch or leaf
+                sub_opts = SECONDARY_OPTIONS.get(keyword_hit, [])
+                if sub_opts:
+                    state.primary_choice = keyword_hit
+                    state.stage = "menu_secondary"
+                    options = sub_opts
+                    responses = [format_bot_message(f"Great! Let’s drill into {keyword_hit}. Pick a specific topic:")]
+                    return respond(state, responses, options)
+                else:
+                    return deliver_info(state, keyword_hit)
 
             secondary_hit = keyword_match(trimmed, SECONDARY_KEYWORDS)
             if secondary_hit:
@@ -279,11 +266,19 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             )
             return respond(state, [fallback], PRIMARY_OPTIONS)
 
-        state.primary_choice = match
-        state.stage = "menu_secondary"
-        options = SECONDARY_OPTIONS[match]
-        responses = [format_bot_message(f"Great! Let’s drill into {match}. Pick a specific topic:")]
-        return respond(state, responses, options)
+        # Found a match in PRIMARY_OPTIONS
+        sub_opts = SECONDARY_OPTIONS.get(match, [])
+        
+        if sub_opts:
+            # It is a Category/Branch -> Show Sub-options
+            state.primary_choice = match
+            state.stage = "menu_secondary"
+            options = sub_opts
+            responses = [format_bot_message(f"Great! Let’s drill into {match}. Pick a specific topic:")]
+            return respond(state, responses, options)
+        else:
+            # It is a Direct Answer/Leaf -> Show Info + Main Menu
+            return deliver_info(state, match)
 
     if state.stage == "menu_secondary":
         primary = state.primary_choice
