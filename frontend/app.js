@@ -1,148 +1,159 @@
 const API_BASE = "/api";
 
-const chatPopup = document.getElementById("chatPopup");
-const toggleBtn = document.getElementById("chatToggle");
-const messagesEl = document.getElementById("chatMessages");
-const optionsEl = document.getElementById("chatOptions");
-const inputEl = document.getElementById("chatInput");
-const sendBtn = document.getElementById("chatSend");
-const resetBtn = document.getElementById("chatReset");
-const closeBtn = document.getElementById("chatClose");
-
+// State
 let sessionId = null;
-let isSending = false;
-let typingMessageEl = null;
-let typingStartTime = null;
-const MIN_TYPING_DISPLAY_TIME = 1000; // Minimum 1 second to see typing indicator
+let userName = "";
+let currentView = "welcome"; // welcome, dashboard, chat
 
-function ensureMessageVisible(node) {
-  if (!node || !messagesEl) return;
-  // Wait for DOM to fully render, then scroll to show message at top
-  setTimeout(() => {
-    // Get the message position relative to the scroll container
-    const messageRect = node.getBoundingClientRect();
-    const containerRect = messagesEl.getBoundingClientRect();
-    const messageTop = node.offsetTop;
-    const containerPadding = 20;
-    
-    // Calculate scroll position to show message at top of visible area
-    const targetScroll = messageTop - containerPadding;
-    
-    // Scroll to show the message
-    messagesEl.scrollTop = targetScroll;
-    
-    // Double-check after a brief delay to ensure it's visible
-    setTimeout(() => {
-      const currentMessageTop = node.getBoundingClientRect().top;
-      const currentContainerTop = messagesEl.getBoundingClientRect().top;
-      // If message is not visible at top, scroll again
-      if (currentMessageTop > currentContainerTop + 30) {
-        messagesEl.scrollTop = node.offsetTop - containerPadding;
-      }
-    }, 100);
-  }, 100);
-}
+// DOM Elements
+const views = {
+  welcome: document.getElementById("view-welcome"),
+  dashboard: document.getElementById("view-dashboard"),
+  chat: document.getElementById("view-chat"),
+};
 
-function scrollToBottom() {
-  if (!messagesEl) return;
-  // Auto-scroll to bottom smoothly
-  const scroll = () => {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  };
-  
-  // Immediate scroll
-  scroll();
-  
-  // Scroll after DOM updates
-  requestAnimationFrame(() => {
-    scroll();
-    setTimeout(() => {
-      scroll();
-      // Final check after content is fully rendered
-      setTimeout(scroll, 100);
-    }, 50);
-  });
-}
+const nameForm = document.getElementById("name-form");
+const nameInput = document.getElementById("name-input");
+const userNameDisplay = document.getElementById("user-name-display");
 
-function createMessageShell(role) {
-  const wrapper = document.createElement("div");
-  wrapper.className = `chat-message ${role}`;
+const dashboardOptions = document.getElementById("dashboard-options");
+const dashboardSearch = document.getElementById("dashboard-search");
+const dashboardSearchBtn = document.getElementById("dashboard-search-btn");
 
-  const avatar = document.createElement("div");
-  avatar.className = `avatar ${role}`;
-  avatar.textContent = role === "bot" ? "FF" : "You";
-  wrapper.appendChild(avatar);
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const chatSendBtn = document.getElementById("chatSend");
+const chatOptions = document.getElementById("chatOptions");
+const backBtn = document.getElementById("back-to-dashboard");
+const resetBtn = document.getElementById("reset-chat");
+const restartFlowBtn = document.getElementById("restartFlow");
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  wrapper.appendChild(bubble);
+const DASHBOARD_CARD_META = {
+  "What is the Female Innovation Index?": {
+    icon: "📖",
+    gradient: "linear-gradient(135deg, #7c63ff, #a977ff)",
+    description: "Understand the scope, dataset, and purpose behind the Index.",
+  },
+  "I want to dive into the Index data": {
+    icon: "📈",
+    gradient: "linear-gradient(135deg, #5bc9ff, #4f79ff)",
+    description: "Explore headline metrics, deep tech stats, and how to use the data.",
+  },
+  "I want to learn about the team": {
+    icon: "👥",
+    gradient: "linear-gradient(135deg, #ffa26b, #ff5a7a)",
+    description: "Meet the people and collaborators behind the 2026 Index.",
+  },
+  "I want to learn about Methodology": {
+    icon: "🧪",
+    gradient: "linear-gradient(135deg, #7adca0, #3ab98f)",
+    description: "See the research approach, data sources, and validation checks.",
+  },
+  "I want to learn about Female Foundry": {
+    icon: "🏛️",
+    gradient: "linear-gradient(135deg, #fbc93a, #ff8f5a)",
+    description: "Get the elevator pitch, programs, and ways to engage with Female Foundry.",
+  },
+};
 
-  return { wrapper, bubble };
-}
-
-function showTypingIndicator() {
-  // Remove any existing typing indicator first
-  if (typingMessageEl) {
-    typingMessageEl.remove();
-    typingMessageEl = null;
+// --- Initialization ---
+window.addEventListener("load", () => {
+  // Ensure welcome view is visible on load
+  if (views.welcome) {
+    views.welcome.classList.remove("hidden");
+    views.welcome.classList.add("active");
+    // Hide other views
+    if (views.dashboard) {
+      views.dashboard.classList.add("hidden");
+      views.dashboard.classList.remove("active");
+    }
+    if (views.chat) {
+      views.chat.classList.add("hidden");
+      views.chat.classList.remove("active");
+    }
   }
-  
-  const { wrapper, bubble } = createMessageShell("bot");
-  wrapper.classList.add("typing");
-  bubble.innerHTML =
-    '<span class="typing-dots"><span></span><span></span><span></span></span>';
-  typingMessageEl = wrapper;
-  messagesEl.appendChild(wrapper);
-  typingStartTime = Date.now();
-  
-  // Force visibility and auto-scroll
-  requestAnimationFrame(() => {
-    wrapper.style.display = "flex";
-    wrapper.style.opacity = "1";
-    scrollToBottom();
-  });
-}
+  if (nameInput) nameInput.focus();
+});
 
-function hideTypingIndicator(callback) {
-  if (!typingMessageEl) {
-    if (callback) callback();
+// --- View Management ---
+function switchView(viewName) {
+  if (!views[viewName]) {
+    console.error(`View ${viewName} not found`);
     return;
   }
-  
-  // Ensure typing indicator is visible for minimum time
-  const elapsed = typingStartTime ? Date.now() - typingStartTime : 0;
-  const remainingTime = Math.max(0, MIN_TYPING_DISPLAY_TIME - elapsed);
-  
-  setTimeout(() => {
-    if (typingMessageEl) {
-      typingMessageEl.remove();
-      typingMessageEl = null;
-      typingStartTime = null;
+
+  // Hide all views first
+  Object.values(views).forEach((el) => {
+    if (el) {
+      el.classList.remove("active");
+      el.classList.add("hidden");
     }
-    if (callback) callback();
-  }, remainingTime);
+  });
+
+  // Show target view
+  const target = views[viewName];
+  target.classList.remove("hidden");
+  // Use requestAnimationFrame to ensure DOM update before transition
+  requestAnimationFrame(() => {
+    target.classList.add("active");
+  });
+
+  currentView = viewName;
 }
 
-function updatePlaceholder(stage) {
-  if (stage === "ask_name") {
-    inputEl.placeholder = "Type your name…";
-  } else {
-    inputEl.placeholder = "Ask about programs, stats, etc.";
-  }
+// --- Welcome Flow ---
+if (nameForm) {
+  nameForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = nameInput ? nameInput.value.trim() : "";
+    if (!name) return;
+
+    userName = name;
+    if (userNameDisplay) userNameDisplay.textContent = name;
+
+    try {
+      await startSession(); 
+      // IMPORTANT: Send name immediately to get the options for the dashboard
+      await sendNameToApi(name);
+      switchView("dashboard");
+    } catch (err) {
+      console.error("Failed to start session", err);
+      alert("Could not connect to server. Please try again.");
+    }
+  });
 }
 
-async function createSession() {
+// --- Session Logic ---
+async function startSession() {
   const res = await fetch(`${API_BASE}/session`, { method: "POST" });
-  if (!res.ok) throw new Error("Failed to create session");
+  if (!res.ok) throw new Error("Network error");
   const data = await res.json();
   sessionId = data.session_id;
-  clearMessages();
-  hideTypingIndicator();
-  appendMessages(data.messages || []);
-  renderOptions(data.options || []);
-  updatePlaceholder(data.stage);
-  openChat();
-  inputEl.focus();
+  // Note: data.options is initially empty until we send the name
+}
+
+async function sendNameToApi(name) {
+  try {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId, message: name }),
+    });
+    const data = await res.json();
+    
+    // The response will contain the PRIMARY_OPTIONS because of the name state transition
+    if (data.options && data.options.length > 0) {
+      renderDashboard(data.options);
+    }
+    
+    // Pre-populate chat with the welcome message so it's there when they click an option
+    if (data.messages) {
+      data.messages.forEach(msg => addMessage(msg.role, msg.content));
+    }
+
+  } catch (err) {
+    console.error("Error sending name:", err);
+  }
 }
 
 async function resetSession() {
@@ -150,155 +161,243 @@ async function resetSession() {
   const res = await fetch(`${API_BASE}/session/${sessionId}/reset`, {
     method: "POST",
   });
-  if (!res.ok) throw new Error("Failed to reset session");
   const data = await res.json();
-  clearMessages();
-  hideTypingIndicator();
-  appendMessages(data.messages || []);
-  renderOptions(data.options || []);
-  updatePlaceholder(data.stage);
-  inputEl.focus();
+  clearChat();
+  renderDashboard(data.options); // Resetting brings us back to dashboard state options
+  switchView("dashboard");
 }
 
-async function sendMessage(text) {
-  if (!sessionId || isSending) return;
-  const trimmed = text.trim();
-  if (!trimmed) return;
+// --- Dashboard Logic ---
+function renderDashboard(options) {
+  if (!dashboardOptions) {
+    console.error("dashboardOptions element not found");
+    return;
+  }
+  
+  dashboardOptions.innerHTML = "";
+  
+  if (!options || options.length === 0) {
+    console.warn("No options provided for dashboard");
+    return;
+  }
+  
+  // If backend sends specific strings, map them to icons/descriptions if possible
+  // Or just render generic cards.
+  options.forEach(opt => {
+    const meta = DASHBOARD_CARD_META[opt] || {
+      icon: "💡",
+      gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
+      description: "Tap to explore this topic.",
+    };
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+      <div class="card-title">${opt}</div>
+      <p class="card-desc">${meta.description}</p>
+    `;
+    card.onclick = () => handleDashboardSelection(opt);
+    dashboardOptions.appendChild(card);
+  });
+}
 
-  addMessage("user", trimmed);
-  renderOptions([]);
-  inputEl.value = "";
-  inputEl.focus();
+async function restartExperience() {
+  try {
+    if (sessionId) {
+      await fetch(`${API_BASE}/session/${sessionId}/reset`, {
+        method: "POST",
+      });
+    }
+  } catch (err) {
+    console.error("Failed to reset session on restart", err);
+  }
+  clearChat();
+  userName = "";
+  sessionId = null;
+  if (nameInput) nameInput.value = "";
+  if (userNameDisplay) userNameDisplay.textContent = "there";
+  switchView("welcome");
+  if (nameInput) nameInput.focus();
+}
 
-  isSending = true;
-  showTypingIndicator();
+
+async function handleDashboardSelection(text) {
+  switchView("chat");
+  // Simulate sending this as a message
+  addMessage("user", text);
+  await sendMessageToApi(text);
+}
+
+if (dashboardSearchBtn) {
+  dashboardSearchBtn.addEventListener("click", () => {
+    const val = dashboardSearch ? dashboardSearch.value.trim() : "";
+    if (val) handleDashboardSelection(val);
+  });
+}
+
+if (dashboardSearch) {
+  dashboardSearch.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const val = dashboardSearch.value.trim();
+      if (val) handleDashboardSelection(val);
+    }
+  });
+}
+
+// --- Chat Logic ---
+async function sendMessageToApi(text) {
+  showTyping();
   try {
     const res = await fetch(`${API_BASE}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, message: trimmed }),
+      body: JSON.stringify({ session_id: sessionId, message: text }),
     });
-    if (!res.ok) throw new Error("Chat request failed");
     const data = await res.json();
+    hideTyping();
     
-    // Hide typing indicator (with minimum display time), then show messages
-    hideTypingIndicator(() => {
-      // Small delay to ensure typing indicator is fully removed
-      setTimeout(() => {
-        appendMessages(data.messages || []);
-        renderOptions(data.options || []);
-        updatePlaceholder(data.stage);
-        // Note: appendMessages will handle scrolling to start of bot messages
-      }, 50);
-    });
+    // Append bot responses
+    if (data.messages) {
+      data.messages.forEach(msg => addMessage(msg.role, msg.content));
+    }
+    
+    // Update suggestions/options for next turn
+    renderChatOptions(data.options);
+    
   } catch (err) {
     console.error(err);
-    hideTypingIndicator();
-    addMessage("bot", "Something went wrong. Try again in a moment.");
-  } finally {
-    isSending = false;
+    hideTyping();
+    addMessage("bot", "Sorry, something went wrong.");
   }
-}
-
-function appendMessages(messages) {
-  messages.forEach((msg) => addMessage(msg.role, msg.content));
 }
 
 function addMessage(role, content) {
-  const { wrapper, bubble } = createMessageShell(role);
-  if (role === "bot") {
-    bubble.innerHTML = content;
-  } else {
-    bubble.textContent = content;
+  if (!chatMessages) {
+    console.error("chatMessages element not found");
+    return;
   }
-  messagesEl.appendChild(wrapper);
   
-  // For bot messages, scroll so the START of the message (FF avatar) is at the TOP
-  // For user messages, scroll to bottom
-  if (role === "bot") {
-    // Wait for message to fully render, then scroll to show START at TOP
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const messageTop = wrapper.offsetTop;
-        const containerPadding = 20; // Match the padding of chat-scroll
-        // Scroll so the message START (FF avatar) is at the very top of visible area
-        messagesEl.scrollTop = messageTop - containerPadding;
-        
-        // Force multiple scroll attempts to ensure it works
-        setTimeout(() => {
-          messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
-          setTimeout(() => {
-            messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
-            // Final check - ensure FF avatar is visible at top
-            setTimeout(() => {
-              const rect = wrapper.getBoundingClientRect();
-              const containerRect = messagesEl.getBoundingClientRect();
-              if (rect.top > containerRect.top + 10) {
-                messagesEl.scrollTop = wrapper.offsetTop - containerPadding;
-              }
-            }, 50);
-          }, 50);
-        }, 50);
-      });
-    });
-  } else {
+  const msgDiv = document.createElement("div");
+  msgDiv.className = `chat-message ${role}`;
+  
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = role === "bot" ? "FF" : "You";
+  
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.innerHTML = content; // Allow HTML for links
+  
+  msgDiv.appendChild(avatar);
+  msgDiv.appendChild(bubble);
+  
+  chatMessages.appendChild(msgDiv);
+  scrollToBottom();
+}
+
+function renderChatOptions(options) {
+  if (!chatOptions) {
+    console.error("chatOptions element not found");
+    return;
+  }
+  
+  chatOptions.innerHTML = "";
+  if (!options || options.length === 0) return;
+  
+  options.forEach(opt => {
+    const chip = document.createElement("button");
+    chip.className = "suggestion-chip";
+    chip.textContent = opt;
+    chip.onclick = () => {
+      addMessage("user", opt);
+      sendMessageToApi(opt);
+    };
+    chatOptions.appendChild(chip);
+  });
+
+  // Force scroll to show new options
+  requestAnimationFrame(() => {
     scrollToBottom();
-  }
-}
-
-function renderOptions(options) {
-  optionsEl.innerHTML = "";
-  if (!options || !options.length) return;
-  options.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "option-pill";
-    btn.type = "button";
-    btn.textContent = opt;
-    btn.addEventListener("click", () => sendMessage(opt));
-    optionsEl.appendChild(btn);
   });
 }
 
-function clearMessages() {
-  messagesEl.innerHTML = "";
-  optionsEl.innerHTML = "";
-  typingMessageEl = null;
+let typingIndicator = null;
+function showTyping() {
+  if (!chatMessages) return;
+  if (typingIndicator) return;
+  const wrapper = document.createElement("div");
+  wrapper.className = "chat-message bot";
+  wrapper.innerHTML = `
+    <div class="avatar">FF</div>
+    <div class="bubble" style="font-style:italic; color:#888;">Typing...</div>
+  `;
+  typingIndicator = wrapper;
+  chatMessages.appendChild(wrapper);
+  scrollToBottom();
 }
 
-function openChat() {
-  chatPopup.classList.remove("hidden");
-  toggleBtn.classList.remove("visible");
-}
-
-function hideChat() {
-  chatPopup.classList.add("hidden");
-  toggleBtn.classList.add("visible");
-}
-
-function handleSendClick() {
-  const value = inputEl.value;
-  sendMessage(value);
-}
-
-sendBtn.addEventListener("click", handleSendClick);
-inputEl.addEventListener("keydown", (evt) => {
-  if (evt.key === "Enter" && !evt.shiftKey) {
-    evt.preventDefault();
-    handleSendClick();
+function hideTyping() {
+  if (typingIndicator) {
+    typingIndicator.remove();
+    typingIndicator = null;
   }
-});
-resetBtn.addEventListener("click", () => {
-  resetSession().catch((err) => console.error(err));
-});
-closeBtn.addEventListener("click", hideChat);
-toggleBtn.addEventListener("click", () => {
-  openChat();
-  inputEl.focus();
-});
+}
 
-window.addEventListener("load", () => {
-  createSession().catch((err) => {
-    console.error(err);
-    addMessage("bot", "Unable to start the session. Refresh the page to try again.");
+function clearChat() {
+  if (chatMessages) chatMessages.innerHTML = "";
+  if (chatOptions) chatOptions.innerHTML = "";
+}
+
+function scrollToBottom() {
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
+// Scroll when window resizes (e.g. keyboard opens on mobile)
+window.addEventListener("resize", scrollToBottom);
+
+// Chat Input Handlers
+if (chatSendBtn) {
+  chatSendBtn.addEventListener("click", () => {
+    const val = chatInput ? chatInput.value.trim() : "";
+    if (!val) return;
+    addMessage("user", val);
+    if (chatInput) chatInput.value = "";
+    sendMessageToApi(val);
   });
-});
+}
+
+if (chatInput) {
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const val = chatInput.value.trim();
+      if (!val) return;
+      addMessage("user", val);
+      chatInput.value = "";
+      sendMessageToApi(val);
+    }
+  });
+}
+
+// Navigation Handlers
+if (backBtn) {
+  backBtn.addEventListener("click", () => {
+    switchView("dashboard");
+  });
+}
+
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    if (confirm("Start a new session?")) {
+      resetSession();
+    }
+  });
+}
+
+if (restartFlowBtn) {
+  restartFlowBtn.addEventListener("click", () => {
+    restartExperience();
+  });
+}

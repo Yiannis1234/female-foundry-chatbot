@@ -69,7 +69,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "I want to learn about Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
-        "<a href='https://www.femalefoundry.co/' target='_blank' class='chat-link-btn'>Visit Female Foundry Website</a>"
+        "<a href='https://www.femalefoundry.co/' target='_blank' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
     ),
     "I want to learn about Female Foundry": (
         "Female Foundry is a network of over 7,000 founders, investors, and operators. We run programs like AI Visionaries and AI Hustle.<br><br>"
