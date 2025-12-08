@@ -45,31 +45,27 @@
 
         <!-- VIEW 2: DASHBOARD (Grid of Boxes) -->
         <section id="view-dashboard" class="view hidden">
-          <div class="dashboard-top-row">
-            <button id="restartFlow" class="ghost-back-btn" type="button">← Back</button>
-            <div class="dashboard-header">
-              <h1>Hi, <span id="user-name-display">there</span>!</h1>
-              <p class="subtitle">
-                Let's explore the 2026 Edition of the Female Innovation Index. What would you like to know?
-              </p>
-            </div>
-          </div>
+            <div class="dashboard-container-inner">
+              <div class="dashboard-top-row">
+                <button id="restartFlow" class="ghost-back-btn" type="button">← Back</button>
+                <div class="dashboard-header">
+                  <h1>Hi, <span id="user-name-display">there</span>!</h1>
+                  <p class="subtitle">
+                    What would you like to explore?
+                  </p>
+                </div>
+              </div>
 
-          <!-- Search bar style input (functional as a custom query) -->
-          <div class="search-bar-container">
-            <input type="text" id="dashboard-search" placeholder="Ask anything..." />
-            <button id="dashboard-search-btn">Search</button>
-          </div>
+              <!-- Search bar style input (functional as a custom query) -->
+              <div class="search-bar-container">
+                <input type="text" id="dashboard-search" placeholder="Ask anything..." />
+                <button id="dashboard-search-btn">Search</button>
+              </div>
 
-          <div class="cards-grid" id="dashboard-options">
-            <!-- Options will be injected here by JS -->
-             <!-- Example Card Structure for reference:
-            <div class="card option-card" data-value="What is...">
-              <div class="card-icon">📊</div>
-              <div class="card-title">What is the Female Innovation Index?</div>
+              <div class="cards-grid" id="dashboard-options">
+                <!-- Options will be injected here by JS -->
+              </div>
             </div>
-            -->
-          </div>
         </section>
 
         <!-- VIEW 3: CHAT INTERFACE -->

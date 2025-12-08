@@ -82,3 +82,5 @@ Run this to merge and push:
 cd "/Users/ioannisvamvakas/FEMALE FOUNDRY/llm-mvp" && git pull origin main --no-rebase && git push origin main
 ```
 
+
+

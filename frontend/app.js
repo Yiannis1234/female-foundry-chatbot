@@ -28,41 +28,51 @@ const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
+// UPDATED METADATA FOR NEW BOXES
 const DASHBOARD_CARD_META = {
-  "What is the Female Innovation Index?": {
-    icon: "📖",
+  "The Era of Abundance": {
+    icon: "🌌", // Example icon
     gradient: "linear-gradient(135deg, #7c63ff, #a977ff)",
-    description: "Understand the scope, dataset, and purpose behind the Index.",
+    description: "Learn how AI is redefining how female founders build and solve the next generation of problems.",
+    link: null // We will handle this via chat response now
   },
-  "I want to dive into the Index data": {
-    icon: "📈",
+  "Key Insights": {
+    icon: "💡",
     gradient: "linear-gradient(135deg, #5bc9ff, #4f79ff)",
-    description: "Explore headline metrics, deep tech stats, and how to use the data.",
+    description: "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
+    link: null // Chat flow
   },
-  "I want to learn about the team": {
-    icon: "👥",
+  "Idea": {
+    icon: "✨",
     gradient: "linear-gradient(135deg, #ffa26b, #ff5a7a)",
-    description: "Meet the people and collaborators behind the 2026 Index.",
+    description: "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
+    link: null // We will handle this via chat response now
   },
-  "I want to learn about Methodology": {
-    icon: "🧪",
+  "Fundraising trends": {
+    icon: "📈",
     gradient: "linear-gradient(135deg, #7adca0, #3ab98f)",
-    description: "See the research approach, data sources, and validation checks.",
+    description: "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
+    link: null // Chat flow
   },
-  "I want to learn about Female Foundry": {
-    icon: "🏛️",
+  "Behind the Index": {
+    icon: "🤝",
     gradient: "linear-gradient(135deg, #fbc93a, #ff8f5a)",
-    description: "Get the elevator pitch, programs, and ways to engage with Female Foundry.",
+    description: "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
+    link: null // Chat flow
+  },
+  "About Female Foundry": {
+    icon: "🏛️",
+    gradient: "linear-gradient(135deg, #cfd8ff, #9eaeff)",
+    description: "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
+    link: null // We will handle this via chat response now
   },
 };
 
 // --- Initialization ---
 window.addEventListener("load", () => {
-  // Ensure welcome view is visible on load
   if (views.welcome) {
     views.welcome.classList.remove("hidden");
     views.welcome.classList.add("active");
-    // Hide other views
     if (views.dashboard) {
       views.dashboard.classList.add("hidden");
       views.dashboard.classList.remove("active");
@@ -93,7 +103,6 @@ function switchView(viewName) {
   // Show target view
   const target = views[viewName];
   target.classList.remove("hidden");
-  // Use requestAnimationFrame to ensure DOM update before transition
   requestAnimationFrame(() => {
     target.classList.add("active");
   });
@@ -113,7 +122,6 @@ if (nameForm) {
 
     try {
       await startSession(); 
-      // IMPORTANT: Send name immediately to get the options for the dashboard
       await sendNameToApi(name);
       switchView("dashboard");
     } catch (err) {
@@ -129,7 +137,6 @@ async function startSession() {
   if (!res.ok) throw new Error("Network error");
   const data = await res.json();
   sessionId = data.session_id;
-  // Note: data.options is initially empty until we send the name
 }
 
 async function sendNameToApi(name) {
@@ -141,15 +148,13 @@ async function sendNameToApi(name) {
     });
     const data = await res.json();
     
-    // The response will contain the PRIMARY_OPTIONS because of the name state transition
+    // The response contains the PRIMARY_OPTIONS
     if (data.options && data.options.length > 0) {
       renderDashboard(data.options);
     }
     
-    // Pre-populate chat with the welcome message so it's there when they click an option
-    if (data.messages) {
-      data.messages.forEach(msg => addMessage(msg.role, msg.content));
-    }
+    // We do NOT populate chat messages here because the user is going to the Dashboard first.
+    // But if we wanted to show a history later, we could.
 
   } catch (err) {
     console.error("Error sending name:", err);
@@ -163,16 +168,17 @@ async function resetSession() {
   });
   const data = await res.json();
   clearChat();
-  renderDashboard(data.options); // Resetting brings us back to dashboard state options
+  
+  // If resetting to start, we might want to go back to Name input? 
+  // Or just clear chat and go to dashboard. 
+  // Requirement says "Restart" flow.
+  renderDashboard(data.options); 
   switchView("dashboard");
 }
 
 // --- Dashboard Logic ---
 function renderDashboard(options) {
-  if (!dashboardOptions) {
-    console.error("dashboardOptions element not found");
-    return;
-  }
+  if (!dashboardOptions) return;
   
   dashboardOptions.innerHTML = "";
   
@@ -181,14 +187,15 @@ function renderDashboard(options) {
     return;
   }
   
-  // If backend sends specific strings, map them to icons/descriptions if possible
-  // Or just render generic cards.
   options.forEach(opt => {
+    // Match metadata either by exact key or fallback
     const meta = DASHBOARD_CARD_META[opt] || {
       icon: "💡",
       gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
       description: "Tap to explore this topic.",
+      link: null
     };
+    
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
@@ -196,26 +203,31 @@ function renderDashboard(options) {
       <div class="card-title">${opt}</div>
       <p class="card-desc">${meta.description}</p>
     `;
-    card.onclick = () => handleDashboardSelection(opt);
+    
+    // Handle click: ALWAYS Chat Flow now
+    card.onclick = () => {
+        handleDashboardSelection(opt);
+    };
+    
     dashboardOptions.appendChild(card);
   });
 }
 
 async function restartExperience() {
+  // Full restart: New Session, Back to Welcome Screen
   try {
     if (sessionId) {
-      await fetch(`${API_BASE}/session/${sessionId}/reset`, {
-        method: "POST",
-      });
+       // Optional: notify backend we are quitting
     }
-  } catch (err) {
-    console.error("Failed to reset session on restart", err);
-  }
-  clearChat();
-  userName = "";
+  } catch (err) { console.error(err); }
+  
   sessionId = null;
+  userName = "";
+  clearChat();
+  
   if (nameInput) nameInput.value = "";
   if (userNameDisplay) userNameDisplay.textContent = "there";
+  
   switchView("welcome");
   if (nameInput) nameInput.focus();
 }
@@ -256,12 +268,10 @@ async function sendMessageToApi(text) {
     const data = await res.json();
     hideTyping();
     
-    // Append bot responses
     if (data.messages) {
       data.messages.forEach(msg => addMessage(msg.role, msg.content));
     }
     
-    // Update suggestions/options for next turn
     renderChatOptions(data.options);
     
   } catch (err) {
@@ -272,10 +282,7 @@ async function sendMessageToApi(text) {
 }
 
 function addMessage(role, content) {
-  if (!chatMessages) {
-    console.error("chatMessages element not found");
-    return;
-  }
+  if (!chatMessages) return;
   
   const msgDiv = document.createElement("div");
   msgDiv.className = `chat-message ${role}`;
@@ -286,7 +293,7 @@ function addMessage(role, content) {
   
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.innerHTML = content; // Allow HTML for links
+  bubble.innerHTML = content; 
   
   msgDiv.appendChild(avatar);
   msgDiv.appendChild(bubble);
@@ -296,10 +303,7 @@ function addMessage(role, content) {
 }
 
 function renderChatOptions(options) {
-  if (!chatOptions) {
-    console.error("chatOptions element not found");
-    return;
-  }
+  if (!chatOptions) return;
   
   chatOptions.innerHTML = "";
   if (!options || options.length === 0) return;
@@ -315,7 +319,6 @@ function renderChatOptions(options) {
     chatOptions.appendChild(chip);
   });
 
-  // Force scroll to show new options
   requestAnimationFrame(() => {
     scrollToBottom();
   });
@@ -354,7 +357,6 @@ function scrollToBottom() {
   }
 }
 
-// Scroll when window resizes (e.g. keyboard opens on mobile)
 window.addEventListener("resize", scrollToBottom);
 
 // Chat Input Handlers
@@ -391,7 +393,7 @@ if (backBtn) {
 if (resetBtn) {
   resetBtn.addEventListener("click", () => {
     if (confirm("Start a new session?")) {
-      resetSession();
+      restartExperience(); // Prefer restart over reset for "Start Over"
     }
   });
 }

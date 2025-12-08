@@ -99,3 +99,5 @@ If hostname is wrong, fix it:
 sudo hostnamectl set-hostname srv1079042.hstgr.cloud
 ```
 
+
+

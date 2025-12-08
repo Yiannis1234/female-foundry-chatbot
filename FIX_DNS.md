@@ -106,3 +106,5 @@ Since `localhost:8100` works, try accessing by IP:
 2. Open: `http://YOUR_IP` in your browser
 3. If that works, the issue is DNS configuration in Hostinger
 
+
+

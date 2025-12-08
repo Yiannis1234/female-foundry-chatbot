@@ -138,3 +138,4 @@ sudo systemctl status femalefoundry nginx
 2. **Try accessing by IP** - If IP works but domain doesn't, it's a DNS issue
 3. **Check Hostinger support** - They might need to configure the subdomain
 
+
