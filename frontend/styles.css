@@ -141,17 +141,20 @@ button {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 #name-input {
   width: 100%;
-  padding: 20px 60px 20px 20px;
-  font-size: 1.2rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Simple box */
   background: white;
   transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
+  text-align: center;
 }
 
 #name-input:focus {
@@ -323,9 +326,10 @@ button {
 
 .card-desc {
   margin: 0;
-  color: #6b6f85;
+  color: #333; /* Darker for visibility */
   font-size: 0.95rem;
   line-height: 1.5;
+  margin-top: 8px;
 }
 
 /* VIEW 3: Chat Interface */

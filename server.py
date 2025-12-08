@@ -41,7 +41,7 @@ PRIMARY_OPTIONS = [
 
 # These are the sub-options for the boxes that lead to a chat flow
 SECONDARY_OPTIONS: Dict[str, List[str]] = {
-    "Key Insights": ["Methodology", "Key Insights"], # "Key Insights" here refers to the detailed analysis
+    "Key Insights": ["Methodology", "Key Insights"],
     "Fundraising trends": [
         "Funding Data",
         "By Country Analysis",
@@ -112,8 +112,7 @@ INFO_MAP: Dict[str, str] = {
 
     # --- BOX 4 FLOW ---
     "Fundraising trends": (
-        "Love it - let's dig in!\n\n"
-        "I can show you the detailed funding data, break it down by country or sector, "
+        "Love it — let’s dig in! I can show you the detailed funding data, break it down by country or sector, "
         "show you the top 50 funding rounds, walk you through the IPO and exit landscape, "
         "or give you a tour of some of the most innovative deeptech startups. What would you like?"
     ),
@@ -154,9 +153,8 @@ INFO_MAP: Dict[str, str] = {
 
     # --- BOX 5 FLOW ---
     "Behind the Index": (
-        "Ah, going behind the scenes — I like your style.\n\n"
-        "Let’s shine a spotlight on the team, the sponsors, the contributors, and the partners who make the Female Innovation Index possible.\n\n"
-        "Grab your popcorn — intros coming up!"
+        "Ah, going behind the scenes — I like your style. Let’s shine a spotlight on the team, the sponsors, "
+        "the contributors, and the partners who make the Female Innovation Index possible. Grab your popcorn — intros coming up!"
     ),
     "The Team": (
         "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
@@ -173,6 +171,17 @@ INFO_MAP: Dict[str, str] = {
     "The Partners": (
         "Our partners help amplify the reach of the Index across the European ecosystem.<br><br>"
         "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' class='chat-link-btn'>Meet the Partners</a>"
+    ),
+
+    # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
+    "The Era of Abundance": (
+        "<a href='https://www.femaleinnovationindex.com/innovation' target='_blank' class='chat-link-btn'>Click here to explore The Era of Abundance</a>"
+    ),
+    "Idea": (
+        "<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_blank' class='chat-link-btn'>Click here to explore Idea</a>"
+    ),
+    "About Female Foundry": (
+        "<a href='https://www.femaleinnovationindex.com/test?target=about' target='_blank' class='chat-link-btn'>Visit Female Foundry</a>"
     ),
 }
 
