@@ -183,7 +183,7 @@ INFO_MAP: Dict[str, str] = {
         "Opening Idea..."
     ),
     "About Female Foundry": (
-        "<script>window.open('https://www.femaleinnovationindex.com/test?target=about', '_blank');</script>"
+        "<script>window.open('https://www.femalefoundry.co/', '_blank');</script>"
         "Opening Female Foundry..."
     ),
 }

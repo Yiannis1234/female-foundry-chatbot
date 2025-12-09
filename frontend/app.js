@@ -79,7 +79,7 @@ const OPTION_LINKS = {
   // Primary (Dashboard)
   "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation",
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
-  "About Female Foundry": "https://www.femaleinnovationindex.com/test?target=about",
+  "About Female Foundry": "https://www.femalefoundry.co/",
 
   // Secondary (Chat buttons)
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
