@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script defer src="/app.js"></script>
+    <script defer src="/app.js?v=8"></script>
   </head>
   <body>
     <div class="app-container">
@@ -31,12 +31,11 @@
       <main id="main-content">
         
         <!-- VIEW 1: WELCOME / NAME INPUT -->
-        <section id="view-welcome" class="view active">
+        <section id="view-welcome" class="view">
           <div class="welcome-content">
-            <h1 class="fade-in">Hey, what's your name?</h1>
             <form id="name-form" class="fade-in delay-1">
               <div class="input-wrapper">
-                <input type="text" id="name-input" placeholder="" autocomplete="off" required />
+                <input type="text" id="name-input" placeholder="Hey, what's your name?" autocomplete="off" required />
               </div>
             </form>
           </div>
@@ -71,18 +70,10 @@
             
             <div class="chat-scroll" id="chatMessages">
               <!-- Messages go here -->
+              <div class="chat-suggestions" id="chatOptions"></div>
             </div>
 
             <div class="chat-input-area">
-              <div class="chat-suggestions" id="chatOptions"></div>
-              <div class="input-row">
-                <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" />
-                <button id="chatSend" class="send-btn" aria-label="Send">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
         </section>

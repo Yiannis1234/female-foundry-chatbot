@@ -31,59 +31,84 @@ const restartFlowBtn = document.getElementById("restartFlow");
 // UPDATED METADATA FOR NEW BOXES
 const DASHBOARD_CARD_META = {
   "The Era of Abundance": {
-    icon: "🌌", // Example icon
+    icon: "🌌",
     gradient: "linear-gradient(135deg, #7c63ff, #a977ff)",
-    description: "Learn how AI is redefining how female founders build and solve the next generation of problems.",
-    link: null // We will handle this via chat response now
+    description:
+      "Learn how AI is redefining how female founders build and solve the next generation of problems.",
+    link: null,
   },
   "Key Insights": {
     icon: "💡",
     gradient: "linear-gradient(135deg, #5bc9ff, #4f79ff)",
-    description: "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
-    link: null // Chat flow
+    description:
+      "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
+    link: null,
   },
-  "Idea": {
+  Idea: {
     icon: "✨",
     gradient: "linear-gradient(135deg, #ffa26b, #ff5a7a)",
-    description: "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
-    link: null // We will handle this via chat response now
+    description:
+      "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
+    link: null,
   },
   "Fundraising trends": {
     icon: "📈",
     gradient: "linear-gradient(135deg, #7adca0, #3ab98f)",
-    description: "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
-    link: null // Chat flow
+    description:
+      "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
+    link: null,
   },
   "Behind the Index": {
     icon: "🤝",
     gradient: "linear-gradient(135deg, #fbc93a, #ff8f5a)",
-    description: "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
-    link: null // Chat flow
+    description:
+      "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
+    link: null,
   },
   "About Female Foundry": {
     icon: "🏛️",
     gradient: "linear-gradient(135deg, #cfd8ff, #9eaeff)",
-    description: "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
-    link: null // We will handle this via chat response now
+    description:
+      "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
+    link: null,
   },
+};
+
+// Direct links map (dashboard buttons and chat chips)
+const OPTION_LINKS = {
+  // Primary (Dashboard)
+  "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation",
+  Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
+  "About Female Foundry": "https://www.femaleinnovationindex.com/test?target=about",
+
+  // Secondary (Chat buttons)
+  "The Team": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
+  "The Contributors": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Partners": "https://www.femaleinnovationindex.com/test?target=partners",
 };
 
 // --- Initialization ---
 window.addEventListener("load", () => {
+  setInitialView();
+  attachWelcomeListeners();
+  if (nameInput) nameInput.focus();
+});
+
+function setInitialView() {
   if (views.welcome) {
     views.welcome.classList.remove("hidden");
     views.welcome.classList.add("active");
-    if (views.dashboard) {
-      views.dashboard.classList.add("hidden");
-      views.dashboard.classList.remove("active");
-    }
-    if (views.chat) {
-      views.chat.classList.add("hidden");
-      views.chat.classList.remove("active");
-    }
   }
-  if (nameInput) nameInput.focus();
-});
+  if (views.dashboard) {
+    views.dashboard.classList.add("hidden");
+    views.dashboard.classList.remove("active");
+  }
+  if (views.chat) {
+    views.chat.classList.add("hidden");
+    views.chat.classList.remove("active");
+  }
+}
 
 // --- View Management ---
 function switchView(viewName) {
@@ -92,7 +117,6 @@ function switchView(viewName) {
     return;
   }
 
-  // Hide all views first
   Object.values(views).forEach((el) => {
     if (el) {
       el.classList.remove("active");
@@ -100,7 +124,6 @@ function switchView(viewName) {
     }
   });
 
-  // Show target view
   const target = views[viewName];
   target.classList.remove("hidden");
   requestAnimationFrame(() => {
@@ -111,24 +134,39 @@ function switchView(viewName) {
 }
 
 // --- Welcome Flow ---
-if (nameForm) {
-  nameForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = nameInput ? nameInput.value.trim() : "";
-    if (!name) return;
+function attachWelcomeListeners() {
+  if (nameForm) {
+    nameForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitName();
+    });
+  }
 
-    userName = name;
-    if (userNameDisplay) userNameDisplay.textContent = name;
+  if (nameInput) {
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitName();
+      }
+    });
+  }
+}
 
-    try {
-      await startSession(); 
-      await sendNameToApi(name);
-      switchView("dashboard");
-    } catch (err) {
-      console.error("Failed to start session", err);
-      alert("Could not connect to server. Please try again.");
-    }
-  });
+async function submitName() {
+  const name = nameInput ? nameInput.value.trim() : "";
+  if (!name) return;
+
+  userName = name;
+  if (userNameDisplay) userNameDisplay.textContent = name;
+
+  try {
+    await startSession();
+    await sendNameToApi(name);
+    switchView("dashboard");
+  } catch (err) {
+    console.error("Failed to start session", err);
+    alert("Could not connect to server. Please try again.");
+  }
 }
 
 // --- Session Logic ---
@@ -147,15 +185,9 @@ async function sendNameToApi(name) {
       body: JSON.stringify({ session_id: sessionId, message: name }),
     });
     const data = await res.json();
-    
-    // The response contains the PRIMARY_OPTIONS
     if (data.options && data.options.length > 0) {
       renderDashboard(data.options);
     }
-    
-    // We do NOT populate chat messages here because the user is going to the Dashboard first.
-    // But if we wanted to show a history later, we could.
-
   } catch (err) {
     console.error("Error sending name:", err);
   }
@@ -163,39 +195,29 @@ async function sendNameToApi(name) {
 
 async function resetSession() {
   if (!sessionId) return;
-  const res = await fetch(`${API_BASE}/session/${sessionId}/reset`, {
-    method: "POST",
-  });
+  const res = await fetch(`${API_BASE}/session/${sessionId}/reset`, { method: "POST" });
   const data = await res.json();
   clearChat();
-  
-  // If resetting to start, we might want to go back to Name input? 
-  // Or just clear chat and go to dashboard. 
-  // Requirement says "Restart" flow.
-  renderDashboard(data.options); 
+  renderDashboard(data.options);
   switchView("dashboard");
 }
 
 // --- Dashboard Logic ---
 function renderDashboard(options) {
   if (!dashboardOptions) return;
-  
+
   dashboardOptions.innerHTML = "";
-  
-  if (!options || options.length === 0) {
-    console.warn("No options provided for dashboard");
-    return;
-  }
-  
-  options.forEach(opt => {
-    // Match metadata either by exact key or fallback
-    const meta = DASHBOARD_CARD_META[opt] || {
-      icon: "💡",
-      gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
-      description: "Tap to explore this topic.",
-      link: null
-    };
-    
+  if (!options || options.length === 0) return;
+
+  options.forEach((opt) => {
+    const meta =
+      DASHBOARD_CARD_META[opt] || {
+        icon: "💡",
+        gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
+        description: "Tap to explore this topic.",
+        link: null,
+      };
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
@@ -203,39 +225,31 @@ function renderDashboard(options) {
       <div class="card-title">${opt}</div>
       <p class="card-desc">${meta.description}</p>
     `;
-    
-    // Handle click: ALWAYS Chat Flow now
+
     card.onclick = () => {
-        handleDashboardSelection(opt);
+      if (OPTION_LINKS[opt]) {
+        window.open(OPTION_LINKS[opt], "_blank");
+        return;
+      }
+      handleDashboardSelection(opt);
     };
-    
+
     dashboardOptions.appendChild(card);
   });
 }
 
 async function restartExperience() {
-  // Full restart: New Session, Back to Welcome Screen
-  try {
-    if (sessionId) {
-       // Optional: notify backend we are quitting
-    }
-  } catch (err) { console.error(err); }
-  
   sessionId = null;
   userName = "";
   clearChat();
-  
   if (nameInput) nameInput.value = "";
   if (userNameDisplay) userNameDisplay.textContent = "there";
-  
   switchView("welcome");
   if (nameInput) nameInput.focus();
 }
 
-
 async function handleDashboardSelection(text) {
   switchView("chat");
-  // Simulate sending this as a message
   addMessage("user", text);
   await sendMessageToApi(text);
 }
@@ -258,6 +272,11 @@ if (dashboardSearch) {
 
 // --- Chat Logic ---
 async function sendMessageToApi(text) {
+  if (OPTION_LINKS[text]) {
+    window.open(OPTION_LINKS[text], "_blank");
+    return;
+  }
+
   showTyping();
   try {
     const res = await fetch(`${API_BASE}/chat`, {
@@ -267,13 +286,10 @@ async function sendMessageToApi(text) {
     });
     const data = await res.json();
     hideTyping();
-    
     if (data.messages) {
-      data.messages.forEach(msg => addMessage(msg.role, msg.content));
+      data.messages.forEach((msg) => addMessage(msg.role, msg.content));
     }
-    
     renderChatOptions(data.options);
-    
   } catch (err) {
     console.error(err);
     hideTyping();
@@ -283,51 +299,58 @@ async function sendMessageToApi(text) {
 
 function addMessage(role, content) {
   if (!chatMessages) return;
-  
+
   const msgDiv = document.createElement("div");
   msgDiv.className = `chat-message ${role}`;
-  
+
   const avatar = document.createElement("div");
   avatar.className = "avatar";
   avatar.textContent = role === "bot" ? "FF" : "You";
-  
+
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.innerHTML = content; 
-  
+  bubble.innerHTML = content;
+
   msgDiv.appendChild(avatar);
   msgDiv.appendChild(bubble);
-  
   chatMessages.appendChild(msgDiv);
   scrollToBottom();
 }
 
 function renderChatOptions(options) {
-  if (!chatOptions) return;
-  
+  if (!chatOptions || !chatMessages) return;
   chatOptions.innerHTML = "";
-  if (!options || options.length === 0) return;
-  
-  options.forEach(opt => {
+
+  if (!options || options.length === 0) {
+    chatOptions.style.display = "none";
+    return;
+  }
+
+  chatOptions.style.display = "flex";
+
+  options.forEach((opt) => {
     const chip = document.createElement("button");
     chip.className = "suggestion-chip";
     chip.textContent = opt;
     chip.onclick = () => {
+      if (OPTION_LINKS[opt]) {
+        window.open(OPTION_LINKS[opt], "_blank");
+        return;
+      }
       addMessage("user", opt);
       sendMessageToApi(opt);
     };
     chatOptions.appendChild(chip);
   });
 
-  requestAnimationFrame(() => {
-    scrollToBottom();
-  });
+  // Ensure chips stay visually below the latest messages
+  chatMessages.appendChild(chatOptions);
+  requestAnimationFrame(() => scrollToBottom());
 }
 
 let typingIndicator = null;
 function showTyping() {
-  if (!chatMessages) return;
-  if (typingIndicator) return;
+  if (!chatMessages || typingIndicator) return;
   const wrapper = document.createElement("div");
   wrapper.className = "chat-message bot";
   wrapper.innerHTML = `
@@ -385,21 +408,17 @@ if (chatInput) {
 
 // Navigation Handlers
 if (backBtn) {
-  backBtn.addEventListener("click", () => {
-    switchView("dashboard");
-  });
+  backBtn.addEventListener("click", () => switchView("dashboard"));
 }
 
 if (resetBtn) {
   resetBtn.addEventListener("click", () => {
     if (confirm("Start a new session?")) {
-      restartExperience(); // Prefer restart over reset for "Start Over"
+      restartExperience();
     }
   });
 }
 
 if (restartFlowBtn) {
-  restartFlowBtn.addEventListener("click", () => {
-    restartExperience();
-  });
+  restartFlowBtn.addEventListener("click", () => restartExperience());
 }

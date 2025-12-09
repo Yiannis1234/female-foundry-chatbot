@@ -175,13 +175,16 @@ INFO_MAP: Dict[str, str] = {
 
     # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
     "The Era of Abundance": (
-        "<a href='https://www.femaleinnovationindex.com/innovation' target='_blank' class='chat-link-btn'>Click here to explore The Era of Abundance</a>"
+        "<script>window.open('https://www.femaleinnovationindex.com/innovation', '_blank');</script>"
+        "Opening The Era of Abundance..."
     ),
     "Idea": (
-        "<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_blank' class='chat-link-btn'>Click here to explore Idea</a>"
+        "<script>window.open('https://www.femaleinnovationindex.com/idea?target=section100', '_blank');</script>"
+        "Opening Idea..."
     ),
     "About Female Foundry": (
-        "<a href='https://www.femaleinnovationindex.com/test?target=about' target='_blank' class='chat-link-btn'>Visit Female Foundry</a>"
+        "<script>window.open('https://www.femaleinnovationindex.com/test?target=about', '_blank');</script>"
+        "Opening Female Foundry..."
     ),
 }
 
@@ -355,11 +358,12 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
                 # If it's a link type, we might just send a link back?
                 # But frontend should capture clicks. If user types "Idea", we can send the link.
                 if match == "Idea":
-                    return respond(state, ["<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_blank'>Click here to explore Idea</a>"], PRIMARY_OPTIONS)
+                    # This fallback should NOT happen if JS is working, but just in case:
+                    return respond(state, [], PRIMARY_OPTIONS)
                 elif match == "The Era of Abundance":
-                    return respond(state, ["<a href='https://www.femaleinnovationindex.com/innovation' target='_blank'>Click here to explore The Era of Abundance</a>"], PRIMARY_OPTIONS)
+                    return respond(state, [], PRIMARY_OPTIONS)
                 elif match == "About Female Foundry":
-                    return respond(state, ["<a href='https://www.femaleinnovationindex.com/test?target=about' target='_blank'>Visit Female Foundry</a>"], PRIMARY_OPTIONS)
+                    return respond(state, [], PRIMARY_OPTIONS)
                     
                 return deliver_info(state, match)
 
