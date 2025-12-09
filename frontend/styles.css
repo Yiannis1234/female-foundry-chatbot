@@ -534,14 +534,9 @@ button {
   font-weight: 600;
 }
 
-.option-chip-bubble .bubble {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 10px;
-}
-
-.option-chip-bubble .suggestion-chip {
-  margin: 0;
+.options-inline-prompt {
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .primary-footer {
