@@ -24,6 +24,7 @@ const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const chatSendBtn = document.getElementById("chatSend");
 const chatOptions = document.getElementById("chatOptions");
+const primaryFooterOptions = document.getElementById("primary-footer-options");
 const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
@@ -324,6 +325,11 @@ function addMessage(role, content) {
 }
 
 function splitBotContent(content) {
+  // If the content contains structured HTML (lists/links), avoid splitting to prevent broken markup.
+  if (content.includes("<ul") || content.includes("<ol") || content.includes("<a")) {
+    return [content];
+  }
+
   // 1) Respect explicit breaks first
   if (content.includes("<br")) {
     return content.split(/<br\s*\/?>\s*/).filter(Boolean);
@@ -357,27 +363,49 @@ function splitBotContent(content) {
 function renderChatOptions(options) {
   if (!chatMessages) return;
 
-  // Remove any previous option bubbles
-  const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble");
+  // Remove any previous option bubbles/prompts
+  const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
   oldOptionBubbles.forEach((el) => el.remove());
 
-  if (!options || options.length === 0) return;
+  if (!options || options.length === 0) {
+    renderPrimaryFooterOptions([]);
+    return;
+  }
 
-  // Create a chat-styled bubble for options
-  const msgDiv = document.createElement("div");
-  msgDiv.className = "chat-message bot options-bubble";
+  // If these are the primary 6, show them in the footer and skip inline bubble spam
+  if (isPrimaryOptions(options)) {
+    renderPrimaryFooterOptions(options);
+    return;
+  }
 
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = "FF";
+  // Clear footer when secondary options shown
+  renderPrimaryFooterOptions([]);
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble bubble-options";
+  // Prompt bubble before the options
+  const promptDiv = document.createElement("div");
+  promptDiv.className = "chat-message bot options-prompt";
+  const promptAvatar = document.createElement("div");
+  promptAvatar.className = "avatar";
+  promptAvatar.textContent = "FF";
+  const promptBubble = document.createElement("div");
+  promptBubble.className = "bubble";
+  promptBubble.innerHTML = "What would you like?";
+  promptDiv.appendChild(promptAvatar);
+  promptDiv.appendChild(promptBubble);
+  chatMessages.appendChild(promptDiv);
 
-  const chipsWrap = document.createElement("div");
-  chipsWrap.className = "chat-suggestions";
-
+  // Each option as its own chat-style bubble
   options.forEach((opt) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "chat-message bot options-bubble option-chip-bubble";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "FF";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble bubble-options";
+
     const chip = document.createElement("button");
     chip.className = "suggestion-chip";
     chip.textContent = `💬 ${opt}`;
@@ -389,15 +417,54 @@ function renderChatOptions(options) {
       addMessage("user", opt);
       sendMessageToApi(opt);
     };
-    chipsWrap.appendChild(chip);
+
+    bubble.appendChild(chip);
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    chatMessages.appendChild(msgDiv);
   });
 
-  bubble.appendChild(chipsWrap);
-  msgDiv.appendChild(avatar);
-  msgDiv.appendChild(bubble);
-  chatMessages.appendChild(msgDiv);
-
   requestAnimationFrame(() => scrollToBottom());
+}
+
+function renderPrimaryFooterOptions(options) {
+  if (!primaryFooterOptions) return;
+  primaryFooterOptions.innerHTML = "";
+
+  if (!options || options.length === 0) {
+    primaryFooterOptions.style.display = "none";
+    return;
+  }
+
+  primaryFooterOptions.style.display = "flex";
+
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "footer-chip";
+    btn.textContent = `💬 ${opt}`;
+    btn.onclick = () => {
+      if (OPTION_LINKS[opt]) {
+        window.open(OPTION_LINKS[opt], "_blank");
+        return;
+      }
+      addMessage("user", opt);
+      sendMessageToApi(opt);
+    };
+    primaryFooterOptions.appendChild(btn);
+  });
+}
+
+function isPrimaryOptions(opts) {
+  const primarySet = new Set([
+    "The Era of Abundance",
+    "Key Insights",
+    "Idea",
+    "Fundraising trends",
+    "Behind the Index",
+    "About Female Foundry",
+  ]);
+  if (!Array.isArray(opts) || opts.length !== 6) return false;
+  return opts.every((o) => primarySet.has(o));
 }
 
 let typingIndicator = null;

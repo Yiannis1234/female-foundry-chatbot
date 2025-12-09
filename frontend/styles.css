@@ -355,7 +355,7 @@ button {
   box-shadow: 0 10px 40px rgba(0,0,0,0.05);
   overflow: hidden;
   border: 1px solid #eee;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .chat-header-actions {
@@ -528,6 +528,60 @@ button {
 .bubble-options {
   background: #f7f7fb;
   border: 1px solid #e6e9f5;
+}
+
+.options-prompt .bubble {
+  font-weight: 600;
+}
+
+.option-chip-bubble .bubble {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+}
+
+.option-chip-bubble .suggestion-chip {
+  margin: 0;
+}
+
+.primary-footer {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: #f7f7fb;
+  border-top: 1px solid #eceff4;
+  padding: 10px 0;
+}
+
+.primary-footer-options {
+  display: none;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.footer-chip {
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid #dde1ff;
+  background: #fff;
+  color: #1f1f33;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(96, 99, 255, 0.08);
+  white-space: nowrap;
+}
+
+.footer-chip:hover {
+  background: #f7f7ff;
+  border-color: #7c63ff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(124, 99, 255, 0.18);
 }
 
 .input-row {
