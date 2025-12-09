@@ -522,6 +522,9 @@ button {
   text-align: center;
   line-height: 1.4;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .suggestion-chip:hover {
@@ -529,6 +532,12 @@ button {
   border-color: #7c63ff;
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(124, 99, 255, 0.15);
+}
+
+.suggestion-chip::before {
+  content: "💬";
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .input-row {

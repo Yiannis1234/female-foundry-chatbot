@@ -94,7 +94,7 @@ SECONDARY_KEYWORDS: Dict[str, str] = {
 INFO_MAP: Dict[str, str] = {
     # --- BOX 2 FLOW ---
     "Key Insights": (
-        "Fantastic! Sounds like you’re on the move— I’ll keep it short and sweet. "
+        "Fantastic! Sounds like you’re on the move— I’ll keep it short and sweet.<br>"
         "Should we jump straight into the key insights, or do you want the behind-the-scenes scoop on the methodology?"
     ),
     "Methodology": (
