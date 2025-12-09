@@ -331,7 +331,7 @@ function renderChatOptions(options) {
   options.forEach((opt) => {
     const chip = document.createElement("button");
     chip.className = "suggestion-chip";
-    chip.textContent = opt;
+    chip.textContent = `💬 ${opt}`;
     chip.onclick = () => {
       if (OPTION_LINKS[opt]) {
         window.open(OPTION_LINKS[opt], "_blank");
