@@ -300,33 +300,54 @@ async function sendMessageToApi(text) {
 function addMessage(role, content) {
   if (!chatMessages) return;
 
-  const msgDiv = document.createElement("div");
-  msgDiv.className = `chat-message ${role}`;
+  // Split bot messages into multiple bubbles on <br> to improve readability.
+  const segments =
+    role === "bot" && content.includes("<br>")
+      ? content.split(/<br\s*\/?>\s*/).filter(Boolean)
+      : [content];
 
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = role === "bot" ? "FF" : "You";
+  segments.forEach((segment) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `chat-message ${role}`;
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.innerHTML = content;
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = role === "bot" ? "FF" : "You";
 
-  msgDiv.appendChild(avatar);
-  msgDiv.appendChild(bubble);
-  chatMessages.appendChild(msgDiv);
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.innerHTML = segment;
+
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    chatMessages.appendChild(msgDiv);
+  });
+
   scrollToBottom();
 }
 
 function renderChatOptions(options) {
-  if (!chatOptions || !chatMessages) return;
-  chatOptions.innerHTML = "";
+  if (!chatMessages) return;
 
-  if (!options || options.length === 0) {
-    chatOptions.style.display = "none";
-    return;
-  }
+  // Remove any previous option bubbles
+  const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble");
+  oldOptionBubbles.forEach((el) => el.remove());
 
-  chatOptions.style.display = "flex";
+  if (!options || options.length === 0) return;
+
+  // Create a chat-styled bubble for options
+  const msgDiv = document.createElement("div");
+  msgDiv.className = "chat-message bot options-bubble";
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = "FF";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble bubble-options";
+
+  const chipsWrap = document.createElement("div");
+  chipsWrap.className = "chat-suggestions";
 
   options.forEach((opt) => {
     const chip = document.createElement("button");
@@ -340,11 +361,14 @@ function renderChatOptions(options) {
       addMessage("user", opt);
       sendMessageToApi(opt);
     };
-    chatOptions.appendChild(chip);
+    chipsWrap.appendChild(chip);
   });
 
-  // Ensure chips stay visually below the latest messages
-  chatMessages.appendChild(chatOptions);
+  bubble.appendChild(chipsWrap);
+  msgDiv.appendChild(avatar);
+  msgDiv.appendChild(bubble);
+  chatMessages.appendChild(msgDiv);
+
   requestAnimationFrame(() => scrollToBottom());
 }
 

@@ -498,14 +498,8 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 12px 4px 6px 4px;
+  padding: 6px 0 0 0;
   min-height: 0;
-  order: 999; /* ensure it stays after messages */
-  position: sticky;
-  bottom: 0;
-  background: #f7f7fb;
-  border-top: 1px solid #eceff4;
-  padding-top: 10px;
 }
 
 .suggestion-chip {
@@ -522,9 +516,6 @@ button {
   text-align: center;
   line-height: 1.4;
   white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .suggestion-chip:hover {
@@ -534,10 +525,9 @@ button {
   box-shadow: 0 8px 16px rgba(124, 99, 255, 0.15);
 }
 
-.suggestion-chip::before {
-  content: "💬";
-  font-size: 0.95rem;
-  line-height: 1;
+.bubble-options {
+  background: #f7f7fb;
+  border: 1px solid #e6e9f5;
 }
 
 .input-row {
