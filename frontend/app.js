@@ -300,11 +300,8 @@ async function sendMessageToApi(text) {
 function addMessage(role, content) {
   if (!chatMessages) return;
 
-  // Split bot messages into multiple bubbles on <br> to improve readability.
   const segments =
-    role === "bot" && content.includes("<br>")
-      ? content.split(/<br\s*\/?>\s*/).filter(Boolean)
-      : [content];
+    role === "bot" ? splitBotContent(content) : [content];
 
   segments.forEach((segment) => {
     const msgDiv = document.createElement("div");
@@ -324,6 +321,37 @@ function addMessage(role, content) {
   });
 
   scrollToBottom();
+}
+
+function splitBotContent(content) {
+  // 1) Respect explicit breaks first
+  if (content.includes("<br")) {
+    return content.split(/<br\s*\/?>\s*/).filter(Boolean);
+  }
+
+  // 2) Split by sentences if long enough
+  const sentenceParts = content
+    .split(/(?<=[.!?])\s+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (sentenceParts.length > 1 && content.length > 120) {
+    return sentenceParts;
+  }
+
+  // 3) Fallback: chunk every ~140 chars
+  if (content.length > 160) {
+    const chunks = [];
+    let start = 0;
+    const size = 140;
+    while (start < content.length) {
+      chunks.push(content.slice(start, start + size));
+      start += size;
+    }
+    return chunks;
+  }
+
+  return [content];
 }
 
 function renderChatOptions(options) {
