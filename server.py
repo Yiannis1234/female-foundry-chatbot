@@ -66,7 +66,6 @@ PRIMARY_KEYWORDS: Dict[str, str] = {
     "abundance": "The Era of Abundance",
     "ai": "The Era of Abundance",
     "insights": "Key Insights",
-    "methodology": "Key Insights",
     "idea": "Idea",
     "fundraising": "Fundraising trends",
     "funding": "Fundraising trends",
@@ -329,6 +328,20 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
         return reset_session(state)
 
     state.history.append(("user", trimmed))
+
+    # Global primary override: if user clicks any primary option, always treat it as a primary selection
+    if state.stage != "ask_name":
+        global_primary_match = None
+        for opt in PRIMARY_OPTIONS:
+            if trimmed.lower() == opt.lower():
+                global_primary_match = opt
+                break
+        if not global_primary_match:
+            global_primary_match = keyword_match(trimmed, PRIMARY_KEYWORDS)
+        if global_primary_match:
+            state.stage = "menu_primary"
+            state.primary_choice = None
+            return _process_primary_selection(state, global_primary_match)
 
     # 1. HANDLE NAME INPUT
     if state.stage == "ask_name":
