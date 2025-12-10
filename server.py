@@ -373,10 +373,7 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
 
     # 3. HANDLE SECONDARY SELECTION
     if state.stage == "menu_secondary":
-        primary = state.primary_choice
-        options = SECONDARY_OPTIONS.get(primary, [])
-        
-        # If user selects a different primary while in secondary, switch context
+        # If user selects a different primary while in secondary, switch context first
         primary_match = None
         for opt in PRIMARY_OPTIONS:
             if trimmed.lower() == opt.lower():
@@ -396,6 +393,10 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             # If no secondary options, deliver info (sets stage/menu back to primary)
             state.stage = "menu_primary"
             return deliver_info(state, primary_match)
+
+        # Otherwise stay in current primary secondary flow
+        primary = state.primary_choice
+        options = SECONDARY_OPTIONS.get(primary, [])
 
         match = None
         for opt in options:
