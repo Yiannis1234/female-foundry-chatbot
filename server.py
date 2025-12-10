@@ -373,6 +373,9 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             primary_match = keyword_match(trimmed, PRIMARY_KEYWORDS)
 
         if primary_match:
+            # reset to primary flow before processing the new primary choice
+            state.stage = "menu_primary"
+            state.primary_choice = None
             return _process_primary_selection(state, primary_match)
 
         # Otherwise stay in current primary secondary flow
@@ -391,11 +394,10 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
         if match:
             return deliver_info(state, match)
             
-        return respond(
-            state,
-            [format_bot_message("Please choose one of the available options.")],
-            options,
-        )
+        # If no match at all, fall back to primary menu to avoid getting stuck
+        state.stage = "menu_primary"
+        state.primary_choice = None
+        return respond(state, [format_bot_message("Please choose one of the available options.")], PRIMARY_OPTIONS)
 
     state.stage = "menu_primary"
     return respond(state, ["Let's start over."], PRIMARY_OPTIONS)
