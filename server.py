@@ -363,6 +363,11 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
 
     # 3. HANDLE SECONDARY SELECTION
     if state.stage == "menu_secondary":
+        # If no current primary_choice, treat this message as a primary selection
+        if not state.primary_choice:
+            state.stage = "menu_primary"
+            return _process_primary_selection(state, keyword_match(trimmed, PRIMARY_KEYWORDS) or trimmed)
+
         # If user selects a different primary while in secondary, switch context first
         primary_match = None
         for opt in PRIMARY_OPTIONS:
