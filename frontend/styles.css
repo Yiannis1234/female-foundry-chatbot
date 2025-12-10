@@ -551,11 +551,10 @@ button {
 
 .primary-footer {
   position: sticky;
-  bottom: 0;
+  bottom: 16px; /* lift above absolute bottom */
   width: 100%;
-  background: #f7f7fb;
-  border-top: 1px solid #eceff4;
-  padding: 10px 0;
+  background: transparent;
+  padding: 0 0 12px 0;
 }
 
 .primary-footer-options {
@@ -565,7 +564,11 @@ button {
   flex-wrap: wrap;
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #eceff4;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
 .footer-chip {
