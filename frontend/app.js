@@ -404,7 +404,7 @@ function renderChatOptions(options) {
   promptDiv.appendChild(promptBubble);
   chatMessages.appendChild(promptDiv);
 
-  // Each option as its own bubble (separate clouds) — no extra prompt to avoid duplication
+  // Each option as its own bubble (separate clouds)
   options.forEach((opt) => {
     const msgDiv = document.createElement("div");
     msgDiv.className = "chat-message bot options-bubble option-chip-bubble";
@@ -453,6 +453,11 @@ function renderPrimaryFooterOptions(options) {
     btn.className = "footer-chip";
     btn.textContent = `💬 ${opt}`;
     btn.onclick = () => {
+      // Clear any pending prompts/bubbles when switching primary via footer
+      if (chatMessages) {
+        const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
+        oldOptionBubbles.forEach((el) => el.remove());
+      }
       if (OPTION_LINKS[opt]) {
         window.open(OPTION_LINKS[opt], "_blank");
         return;
