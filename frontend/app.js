@@ -30,6 +30,15 @@ const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
 // UPDATED METADATA FOR NEW BOXES
+const PRIMARY_LIST = [
+  "The Era of Abundance",
+  "Key Insights",
+  "Idea",
+  "Fundraising trends",
+  "Behind the Index",
+  "About Female Foundry",
+];
+
 const DASHBOARD_CARD_META = {
   "The Era of Abundance": {
     icon: "🌌",
@@ -84,9 +93,9 @@ const OPTION_LINKS = {
 
   // Secondary (Chat buttons)
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
+  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=team",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Partners": "https://www.femaleinnovationindex.com/test?target=partners",
+  "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
 };
 
 // --- Initialization ---
@@ -209,6 +218,9 @@ function renderDashboard(options) {
 
   dashboardOptions.innerHTML = "";
   if (!options || options.length === 0) return;
+
+  // Always show the primary 6 in footer on dashboard
+  renderPrimaryFooterOptions(PRIMARY_LIST);
 
   options.forEach((opt) => {
     const meta =
@@ -378,8 +390,8 @@ function renderChatOptions(options) {
     return;
   }
 
-  // Clear footer when secondary options shown
-  renderPrimaryFooterOptions([]);
+  // Keep primary footer visible even when secondary options show
+  renderPrimaryFooterOptions(PRIMARY_LIST);
 
   // One chat bubble with prompt + chips
   const msgDiv = document.createElement("div");
