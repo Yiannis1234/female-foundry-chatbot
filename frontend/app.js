@@ -375,23 +375,21 @@ function splitBotContent(content) {
 function renderChatOptions(options) {
   if (!chatMessages) return;
 
+  // Footer should always show the primary 6
+  renderPrimaryFooterOptions(PRIMARY_LIST);
+
   // Remove any previous option bubbles/prompts
   const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
   oldOptionBubbles.forEach((el) => el.remove());
 
   if (!options || options.length === 0) {
-    renderPrimaryFooterOptions([]);
     return;
   }
 
   // If these are the primary 6, show them in the footer and skip inline bubble
   if (isPrimaryOptions(options)) {
-    renderPrimaryFooterOptions(options);
     return;
   }
-
-  // Keep footer visible; include secondary chips in footer too
-  renderPrimaryFooterOptions([...PRIMARY_LIST, ...options]);
 
   // Each option as its own bubble (separate clouds) — no extra prompt to avoid duplication
   options.forEach((opt) => {
