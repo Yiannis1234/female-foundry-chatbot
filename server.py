@@ -387,17 +387,15 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
 
         if primary_match:
             sub_opts = SECONDARY_OPTIONS.get(primary_match)
+            state.primary_choice = primary_match
             if sub_opts:
-                state.primary_choice = primary_match
                 state.stage = "menu_secondary"
                 intro_text = INFO_MAP.get(primary_match, f"Let's explore {primary_match}.")
                 formatted_intro = format_bot_message(intro_text)
                 return respond(state, [formatted_intro], sub_opts)
-            else:
-                # no secondary options, deliver info or fallback
-                state.stage = "menu_primary"
-                state.primary_choice = None
-                return deliver_info(state, primary_match)
+            # If no secondary options, deliver info (sets stage/menu back to primary)
+            state.stage = "menu_primary"
+            return deliver_info(state, primary_match)
 
         match = None
         for opt in options:
