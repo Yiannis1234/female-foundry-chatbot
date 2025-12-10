@@ -288,6 +288,24 @@ def deliver_info(state: SessionState, choice: str) -> SessionResponse:
         stage=state.stage,
     )
 
+
+def _process_primary_selection(state: SessionState, match: str | None) -> SessionResponse:
+    if not match:
+        fallback = format_bot_message("I'm not sure about that. Pick a topic from the dashboard or menu.")
+        return respond(state, [fallback], PRIMARY_OPTIONS)
+
+    sub_opts = SECONDARY_OPTIONS.get(match)
+    state.primary_choice = match
+    if sub_opts:
+        state.stage = "menu_secondary"
+        intro_text = INFO_MAP.get(match, f"Let's explore {match}.")
+        formatted_intro = format_bot_message(intro_text)
+        return respond(state, [formatted_intro], sub_opts)
+
+    # no secondary options: deliver info and return to primary menu
+    state.stage = "menu_primary"
+    return deliver_info(state, match)
+
 def respond(state: SessionState, responses: List[str], options: List[str]) -> SessionResponse:
     for response in responses:
         state.history.append(("bot", response))
@@ -341,35 +359,7 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
         if not match:
             match = keyword_match(trimmed, PRIMARY_KEYWORDS)
 
-        if match:
-            # Check if this option has sub-options (Boxes 2, 4, 5)
-            sub_opts = SECONDARY_OPTIONS.get(match)
-            if sub_opts:
-                state.primary_choice = match
-                state.stage = "menu_secondary"
-                
-                # Get the specific intro text for this box
-                intro_text = INFO_MAP.get(match, f"Let's explore {match}.")
-                formatted_intro = format_bot_message(intro_text)
-                
-                return respond(state, [formatted_intro], sub_opts)
-            else:
-                # Direct links or simple info (Boxes 1, 3, 6 are links handled by frontend, but if they type it...)
-                # If it's a link type, we might just send a link back?
-                # But frontend should capture clicks. If user types "Idea", we can send the link.
-                if match == "Idea":
-                    # This fallback should NOT happen if JS is working, but just in case:
-                    return respond(state, [], PRIMARY_OPTIONS)
-                elif match == "The Era of Abundance":
-                    return respond(state, [], PRIMARY_OPTIONS)
-                elif match == "About Female Foundry":
-                    return respond(state, [], PRIMARY_OPTIONS)
-                    
-                return deliver_info(state, match)
-
-        # No match found
-        fallback = format_bot_message("I'm not sure about that. Pick a topic from the dashboard or menu.")
-        return respond(state, [fallback], PRIMARY_OPTIONS)
+        return _process_primary_selection(state, match)
 
     # 3. HANDLE SECONDARY SELECTION
     if state.stage == "menu_secondary":
@@ -383,17 +373,7 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             primary_match = keyword_match(trimmed, PRIMARY_KEYWORDS)
 
         if primary_match:
-            sub_opts = SECONDARY_OPTIONS.get(primary_match)
-            state.primary_choice = primary_match
-            if sub_opts:
-                state.stage = "menu_secondary"
-                intro_text = INFO_MAP.get(primary_match, f"Let's explore {primary_match}.")
-                formatted_intro = format_bot_message(intro_text)
-                # When switching primaries, DO NOT reuse previous secondary options
-                return respond(state, [formatted_intro], sub_opts)
-            # If no secondary options, deliver info (sets stage/menu back to primary)
-            state.stage = "menu_primary"
-            return deliver_info(state, primary_match)
+            return _process_primary_selection(state, primary_match)
 
         # Otherwise stay in current primary secondary flow
         primary = state.primary_choice
