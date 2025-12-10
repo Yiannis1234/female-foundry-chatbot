@@ -539,6 +539,16 @@ button {
   margin-bottom: 8px;
 }
 
+.option-chip-bubble .bubble {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+}
+
+.option-chip-bubble .suggestion-chip {
+  margin: 0;
+}
+
 .primary-footer {
   position: sticky;
   bottom: 0;

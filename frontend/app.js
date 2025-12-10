@@ -93,9 +93,9 @@ const OPTION_LINKS = {
 
   // Secondary (Chat buttons)
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Partners": "https://www.femaleinnovationindex.com/test?target=partners",
 };
 
 // --- Initialization ---
@@ -390,34 +390,34 @@ function renderChatOptions(options) {
     return;
   }
 
-  // If Key Insights secondary, keep footer and add these two as well
-  if (isKeyInsightsSecondary(options)) {
-    renderPrimaryFooterOptions([...PRIMARY_LIST, ...options]);
-  } else {
-    // Keep primary footer visible when other secondary options show
-    renderPrimaryFooterOptions(PRIMARY_LIST);
-  }
+  // Keep footer visible; include secondary chips in footer too
+  renderPrimaryFooterOptions([...PRIMARY_LIST, ...options]);
 
-  // One chat bubble with prompt + chips
-  const msgDiv = document.createElement("div");
-  msgDiv.className = "chat-message bot options-bubble";
+  // Prompt bubble
+  const promptDiv = document.createElement("div");
+  promptDiv.className = "chat-message bot options-prompt";
+  const promptAvatar = document.createElement("div");
+  promptAvatar.className = "avatar";
+  promptAvatar.textContent = "FF";
+  const promptBubble = document.createElement("div");
+  promptBubble.className = "bubble";
+  promptBubble.innerHTML = "What would you like?";
+  promptDiv.appendChild(promptAvatar);
+  promptDiv.appendChild(promptBubble);
+  chatMessages.appendChild(promptDiv);
 
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = "FF";
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble bubble-options";
-
-  const prompt = document.createElement("div");
-  prompt.className = "options-inline-prompt";
-  prompt.textContent = "What would you like?";
-  bubble.appendChild(prompt);
-
-  const chipsWrap = document.createElement("div");
-  chipsWrap.className = "chat-suggestions";
-
+  // Each option as its own bubble (separate clouds)
   options.forEach((opt) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "chat-message bot options-bubble option-chip-bubble";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = "FF";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble bubble-options";
+
     const chip = document.createElement("button");
     chip.className = "suggestion-chip";
     chip.textContent = `💬 ${opt}`;
@@ -429,13 +429,12 @@ function renderChatOptions(options) {
       addMessage("user", opt);
       sendMessageToApi(opt);
     };
-    chipsWrap.appendChild(chip);
-  });
 
-  bubble.appendChild(chipsWrap);
-  msgDiv.appendChild(avatar);
-  msgDiv.appendChild(bubble);
-  chatMessages.appendChild(msgDiv);
+    bubble.appendChild(chip);
+    msgDiv.appendChild(avatar);
+    msgDiv.appendChild(bubble);
+    chatMessages.appendChild(msgDiv);
+  });
 
   requestAnimationFrame(() => scrollToBottom());
 }
