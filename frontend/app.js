@@ -390,8 +390,13 @@ function renderChatOptions(options) {
     return;
   }
 
-  // Keep primary footer visible even when secondary options show
-  renderPrimaryFooterOptions(PRIMARY_LIST);
+  // If Key Insights secondary, keep footer and add these two as well
+  if (isKeyInsightsSecondary(options)) {
+    renderPrimaryFooterOptions([...PRIMARY_LIST, ...options]);
+  } else {
+    // Keep primary footer visible when other secondary options show
+    renderPrimaryFooterOptions(PRIMARY_LIST);
+  }
 
   // One chat bubble with prompt + chips
   const msgDiv = document.createElement("div");
@@ -473,6 +478,12 @@ function isPrimaryOptions(opts) {
   ]);
   if (!Array.isArray(opts) || opts.length !== 6) return false;
   return opts.every((o) => primarySet.has(o));
+}
+
+function isKeyInsightsSecondary(opts) {
+  if (!Array.isArray(opts) || opts.length !== 2) return false;
+  const set = new Set(opts);
+  return set.has("Methodology") && set.has("Key Insights");
 }
 
 let typingIndicator = null;
