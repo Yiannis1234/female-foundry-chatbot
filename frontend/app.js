@@ -391,6 +391,19 @@ function renderChatOptions(options) {
     return;
   }
 
+  // Add a prompt bubble before secondary options
+  const promptDiv = document.createElement("div");
+  promptDiv.className = "chat-message bot options-prompt";
+  const promptAvatar = document.createElement("div");
+  promptAvatar.className = "avatar";
+  promptAvatar.textContent = "FF";
+  const promptBubble = document.createElement("div");
+  promptBubble.className = "bubble";
+  promptBubble.innerHTML = "What would you like to explore?";
+  promptDiv.appendChild(promptAvatar);
+  promptDiv.appendChild(promptBubble);
+  chatMessages.appendChild(promptDiv);
+
   // Each option as its own bubble (separate clouds) — no extra prompt to avoid duplication
   options.forEach((opt) => {
     const msgDiv = document.createElement("div");
