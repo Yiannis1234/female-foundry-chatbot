@@ -393,20 +393,7 @@ function renderChatOptions(options) {
   // Keep footer visible; include secondary chips in footer too
   renderPrimaryFooterOptions([...PRIMARY_LIST, ...options]);
 
-  // Prompt bubble
-  const promptDiv = document.createElement("div");
-  promptDiv.className = "chat-message bot options-prompt";
-  const promptAvatar = document.createElement("div");
-  promptAvatar.className = "avatar";
-  promptAvatar.textContent = "FF";
-  const promptBubble = document.createElement("div");
-  promptBubble.className = "bubble";
-  promptBubble.innerHTML = "What would you like?";
-  promptDiv.appendChild(promptAvatar);
-  promptDiv.appendChild(promptBubble);
-  chatMessages.appendChild(promptDiv);
-
-  // Each option as its own bubble (separate clouds)
+  // Each option as its own bubble (separate clouds) — no extra prompt to avoid duplication
   options.forEach((opt) => {
     const msgDiv = document.createElement("div");
     msgDiv.className = "chat-message bot options-bubble option-chip-bubble";
