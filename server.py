@@ -162,11 +162,11 @@ INFO_MAP: Dict[str, str] = {
     ),
     "The Sponsors": (
         "Our sponsors provide the critical support needed to keep this research independent and open-source.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' class='chat-link-btn'>Meet the Sponsors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' class='chat-link-btn'>Meet the Sponsors</a>"
     ),
     "The Contributors": (
         "Over 100 industry experts contributed their data and perspectives to this year's Index.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' class='chat-link-btn'>Meet the Contributors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' class='chat-link-btn'>Meet the Contributors</a>"
     ),
     "The Partners": (
         "Our partners help amplify the reach of the Index across the European ecosystem.<br><br>"

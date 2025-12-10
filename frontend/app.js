@@ -93,8 +93,8 @@ const OPTION_LINKS = {
 
   // Secondary (Chat buttons)
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Contributors": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
+  "The Contributors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
 };
 
