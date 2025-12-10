@@ -389,6 +389,7 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
                 state.stage = "menu_secondary"
                 intro_text = INFO_MAP.get(primary_match, f"Let's explore {primary_match}.")
                 formatted_intro = format_bot_message(intro_text)
+                # When switching primaries, DO NOT reuse previous secondary options
                 return respond(state, [formatted_intro], sub_opts)
             # If no secondary options, deliver info (sets stage/menu back to primary)
             state.stage = "menu_primary"
