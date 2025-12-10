@@ -113,7 +113,7 @@ INFO_MAP: Dict[str, str] = {
     "Fundraising trends": (
         "Love it — let’s dig in! I can show you the detailed funding data, break it down by country or sector, "
         "show you the top 50 funding rounds, walk you through the IPO and exit landscape, "
-        "or give you a tour of some of the most innovative deeptech startups. What would you like?"
+        "or give you a tour of some of the most innovative deeptech startups."
     ),
     "Funding Data": (
         "Based on our 2026 analysis of the Top 50 female-founded companies:\n"
