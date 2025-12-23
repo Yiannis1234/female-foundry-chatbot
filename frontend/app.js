@@ -109,45 +109,46 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-// Lock scrolling during content updates, then scroll to top
-let scrollLocked = false;
-
-function lockScroll() {
-  if (!chatMessages) return;
-  scrollLocked = true;
-  chatMessages.style.overflow = 'hidden';
-  chatMessages.scrollTop = 0;
-}
-
-function unlockScrollAndGoTop() {
-  if (!chatMessages) return;
-  chatMessages.scrollTop = 0;
-  chatMessages.style.overflow = 'auto';
-  scrollLocked = false;
-  // Extra attempts after unlock
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 10);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 50);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 100);
-}
+// AGGRESSIVE scroll control for Wix embed environment
+let scrollLockTimer = null;
 
 function forceScrollToTop() {
   if (!chatMessages) return;
+  
+  // Immediately set scroll
   chatMessages.scrollTop = 0;
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 0);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 50);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 100);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 200);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 500);
-  requestAnimationFrame(() => { if (chatMessages) chatMessages.scrollTop = 0; });
-}
-
-// Prevent any scroll events when locked
-if (chatMessages) {
-  chatMessages.addEventListener('scroll', () => {
-    if (scrollLocked) {
+  
+  // Clear any existing timer
+  if (scrollLockTimer) clearInterval(scrollLockTimer);
+  
+  // Keep forcing scroll to top for 2 seconds (handles delayed iframe behaviors)
+  let attempts = 0;
+  scrollLockTimer = setInterval(() => {
+    if (chatMessages) {
       chatMessages.scrollTop = 0;
     }
-  }, { passive: false });
+    attempts++;
+    if (attempts > 200) { // 2 seconds at 10ms intervals
+      clearInterval(scrollLockTimer);
+      scrollLockTimer = null;
+    }
+  }, 10);
+  
+  // Also use requestAnimationFrame for immediate visual update
+  const rafLoop = () => {
+    if (chatMessages && scrollLockTimer) {
+      chatMessages.scrollTop = 0;
+      requestAnimationFrame(rafLoop);
+    }
+  };
+  requestAnimationFrame(rafLoop);
+}
+
+function stopScrollLock() {
+  if (scrollLockTimer) {
+    clearInterval(scrollLockTimer);
+    scrollLockTimer = null;
+  }
 }
 
 
@@ -352,11 +353,11 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
-  lockScroll();
+  forceScrollToTop();
   switchView("chat");
   addMessage("user", text, false);
   await sendMessageToApi(text, { pinTop: true });
-  unlockScrollAndGoTop();
+  forceScrollToTop();
 }
 
 if (dashboardSearchBtn) {
@@ -409,7 +410,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     hideTyping();
 
     if (pinTop) {
-      lockScroll();
+      forceScrollToTop();
       notifyParentPreventScroll();
     }
     
@@ -423,7 +424,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     renderChatOptions(data.options);
 
     if (pinTop) {
-      unlockScrollAndGoTop();
+      forceScrollToTop();
     }
   } catch (err) {
     console.error('[DEBUG] API error:', err);
@@ -566,7 +567,7 @@ function renderChatOptions(options) {
         return;
       }
       
-      lockScroll();
+      forceScrollToTop();
       notifyParentPreventScroll();
       addMessage("user", opt, false);
       sendMessageToApi(opt, { pinTop: true });
@@ -611,7 +612,7 @@ function renderPrimaryFooterOptions(options) {
         return;
       }
       
-      lockScroll();
+      forceScrollToTop();
       notifyParentPreventScroll();
       addMessage("user", opt, false);
       sendMessageToApi(opt, { pinTop: true });
