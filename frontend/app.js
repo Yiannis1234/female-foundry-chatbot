@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 51 loaded - aggressive scroll fix');
+console.log('[FF-CHATBOT] Version 52 loaded - aggressive scroll fix');
 
 // AGGRESSIVE scroll control for Wix embed environment
 let scrollLockTimer = null;
