@@ -224,60 +224,64 @@
     /* Mobile Responsive Styles - BREAK OUT OF IFRAME AND GO FULLSCREEN */
     @media screen and (max-width: 768px) {
       html, body {
-        font-size: 14px !important;
+        font-size: 16px !important;
         -webkit-text-size-adjust: 100% !important;
-        overflow: visible !important;
+        overflow: hidden !important;
+        margin: 0;
+        padding: 0;
       }
 
-      /* BREAK OUT OF IFRAME - Make widget fullscreen */
+      /* Widget container - ensure it fills the iframe */
       #ff-chatbot-widget {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Button - larger and more visible on mobile */
+      #ff-chatbot-button {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 24px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        box-shadow: 0 6px 24px rgba(124, 99, 255, 0.5) !important;
+      }
+
+      /* When window is open - fullscreen */
+      #ff-chatbot-widget.open #ff-chatbot-window {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
         z-index: 9999999 !important;
+        border-radius: 0 !important;
       }
 
-      /* Normal button size on mobile */
-      #ff-chatbot-button {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 20px !important;
-        bottom: 10px !important;
-        right: 10px !important;
-      }
-
-      /* Fullscreen window on mobile */
-      #ff-chatbot-window {
-        border-radius: 0;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-      }
-
-      /* Normal header on mobile */
+      /* Header on mobile */
       .chat-window-header {
-        padding: 12px 16px !important;
-        min-height: 50px !important;
+        padding: 14px 18px !important;
+        min-height: 56px !important;
       }
 
       .chat-window-header h3 {
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      /* Normal buttons in header */
+      /* Buttons in header */
       .chat-window-btn {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 18px !important;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 20px !important;
       }
 
-      /* Fullscreen - no scaling needed */
+      /* Content area */
       .chat-window-content {
         overflow: auto !important;
         -webkit-overflow-scrolling: touch;
@@ -293,52 +297,52 @@
 
     @media screen and (max-width: 480px) {
       html, body {
-        font-size: 14px !important;
+        font-size: 16px !important;
       }
 
-      /* Make widget container fullscreen on small phones */
+      /* Widget container */
       #ff-chatbot-widget {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        z-index: 999999 !important;
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
       }
 
-      /* Normal button on small phones */
+      /* Larger button on small phones */
       #ff-chatbot-button {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 20px !important;
-        bottom: 10px !important;
-        right: 10px !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 26px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        box-shadow: 0 6px 24px rgba(124, 99, 255, 0.5) !important;
       }
 
-      /* Fullscreen window on small phones */
-      #ff-chatbot-window {
+      /* Fullscreen window when open */
+      #ff-chatbot-widget.open #ff-chatbot-window {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
+        z-index: 9999999 !important;
       }
 
       .chat-window-header {
-        padding: 12px 16px !important;
-        min-height: 50px !important;
+        padding: 16px 20px !important;
+        min-height: 60px !important;
       }
 
       .chat-window-header h3 {
-        font-size: 1rem !important;
+        font-size: 1.2rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .chat-window-btn {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 18px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 22px !important;
       }
 
       /* Fullscreen - no scaling needed */
@@ -419,7 +423,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=62"
+          src="https://srv1079042.hstgr.cloud/?v=63"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
