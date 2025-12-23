@@ -22,22 +22,25 @@
       text-size-adjust: 100% !important;
     }
 
-    /* Widget Container - Fills the Wix iframe */
+    /* Widget Container - Fills the Wix iframe perfectly */
     #ff-chatbot-widget {
       position: relative;
       width: 100%;
       height: 100%;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
       background: transparent;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* Chat Button - Bottom right corner */
+    /* Chat Button - Bottom right corner - adjusted for iframe */
     #ff-chatbot-button {
       position: absolute;
-      bottom: 50px;
-      right: 50px;
-      width: 56px;
-      height: 56px;
+      bottom: 10px;
+      right: 10px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: linear-gradient(135deg, #7c63ff, #fd72c7);
       color: white;
@@ -48,12 +51,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
       z-index: 999999 !important;
       transition: transform 0.2s;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+      margin: 0;
+      padding: 0;
     }
 
     #ff-chatbot-button:hover {
@@ -68,56 +73,66 @@
       width: 100%;
       height: 100%;
       background: white;
-      display: none;
+      display: flex;
       flex-direction: column;
       overflow: hidden;
       z-index: 20;
       border-radius: 0;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     #ff-chatbot-widget.open #ff-chatbot-window {
       display: flex;
     }
 
-    /* Header with controls */
+    /* Header with controls - compact for iframe */
     .chat-window-header {
-      padding: 12px 16px;
+      padding: 8px 12px;
       background: linear-gradient(135deg, #7c63ff, #fd72c7);
       color: white;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
-      min-height: 50px;
+      min-height: 44px;
+      margin: 0;
+      box-sizing: border-box;
     }
 
     .chat-window-header h3 {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin: 0;
       flex: 1;
+      line-height: 1.2;
     }
 
     .chat-window-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .chat-window-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: white;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.2s;
       font-weight: bold;
+      flex-shrink: 0;
+      margin: 0;
+      padding: 0;
     }
 
     .chat-window-btn:hover {
@@ -127,30 +142,46 @@
     /* Chat content area - contains the chatbot iframe */
     .chat-window-content {
       flex: 1;
-      overflow: auto !important; /* Allow scrolling when scaled */
+      overflow: hidden !important;
       display: flex;
       flex-direction: column;
       position: relative;
       min-height: 0;
       -webkit-overflow-scrolling: touch;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* Iframe inside - fills the content area */
+    /* Iframe inside - fills the content area perfectly */
     #ff-chatbot-iframe {
       width: 100%;
       height: 100%;
       border: none;
       flex: 1;
       display: block;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     /* Minimized state - hide window, show button */
     #ff-chatbot-widget.minimized #ff-chatbot-window {
-      display: none;
+      display: none !important;
     }
 
     #ff-chatbot-widget.minimized #ff-chatbot-button {
-      display: flex;
+      display: flex !important;
+    }
+
+    /* When open, hide button */
+    #ff-chatbot-widget.open #ff-chatbot-button {
+      display: none !important;
+    }
+
+    /* Default state - start with chat open */
+    #ff-chatbot-widget {
+      /* Start with chat open by default */
     }
 
     /* Mobile Responsive Styles - BREAK OUT OF IFRAME AND GO FULLSCREEN */
@@ -175,11 +206,11 @@
 
       /* Normal button size on mobile */
       #ff-chatbot-button {
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 22px !important;
-        bottom: 20px !important;
-        right: 20px !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 20px !important;
+        bottom: 10px !important;
+        right: 10px !important;
       }
 
       /* Fullscreen window on mobile */
@@ -242,11 +273,11 @@
 
       /* Normal button on small phones */
       #ff-chatbot-button {
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 22px !important;
-        bottom: 15px !important;
-        right: 15px !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 20px !important;
+        bottom: 10px !important;
+        right: 10px !important;
       }
 
       /* Fullscreen window on small phones */
@@ -309,9 +340,11 @@
       }
 
       #ff-chatbot-button {
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 22px !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 20px !important;
+        bottom: 10px !important;
+        right: 10px !important;
       }
 
       .chat-window-btn {
@@ -331,9 +364,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div id="ff-chatbot-widget">
+  <div id="ff-chatbot-widget" class="open">
     <!-- Chat Button (Always visible when minimized or closed) -->
-    <button id="ff-chatbot-button" aria-label="Open chat" onclick="window.ffOpenChat && window.ffOpenChat(event)">
+    <button id="ff-chatbot-button" aria-label="Open chat" onclick="window.ffOpenChat && window.ffOpenChat(event)" style="display: none;">
       💬
     </button>
 
