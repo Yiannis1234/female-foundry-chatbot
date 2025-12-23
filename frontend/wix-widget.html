@@ -14,10 +14,9 @@
     html, body {
       width: 100%;
       height: 100%;
-      overflow: auto; /* Allow scrolling */
+      overflow: hidden;
       margin: 0;
       padding: 0;
-      -webkit-overflow-scrolling: touch;
     }
 
     /* Widget Container - Fills the Wix iframe */
@@ -26,8 +25,7 @@
       width: 100%;
       height: 100%;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 56px; /* Ensure button is always visible */
-      background: transparent; /* Transparent background when showing button */
+      background: transparent;
     }
 
     /* Chat Button - Centered and visible when closed */
@@ -44,7 +42,7 @@
       border: none;
       cursor: pointer;
       box-shadow: 0 4px 20px rgba(124, 99, 255, 0.4);
-      display: flex !important; /* Force display */
+      display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
@@ -67,8 +65,9 @@
       background: white;
       display: none;
       flex-direction: column;
-      overflow: visible; /* Allow scrolling */
+      overflow: hidden;
       z-index: 20;
+      border-radius: 0;
     }
 
     #ff-chatbot-widget.open #ff-chatbot-window {
@@ -120,25 +119,23 @@
       background: rgba(255, 255, 255, 0.3);
     }
 
-    /* Chat content area - scrollable */
+    /* Chat content area - contains the chatbot iframe */
     .chat-window-content {
       flex: 1;
-      overflow: visible;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       position: relative;
-      min-height: 0; /* Critical for scrolling in flex containers */
+      min-height: 0;
     }
 
-    /* Iframe inside - fills the content area and is scrollable */
+    /* Iframe inside - fills the content area */
     #ff-chatbot-iframe {
       width: 100%;
       height: 100%;
       border: none;
       flex: 1;
       display: block;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     /* Minimized state - hide window, show button */
@@ -177,7 +174,7 @@
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
-          style="overflow: auto; -webkit-overflow-scrolling: touch;"
+          style="width: 100%; height: 100%; border: none;"
         ></iframe>
       </div>
     </div>
@@ -185,74 +182,41 @@
 
   <script>
     (function() {
-      // Ensure button is visible immediately
-      document.addEventListener('DOMContentLoaded', function() {
-        const widget = document.getElementById('ff-chatbot-widget');
-        const button = document.getElementById('ff-chatbot-button');
-        const window = document.getElementById('ff-chatbot-window');
-        const minimizeBtn = document.getElementById('ff-minimize-btn');
-        const closeBtn = document.getElementById('ff-close-btn');
-        const iframe = document.getElementById('ff-chatbot-iframe');
+      const widget = document.getElementById('ff-chatbot-widget');
+      const button = document.getElementById('ff-chatbot-button');
+      const window = document.getElementById('ff-chatbot-window');
+      const minimizeBtn = document.getElementById('ff-minimize-btn');
+      const closeBtn = document.getElementById('ff-close-btn');
+      const iframe = document.getElementById('ff-chatbot-iframe');
 
-        // Make sure button is visible
-        if (button) {
-          button.style.display = 'flex';
-        }
+      // Open chat
+      function openChat() {
+        widget.classList.add('open');
+        widget.classList.remove('minimized');
+        // Reset iframe to ensure fresh state
+        iframe.src = iframe.src;
+      }
 
-        // Open chat
-        function openChat() {
-          if (widget) {
-            widget.classList.add('open');
-            widget.classList.remove('minimized');
-            // Reset iframe to ensure fresh state
-            if (iframe) {
-              iframe.src = iframe.src;
-            }
-          }
-        }
+      // Minimize chat (hide window, show button)
+      function minimizeChat() {
+        widget.classList.add('minimized');
+        widget.classList.remove('open');
+      }
 
-        // Minimize chat (hide window, show button)
-        function minimizeChat() {
-          if (widget) {
-            widget.classList.add('minimized');
-            widget.classList.remove('open');
-            if (button) {
-              button.style.display = 'flex';
-            }
-          }
-        }
+      // Close chat (same as minimize)
+      function closeChat() {
+        minimizeChat();
+      }
 
-        // Close chat (same as minimize for now)
-        function closeChat() {
-          minimizeChat();
-        }
+      // Event listeners
+      button.addEventListener('click', openChat);
+      minimizeBtn.addEventListener('click', minimizeChat);
+      closeBtn.addEventListener('click', closeChat);
 
-        // Event listeners
-        if (button) {
-          button.addEventListener('click', openChat);
-        }
-        if (minimizeBtn) {
-          minimizeBtn.addEventListener('click', minimizeChat);
-        }
-        if (closeBtn) {
-          closeBtn.addEventListener('click', closeChat);
-        }
-
-        // Prevent clicks inside iframe from bubbling
-        if (window) {
-          window.addEventListener('click', function(e) {
-            e.stopPropagation();
-          });
-        }
+      // Prevent clicks inside iframe from bubbling
+      window.addEventListener('click', function(e) {
+        e.stopPropagation();
       });
-
-      // Also run immediately in case DOMContentLoaded already fired
-      setTimeout(function() {
-        const button = document.getElementById('ff-chatbot-button');
-        if (button) {
-          button.style.display = 'flex';
-        }
-      }, 100);
     })();
   </script>
 </body>
