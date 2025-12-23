@@ -347,16 +347,41 @@ async function sendMessageToApi(text) {
     });
     const data = await res.json();
     hideTyping();
+    
+    // Force scroll to top BEFORE adding messages
+    if (chatMessages) {
+      chatMessages.scrollTop = 0;
+    }
+    
     if (data.messages) {
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
+    
+    // Force scroll to top AFTER adding messages
+    requestAnimationFrame(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    });
+    
     renderChatOptions(data.options);
-    // Force scroll to top after showing options so user sees the start
+    
+    // Force scroll to top after showing options - multiple attempts
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 0);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
     }, 50);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 100);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
@@ -379,7 +404,6 @@ function addMessage(role, content, shouldScroll = false) {
 
   // Store scroll position to prevent auto-scroll
   const oldScrollTop = chatMessages.scrollTop;
-  const wasAtTop = oldScrollTop < 50; // Consider "at top" if within 50px
 
   const segments =
     role === "bot" ? splitBotContent(content) : [content];
@@ -399,6 +423,11 @@ function addMessage(role, content, shouldScroll = false) {
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(bubble);
     chatMessages.appendChild(msgDiv);
+    
+    // Immediately prevent scroll after each message is added
+    if (!shouldScroll) {
+      chatMessages.scrollTop = 0;
+    }
   });
 
   // Only scroll to bottom if explicitly requested (user typing)
@@ -409,17 +438,23 @@ function addMessage(role, content, shouldScroll = false) {
       }
     });
   } else {
-    // Prevent auto-scroll - keep at top or maintain position
+    // Force stay at top - don't allow any scrolling
     requestAnimationFrame(() => {
       if (chatMessages) {
-        if (wasAtTop) {
-          chatMessages.scrollTop = 0;
-        } else {
-          // Maintain relative position
-          chatMessages.scrollTop = oldScrollTop;
-        }
+        chatMessages.scrollTop = 0;
       }
     });
+    // Multiple attempts to force stay at top
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 0);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 10);
   }
 }
 
@@ -511,7 +546,17 @@ function renderChatOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
+      // Force scroll to top BEFORE adding message
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
       addMessage("user", opt, false); // Don't scroll when clicking options
+      // Force scroll to top AFTER adding message
+      setTimeout(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      }, 0);
       sendMessageToApi(opt);
     };
 
@@ -550,7 +595,17 @@ function renderPrimaryFooterOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
+      // Force scroll to top BEFORE adding message
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
       addMessage("user", opt, false); // Don't scroll when clicking options
+      // Force scroll to top AFTER adding message
+      setTimeout(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      }, 0);
       sendMessageToApi(opt);
     };
     primaryFooterOptions.appendChild(btn);
