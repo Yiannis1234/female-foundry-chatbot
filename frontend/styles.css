@@ -93,13 +93,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .brand {
-    font-size: 1.1rem !important;
+    font-size: 0.9rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .brand {
-    font-size: 1.2rem !important;
+    font-size: 0.9rem !important;
   }
 }
 
@@ -217,17 +217,17 @@ button {
 
 @media screen and (max-width: 768px) {
   #name-input {
-    font-size: 1.5rem !important;
-    padding: 24px 28px !important;
-    min-height: 70px !important;
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+    min-height: auto !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   #name-input {
-    font-size: 1.8rem !important;
-    padding: 28px 32px !important;
-    min-height: 80px !important;
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+    min-height: auto !important;
   }
 }
 
@@ -319,13 +319,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .dashboard-header h1 {
-    font-size: 2.5rem !important;
+    font-size: 1.8rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .dashboard-header h1 {
-    font-size: 3rem !important;
+    font-size: 1.8rem !important;
   }
 }
 
@@ -338,13 +338,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .dashboard-header .subtitle {
-    font-size: 1.3rem !important;
+    font-size: 1rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .dashboard-header .subtitle {
-    font-size: 1.5rem !important;
+    font-size: 1rem !important;
   }
 }
 
@@ -428,13 +428,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .card-title {
-    font-size: 1.4rem !important;
+    font-size: 1.1rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-title {
-    font-size: 1.6rem !important;
+    font-size: 1.1rem !important;
   }
 }
 
@@ -448,15 +448,15 @@ button {
 
 @media screen and (max-width: 768px) {
   .card-desc {
-    font-size: 1.1rem !important;
-    line-height: 1.6 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-desc {
-    font-size: 1.2rem !important;
-    line-height: 1.7 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
   }
 }
 
@@ -574,17 +574,17 @@ button {
 
 @media screen and (max-width: 768px) {
   .chat-message .bubble {
-    font-size: 1.2rem !important;
-    padding: 16px 20px !important;
-    line-height: 1.6 !important;
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
+    line-height: 1.5 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .chat-message .bubble {
-    font-size: 1.3rem !important;
-    padding: 18px 22px !important;
-    line-height: 1.7 !important;
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
+    line-height: 1.5 !important;
   }
 }
 
@@ -664,19 +664,19 @@ button {
 
 @media screen and (max-width: 768px) {
   .suggestion-chip {
-    font-size: 1.2rem !important;
-    padding: 16px 22px !important;
-    min-height: 52px !important;
-    line-height: 1.5 !important;
+    font-size: 0.92rem !important;
+    padding: 10px 16px !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .suggestion-chip {
-    font-size: 1.3rem !important;
-    padding: 18px 24px !important;
-    min-height: 56px !important;
-    line-height: 1.6 !important;
+    font-size: 0.92rem !important;
+    padding: 10px 16px !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
   }
 }
 
@@ -814,80 +814,80 @@ button {
     margin-bottom: 0;
   }
 
-  /* Larger text on mobile */
+  /* Normal text on mobile */
   body {
-    font-size: 18px !important;
+    font-size: 16px !important;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
 
   .chat-message .bubble {
-    font-size: 1.1rem !important;
-    padding: 16px 20px !important;
-    line-height: 1.6 !important;
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
+    line-height: 1.5 !important;
   }
 
   .suggestion-chip {
-    font-size: 1.1rem !important;
-    padding: 14px 20px !important;
-    min-height: 48px !important;
+    font-size: 0.92rem !important;
+    padding: 10px 16px !important;
+    min-height: auto !important;
   }
 
   .footer-chip {
-    font-size: 1.1rem !important;
-    padding: 14px 18px !important;
-    min-height: 48px !important;
+    font-size: 0.92rem !important;
+    padding: 10px 14px !important;
+    min-height: auto !important;
   }
 
   .card {
-    padding: 24px !important;
+    padding: 20px !important;
   }
 
   .card-title {
-    font-size: 1.2rem !important;
+    font-size: 1.1rem !important;
   }
 
   .card-desc {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
-  /* Even larger on small phones */
+  /* Normal size on small phones */
   body {
-    font-size: 22px !important;
+    font-size: 16px !important;
   }
 
   .chat-message .bubble {
-    font-size: 1.4rem !important;
-    padding: 20px 24px !important;
-    line-height: 1.8 !important;
+    font-size: 0.95rem !important;
+    padding: 12px 16px !important;
+    line-height: 1.5 !important;
   }
 
   .suggestion-chip {
-    font-size: 1.4rem !important;
-    padding: 20px 26px !important;
-    min-height: 60px !important;
+    font-size: 0.92rem !important;
+    padding: 10px 16px !important;
+    min-height: auto !important;
   }
 
   .footer-chip {
-    font-size: 1.4rem !important;
-    padding: 20px 24px !important;
-    min-height: 60px !important;
+    font-size: 0.92rem !important;
+    padding: 10px 14px !important;
+    min-height: auto !important;
   }
 
   #name-input {
-    font-size: 1.8rem !important;
-    padding: 28px 32px !important;
-    min-height: 80px !important;
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+    min-height: auto !important;
   }
 
   .dashboard-header h1 {
-    font-size: 3.2rem !important;
+    font-size: 1.8rem !important;
   }
 
   .dashboard-header .subtitle {
-    font-size: 1.6rem !important;
+    font-size: 1rem !important;
   }
 }
 
@@ -902,7 +902,7 @@ button {
   }
 
   #name-input {
-    min-height: 56px !important;
-    font-size: 1.2rem !important;
+    min-height: auto !important;
+    font-size: 1rem !important;
   }
 }
