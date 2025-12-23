@@ -9,7 +9,8 @@ body {
   background-color: #f9f9fc;
   color: #1a1a1a;
   height: 100vh;
-  overflow: auto; /* Allow scrolling when embedded */
+  overflow: auto !important; /* Force scrolling when embedded */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
 }
 
 button {
@@ -78,11 +79,12 @@ button {
 #main-content {
   flex: 1;
   position: relative;
-  overflow: hidden; /* manage scroll inside sections */
+  overflow: visible; /* Allow scrolling when embedded */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 0; /* Important for flex scrolling */
 }
 
 /* Views State Management */
@@ -353,9 +355,10 @@ button {
   background: white;
   border-radius: 24px; /* Card look */
   box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-  overflow: hidden;
+  overflow: visible; /* Allow scrolling */
   border: 1px solid #eee;
   margin-bottom: 0;
+  min-height: 0; /* Important for flex scrolling */
 }
 
 .chat-header-actions {
@@ -395,13 +398,16 @@ button {
 
 .chat-scroll {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto !important;
+  overflow-x: hidden;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
   scroll-behavior: smooth;
   position: relative;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  min-height: 0; /* Important for flex scrolling */
 }
 
 .chat-message {
