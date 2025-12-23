@@ -26,13 +26,16 @@
       width: 100%;
       height: 100%;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 56px; /* Ensure button is always visible */
+      background: transparent; /* Transparent background when showing button */
     }
 
-    /* Chat Button - Always visible at bottom right */
+    /* Chat Button - Centered and visible when closed */
     #ff-chatbot-button {
       position: absolute;
-      bottom: 0;
-      right: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -41,7 +44,7 @@
       border: none;
       cursor: pointer;
       box-shadow: 0 4px 20px rgba(124, 99, 255, 0.4);
-      display: flex;
+      display: flex !important; /* Force display */
       align-items: center;
       justify-content: center;
       font-size: 22px;
@@ -51,7 +54,7 @@
     }
 
     #ff-chatbot-button:hover {
-      transform: scale(1.05);
+      transform: translate(-50%, -50%) scale(1.05);
     }
 
     /* Chat Window - Fills the iframe when open */
@@ -182,41 +185,74 @@
 
   <script>
     (function() {
-      const widget = document.getElementById('ff-chatbot-widget');
-      const button = document.getElementById('ff-chatbot-button');
-      const window = document.getElementById('ff-chatbot-window');
-      const minimizeBtn = document.getElementById('ff-minimize-btn');
-      const closeBtn = document.getElementById('ff-close-btn');
-      const iframe = document.getElementById('ff-chatbot-iframe');
+      // Ensure button is visible immediately
+      document.addEventListener('DOMContentLoaded', function() {
+        const widget = document.getElementById('ff-chatbot-widget');
+        const button = document.getElementById('ff-chatbot-button');
+        const window = document.getElementById('ff-chatbot-window');
+        const minimizeBtn = document.getElementById('ff-minimize-btn');
+        const closeBtn = document.getElementById('ff-close-btn');
+        const iframe = document.getElementById('ff-chatbot-iframe');
 
-      // Open chat
-      function openChat() {
-        widget.classList.add('open');
-        widget.classList.remove('minimized');
-        // Reset iframe to ensure fresh state
-        iframe.src = iframe.src;
-      }
+        // Make sure button is visible
+        if (button) {
+          button.style.display = 'flex';
+        }
 
-      // Minimize chat (hide window, show button)
-      function minimizeChat() {
-        widget.classList.add('minimized');
-        widget.classList.remove('open');
-      }
+        // Open chat
+        function openChat() {
+          if (widget) {
+            widget.classList.add('open');
+            widget.classList.remove('minimized');
+            // Reset iframe to ensure fresh state
+            if (iframe) {
+              iframe.src = iframe.src;
+            }
+          }
+        }
 
-      // Close chat (same as minimize for now)
-      function closeChat() {
-        minimizeChat();
-      }
+        // Minimize chat (hide window, show button)
+        function minimizeChat() {
+          if (widget) {
+            widget.classList.add('minimized');
+            widget.classList.remove('open');
+            if (button) {
+              button.style.display = 'flex';
+            }
+          }
+        }
 
-      // Event listeners
-      button.addEventListener('click', openChat);
-      minimizeBtn.addEventListener('click', minimizeChat);
-      closeBtn.addEventListener('click', closeChat);
+        // Close chat (same as minimize for now)
+        function closeChat() {
+          minimizeChat();
+        }
 
-      // Prevent clicks inside iframe from bubbling
-      window.addEventListener('click', function(e) {
-        e.stopPropagation();
+        // Event listeners
+        if (button) {
+          button.addEventListener('click', openChat);
+        }
+        if (minimizeBtn) {
+          minimizeBtn.addEventListener('click', minimizeChat);
+        }
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeChat);
+        }
+
+        // Prevent clicks inside iframe from bubbling
+        if (window) {
+          window.addEventListener('click', function(e) {
+            e.stopPropagation();
+          });
+        }
       });
+
+      // Also run immediately in case DOMContentLoaded already fired
+      setTimeout(function() {
+        const button = document.getElementById('ff-chatbot-button');
+        if (button) {
+          button.style.display = 'flex';
+        }
+      }, 100);
     })();
   </script>
 </body>
