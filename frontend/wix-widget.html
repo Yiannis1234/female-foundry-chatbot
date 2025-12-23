@@ -150,11 +150,24 @@
       display: flex;
     }
 
-    /* Mobile Responsive Styles - FORCE LARGER SIZES */
+    /* Mobile Responsive Styles - BREAK OUT OF IFRAME AND GO FULLSCREEN */
     @media screen and (max-width: 768px) {
       html, body {
         font-size: 18px !important;
         -webkit-text-size-adjust: 100% !important;
+        overflow: visible !important;
+      }
+
+      /* BREAK OUT OF IFRAME - Make widget fullscreen */
+      #ff-chatbot-widget {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999999 !important;
       }
 
       /* Much larger button on mobile */
@@ -166,9 +179,14 @@
         right: 20px !important;
       }
 
-      /* Full screen chat on mobile */
+      /* Fullscreen window on mobile */
       #ff-chatbot-window {
         border-radius: 0;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
       }
 
       /* Larger header text on mobile */
@@ -188,25 +206,35 @@
         font-size: 28px !important;
       }
 
-      /* Force iframe to scale - make chatbot bigger on mobile */
+      /* Fullscreen - no scaling needed */
       .chat-window-content {
         overflow: auto !important;
         -webkit-overflow-scrolling: touch;
       }
       
       #ff-chatbot-iframe {
-        zoom: 1.4 !important;
-        -webkit-transform: scale(1.4) !important;
-        transform: scale(1.4) !important;
-        transform-origin: top left !important;
-        width: 71.5% !important;
-        height: 71.5% !important;
+        width: 100% !important;
+        height: 100% !important;
+        zoom: 1 !important;
+        transform: none !important;
       }
     }
 
     @media screen and (max-width: 480px) {
       html, body {
         font-size: 20px !important;
+      }
+
+      /* Make widget container fullscreen on small phones */
+      #ff-chatbot-widget {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 999999 !important;
       }
 
       /* Even larger button on small phones */
@@ -216,6 +244,15 @@
         font-size: 45px !important;
         bottom: 15px !important;
         right: 15px !important;
+      }
+
+      /* Fullscreen window on small phones */
+      #ff-chatbot-window {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
       }
 
       .chat-window-header {
@@ -233,24 +270,41 @@
         font-size: 30px !important;
       }
 
-      /* Even more scaling for small phones */
+      /* Fullscreen - no scaling needed */
       .chat-window-content {
         overflow: auto !important;
         -webkit-overflow-scrolling: touch;
       }
       
       #ff-chatbot-iframe {
-        zoom: 1.6 !important;
-        -webkit-transform: scale(1.6) !important;
-        transform: scale(1.6) !important;
-        transform-origin: top left !important;
-        width: 62.5% !important;
-        height: 62.5% !important;
+        width: 100% !important;
+        height: 100% !important;
+        zoom: 1 !important;
+        transform: none !important;
       }
     }
 
-    /* Touch-friendly on all mobile devices */
+    /* Touch-friendly on all mobile devices - FORCE FULLSCREEN */
     @media (hover: none) and (pointer: coarse) {
+      #ff-chatbot-widget {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 999999 !important;
+      }
+
+      #ff-chatbot-window {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+      }
+
       #ff-chatbot-button {
         width: 85px !important;
         height: 85px !important;
@@ -261,6 +315,11 @@
         width: 50px !important;
         height: 50px !important;
         font-size: 26px !important;
+      }
+
+      #ff-chatbot-iframe {
+        width: 100% !important;
+        height: 100% !important;
       }
     }
   </style>
@@ -299,6 +358,30 @@
 
   <script>
     (function() {
+      // Detect mobile and break out of iframe
+      function isMobile() {
+        return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      }
+
+      // Break out of iframe on mobile
+      if (isMobile() && window.self !== window.top) {
+        // We're in an iframe on mobile - try to break out
+        try {
+          const widget = document.getElementById('ff-chatbot-widget');
+          if (widget) {
+            widget.style.position = 'fixed';
+            widget.style.top = '0';
+            widget.style.left = '0';
+            widget.style.width = '100vw';
+            widget.style.height = '100vh';
+            widget.style.zIndex = '9999999';
+          }
+        } catch(e) {
+          // Cross-origin restriction - can't access parent
+          console.log('Cannot break out of iframe (cross-origin)');
+        }
+      }
+
       const widget = document.getElementById('ff-chatbot-widget');
       const button = document.getElementById('ff-chatbot-button');
       const window = document.getElementById('ff-chatbot-window');
