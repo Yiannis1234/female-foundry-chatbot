@@ -109,67 +109,61 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 52 loaded - aggressive scroll fix');
+console.log('[FF-CHATBOT] Version 53 loaded');
 
 // AGGRESSIVE scroll control for Wix embed environment
 let scrollLockTimer = null;
-let scrollLockRaf = null;
+
+function getScrollContainer() {
+  // Always get fresh reference
+  return document.getElementById("chatMessages");
+}
 
 function forceScrollToTop() {
-  if (!chatMessages) return;
+  const container = getScrollContainer();
+  if (!container) {
+    console.log('[FF-CHATBOT] ERROR: chatMessages not found!');
+    return;
+  }
   
-  console.log('[FF-CHATBOT] forceScrollToTop called');
+  console.log('[FF-CHATBOT] forceScrollToTop - current scrollTop:', container.scrollTop, 'scrollHeight:', container.scrollHeight);
   
-  // NUCLEAR OPTION: Set overflow hidden, scroll to 0, then restore
-  const originalOverflow = chatMessages.style.overflow;
-  chatMessages.style.overflow = 'hidden';
-  chatMessages.scrollTop = 0;
+  // Clear any existing timer
+  if (scrollLockTimer) {
+    clearInterval(scrollLockTimer);
+  }
   
-  // Clear any existing timers
-  if (scrollLockTimer) clearInterval(scrollLockTimer);
-  if (scrollLockRaf) cancelAnimationFrame(scrollLockRaf);
+  // IMMEDIATELY scroll to top and lock overflow
+  container.style.overflow = 'hidden';
+  container.scrollTop = 0;
   
-  // Keep forcing scroll to top for 3 seconds
-  let attempts = 0;
-  const maxAttempts = 300; // 3 seconds at 10ms
+  // Force scroll to 0 every frame for 5 seconds
+  let frame = 0;
+  const maxFrames = 500; // 5 seconds at 10ms
   
   scrollLockTimer = setInterval(() => {
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      // Log occasionally to debug
-      if (attempts % 50 === 0) {
-        console.log('[FF-CHATBOT] Forcing scrollTop=0, attempt', attempts);
+    const el = getScrollContainer();
+    if (el) {
+      // Force to 0 no matter what
+      if (el.scrollTop !== 0) {
+        console.log('[FF-CHATBOT] Frame', frame, '- scrollTop was', el.scrollTop, ', forcing to 0');
       }
+      el.scrollTop = 0;
     }
-    attempts++;
-    if (attempts >= maxAttempts) {
+    frame++;
+    if (frame >= maxFrames) {
       clearInterval(scrollLockTimer);
       scrollLockTimer = null;
-      // Restore overflow after lock period
-      chatMessages.style.overflow = originalOverflow || 'auto';
-      console.log('[FF-CHATBOT] Scroll lock released');
+      // Re-enable scrolling
+      if (el) {
+        el.style.overflow = 'auto';
+      }
+      console.log('[FF-CHATBOT] Scroll lock released after 5 seconds');
     }
   }, 10);
   
-  // Also use RAF
-  const rafLoop = () => {
-    if (chatMessages && scrollLockTimer) {
-      chatMessages.scrollTop = 0;
-      scrollLockRaf = requestAnimationFrame(rafLoop);
-    }
-  };
-  scrollLockRaf = requestAnimationFrame(rafLoop);
-}
-
-function stopScrollLock() {
-  if (scrollLockTimer) {
-    clearInterval(scrollLockTimer);
-    scrollLockTimer = null;
-  }
-  if (scrollLockRaf) {
-    cancelAnimationFrame(scrollLockRaf);
-    scrollLockRaf = null;
-  }
+  // Also notify parent iframe
+  notifyParentPreventScroll();
 }
 
 
