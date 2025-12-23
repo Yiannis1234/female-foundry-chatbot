@@ -109,26 +109,35 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 57 loaded');
+console.log('[FF-CHATBOT] Version 59 loaded');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
 
-function scrollToLatestUserMessage() {
-  if (latestUserMessage) {
-    // Scroll the user's message into view at the top
+function scrollToShowOptions() {
+  const chat = document.getElementById('chatMessages');
+  if (!chat) return;
+  
+  // Find the last options bubble or prompt
+  const optionsBubbles = chat.querySelectorAll('.options-bubble, .options-prompt');
+  if (optionsBubbles.length > 0) {
+    // Scroll to show the options (at the end)
+    const lastOption = optionsBubbles[optionsBubbles.length - 1];
+    lastOption.scrollIntoView({ behavior: 'instant', block: 'end' });
+  } else if (latestUserMessage) {
+    // Fallback: scroll user message to top
     latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 }
 
 function forceScrollToTop() {
-  // Scroll to the latest user message (not the absolute top)
-  scrollToLatestUserMessage();
+  // Scroll to show options
+  scrollToShowOptions();
   
   // Keep trying for 1 second
   const times = [10, 30, 50, 100, 150, 200, 300, 500, 750, 1000];
   times.forEach(t => {
-    setTimeout(scrollToLatestUserMessage, t);
+    setTimeout(scrollToShowOptions, t);
   });
   
   notifyParentPreventScroll();
