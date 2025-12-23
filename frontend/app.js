@@ -29,6 +29,16 @@ const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
+function openExternal(url) {
+  // Ensure the chatbot stays on the current page: always open external navigation in a new tab/window.
+  // Note: this is triggered directly from user clicks, so popup blockers shouldn't interfere.
+  try {
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch (e) {
+    window.open(url, "_blank");
+  }
+}
+
 // UPDATED METADATA FOR NEW BOXES
 const PRIMARY_LIST = [
   "The Era of Abundance",
@@ -103,6 +113,25 @@ window.addEventListener("load", () => {
   setInitialView();
   attachWelcomeListeners();
   if (nameInput) nameInput.focus();
+
+  // Intercept any <a href="..."> clicks inside chat bubbles and always open in a new tab,
+  // so the chatbot page never navigates away (even if the link is "external").
+  if (chatMessages) {
+    chatMessages.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!target || !(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!anchor) return;
+
+      const href = anchor.getAttribute("href") || "";
+      // Only intercept http(s) links. Let mailto/tel behave normally.
+      if (/^https?:\/\//i.test(href)) {
+        e.preventDefault();
+        e.stopPropagation();
+        openExternal(href);
+      }
+    });
+  }
 });
 
 function setInitialView() {
@@ -141,6 +170,11 @@ function switchView(viewName) {
   });
 
   currentView = viewName;
+
+  // When switching to chat view, scroll to top to show the start
+  if (viewName === "chat") {
+    setTimeout(() => scrollToTop(), 100);
+  }
 }
 
 // --- Welcome Flow ---
@@ -241,7 +275,7 @@ function renderDashboard(options) {
 
     card.onclick = () => {
       if (OPTION_LINKS[opt]) {
-        window.open(OPTION_LINKS[opt], "_blank");
+        openExternal(OPTION_LINKS[opt]);
         return;
       }
       handleDashboardSelection(opt);
@@ -263,7 +297,7 @@ async function restartExperience() {
 
 async function handleDashboardSelection(text) {
   switchView("chat");
-  addMessage("user", text);
+  addMessage("user", text, false); // Don't scroll when clicking from dashboard
   await sendMessageToApi(text);
 }
 
@@ -286,7 +320,7 @@ if (dashboardSearch) {
 // --- Chat Logic ---
 async function sendMessageToApi(text) {
   if (OPTION_LINKS[text]) {
-    window.open(OPTION_LINKS[text], "_blank");
+    openExternal(OPTION_LINKS[text]);
     return;
   }
 
@@ -300,17 +334,19 @@ async function sendMessageToApi(text) {
     const data = await res.json();
     hideTyping();
     if (data.messages) {
-      data.messages.forEach((msg) => addMessage(msg.role, msg.content));
+      data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
     renderChatOptions(data.options);
+    // Scroll to top after showing options so user sees the start
+    setTimeout(() => scrollToTop(), 200);
   } catch (err) {
     console.error(err);
     hideTyping();
-    addMessage("bot", "Sorry, something went wrong.");
+    addMessage("bot", "Sorry, something went wrong.", false);
   }
 }
 
-function addMessage(role, content) {
+function addMessage(role, content, shouldScroll = false) {
   if (!chatMessages) return;
 
   const segments =
@@ -333,7 +369,10 @@ function addMessage(role, content) {
     chatMessages.appendChild(msgDiv);
   });
 
-  scrollToBottom();
+  // Only scroll to bottom if explicitly requested (user typing)
+  if (shouldScroll) {
+    scrollToBottom();
+  }
 }
 
 function splitBotContent(content) {
@@ -421,10 +460,10 @@ function renderChatOptions(options) {
     chip.textContent = `💬 ${opt}`;
     chip.onclick = () => {
       if (OPTION_LINKS[opt]) {
-        window.open(OPTION_LINKS[opt], "_blank");
+        openExternal(OPTION_LINKS[opt]);
         return;
       }
-      addMessage("user", opt);
+      addMessage("user", opt, false); // Don't scroll when clicking options
       sendMessageToApi(opt);
     };
 
@@ -434,7 +473,8 @@ function renderChatOptions(options) {
     chatMessages.appendChild(msgDiv);
   });
 
-  requestAnimationFrame(() => scrollToBottom());
+  // Don't auto-scroll when showing options - let user see the start
+  // requestAnimationFrame(() => scrollToBottom());
 }
 
 function renderPrimaryFooterOptions(options) {
@@ -459,10 +499,10 @@ function renderPrimaryFooterOptions(options) {
         oldOptionBubbles.forEach((el) => el.remove());
       }
       if (OPTION_LINKS[opt]) {
-        window.open(OPTION_LINKS[opt], "_blank");
+        openExternal(OPTION_LINKS[opt]);
         return;
       }
-      addMessage("user", opt);
+      addMessage("user", opt, false); // Don't scroll when clicking options
       sendMessageToApi(opt);
     };
     primaryFooterOptions.appendChild(btn);
@@ -499,7 +539,8 @@ function showTyping() {
   `;
   typingIndicator = wrapper;
   chatMessages.appendChild(wrapper);
-  scrollToBottom();
+  // Don't auto-scroll - let user see the start
+  // scrollToBottom();
 }
 
 function hideTyping() {
@@ -520,6 +561,12 @@ function scrollToBottom() {
   }
 }
 
+function scrollToTop() {
+  if (chatMessages) {
+    chatMessages.scrollTop = 0;
+  }
+}
+
 window.addEventListener("resize", scrollToBottom);
 
 // Chat Input Handlers
@@ -527,7 +574,7 @@ if (chatSendBtn) {
   chatSendBtn.addEventListener("click", () => {
     const val = chatInput ? chatInput.value.trim() : "";
     if (!val) return;
-    addMessage("user", val);
+    addMessage("user", val, true); // Scroll when user types
     if (chatInput) chatInput.value = "";
     sendMessageToApi(val);
   });
@@ -539,7 +586,7 @@ if (chatInput) {
       e.preventDefault();
       const val = chatInput.value.trim();
       if (!val) return;
-      addMessage("user", val);
+      addMessage("user", val, true); // Scroll when user types
       chatInput.value = "";
       sendMessageToApi(val);
     }
