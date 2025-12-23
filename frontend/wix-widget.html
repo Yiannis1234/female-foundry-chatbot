@@ -12,26 +12,31 @@
     }
 
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
       -webkit-text-size-adjust: 100% !important;
       -ms-text-size-adjust: 100% !important;
       text-size-adjust: 100% !important;
+      /* Wix iframe fixes */
+      position: relative !important;
+      box-sizing: border-box !important;
     }
 
     /* Widget Container - Fills the Wix iframe perfectly */
     #ff-chatbot-widget {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-      background: transparent;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
+      background: transparent !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+      /* Ensure Wix doesn't override */
+      display: block !important;
     }
 
     /* Chat Button - Bottom right corner - adjusted for iframe */
@@ -423,7 +428,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=63"
+          src="https://srv1079042.hstgr.cloud/?v=64"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -510,12 +515,32 @@
         }
       });
 
+      // Detect if we're in Wix
+      const isWix = window.parent !== window || window.location !== window.parent.location;
+      
+      // Wix-specific fixes
+      if (isWix) {
+        // Force styles on Wix
+        document.documentElement.style.setProperty('--wix-override', '1');
+        // Prevent Wix from interfering
+        if (document.body) {
+          document.body.style.setProperty('overflow', 'hidden', 'important');
+          document.body.style.setProperty('position', 'relative', 'important');
+        }
+      }
+
       // Wait for DOM and attach listeners
       function init() {
         if (!widget || !button || !chatWindow) {
           console.error('Widget elements not found', {widget, button, chatWindow});
           setTimeout(init, 100); // Retry after 100ms
           return;
+        }
+        
+        // Wix-specific: Ensure button is visible
+        if (isWix && button) {
+          button.style.setProperty('display', 'flex', 'important');
+          button.style.setProperty('z-index', '999999', 'important');
         }
         
         // Prevent scroll on widget container
@@ -570,7 +595,7 @@
           }, true);
           closeBtn.addEventListener('touchend', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+        e.stopPropagation();
             window.ffCloseChat(e);
           }, true);
         } else {
