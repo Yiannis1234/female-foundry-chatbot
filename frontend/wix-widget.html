@@ -30,6 +30,8 @@
       position: relative !important;
       width: 100% !important;
       height: 100% !important;
+      min-width: 1px !important;
+      min-height: 1px !important;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
       background: transparent !important;
       margin: 0 !important;
@@ -37,6 +39,9 @@
       box-sizing: border-box !important;
       /* Ensure Wix doesn't override */
       display: block !important;
+      /* Ensure it's always visible */
+      visibility: visible !important;
+      opacity: 1 !important;
     }
 
     /* Chat Button - Bottom right corner - adjusted for iframe */
@@ -64,6 +69,9 @@
       touch-action: manipulation;
       margin: 0;
       padding: 0;
+      /* Always visible */
+      visibility: visible !important;
+      opacity: 1 !important;
     }
 
     #ff-chatbot-button:hover {
@@ -442,7 +450,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=65"
+          src="https://srv1079042.hstgr.cloud/?v=66"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -532,6 +540,11 @@
       // Detect if we're in Wix
       const isWix = window.parent !== window || window.location !== window.parent.location;
       
+      // Detect mobile
+      function isMobile() {
+        return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      }
+      
       // Wix-specific fixes
       if (isWix) {
         // Force styles on Wix
@@ -542,6 +555,27 @@
           document.body.style.setProperty('position', 'relative', 'important');
         }
       }
+      
+      // Force break-out on mobile immediately
+      function forceMobileBreakout() {
+        if (isMobile() && widget) {
+          widget.style.setProperty('position', 'fixed', 'important');
+          widget.style.setProperty('top', '0', 'important');
+          widget.style.setProperty('left', '0', 'important');
+          widget.style.setProperty('width', '100vw', 'important');
+          widget.style.setProperty('height', '100vh', 'important');
+          widget.style.setProperty('z-index', '9999999', 'important');
+          
+          if (button) {
+            button.style.setProperty('position', 'fixed', 'important');
+            button.style.setProperty('z-index', '99999999', 'important');
+          }
+        }
+      }
+      
+      // Apply immediately and on resize
+      forceMobileBreakout();
+      window.addEventListener('resize', forceMobileBreakout);
 
       // Wait for DOM and attach listeners
       function init() {
@@ -555,7 +589,12 @@
         if (isWix && button) {
           button.style.setProperty('display', 'flex', 'important');
           button.style.setProperty('z-index', '999999', 'important');
+          button.style.setProperty('visibility', 'visible', 'important');
+          button.style.setProperty('opacity', '1', 'important');
         }
+        
+        // Force mobile breakout after init
+        forceMobileBreakout();
         
         // Prevent scroll on widget container
         if (widget) {
