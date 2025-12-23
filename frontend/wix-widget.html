@@ -358,65 +358,79 @@
 
   <script>
     (function() {
-      // Detect mobile and break out of iframe
-      function isMobile() {
-        return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      }
+      // Wait for DOM to be ready
+      function init() {
+        const widget = document.getElementById('ff-chatbot-widget');
+        const button = document.getElementById('ff-chatbot-button');
+        const chatWindow = document.getElementById('ff-chatbot-window');
+        const minimizeBtn = document.getElementById('ff-minimize-btn');
+        const closeBtn = document.getElementById('ff-close-btn');
+        const iframe = document.getElementById('ff-chatbot-iframe');
 
-      // Break out of iframe on mobile
-      if (isMobile() && window.self !== window.top) {
-        // We're in an iframe on mobile - try to break out
-        try {
-          const widget = document.getElementById('ff-chatbot-widget');
-          if (widget) {
-            widget.style.position = 'fixed';
-            widget.style.top = '0';
-            widget.style.left = '0';
-            widget.style.width = '100vw';
-            widget.style.height = '100vh';
-            widget.style.zIndex = '9999999';
-          }
-        } catch(e) {
-          // Cross-origin restriction - can't access parent
-          console.log('Cannot break out of iframe (cross-origin)');
+        if (!widget || !button || !chatWindow) {
+          console.error('Widget elements not found');
+          return;
         }
+
+        // Open chat
+        function openChat(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Opening chat');
+          widget.classList.add('open');
+          widget.classList.remove('minimized');
+          // Reset iframe to ensure fresh state
+          if (iframe) {
+            iframe.src = iframe.src;
+          }
+        }
+
+        // Minimize chat (hide window, show button)
+        function minimizeChat(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Minimizing chat');
+          widget.classList.add('minimized');
+          widget.classList.remove('open');
+        }
+
+        // Close chat (same as minimize)
+        function closeChat(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          minimizeChat(e);
+        }
+
+        // Event listeners
+        button.addEventListener('click', openChat);
+        button.addEventListener('touchend', openChat); // For mobile touch
+        
+        if (minimizeBtn) {
+          minimizeBtn.addEventListener('click', minimizeChat);
+          minimizeBtn.addEventListener('touchend', minimizeChat);
+        }
+        
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeChat);
+          closeBtn.addEventListener('touchend', closeChat);
+        }
+
+        // Prevent clicks inside iframe from bubbling
+        if (chatWindow) {
+          chatWindow.addEventListener('click', function(e) {
+            e.stopPropagation();
+          });
+        }
+
+        console.log('Widget initialized');
       }
 
-      const widget = document.getElementById('ff-chatbot-widget');
-      const button = document.getElementById('ff-chatbot-button');
-      const window = document.getElementById('ff-chatbot-window');
-      const minimizeBtn = document.getElementById('ff-minimize-btn');
-      const closeBtn = document.getElementById('ff-close-btn');
-      const iframe = document.getElementById('ff-chatbot-iframe');
-
-      // Open chat
-      function openChat() {
-        widget.classList.add('open');
-        widget.classList.remove('minimized');
-        // Reset iframe to ensure fresh state
-        iframe.src = iframe.src;
+      // Run when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
       }
-
-      // Minimize chat (hide window, show button)
-      function minimizeChat() {
-        widget.classList.add('minimized');
-        widget.classList.remove('open');
-      }
-
-      // Close chat (same as minimize)
-      function closeChat() {
-        minimizeChat();
-      }
-
-      // Event listeners
-      button.addEventListener('click', openChat);
-      minimizeBtn.addEventListener('click', minimizeChat);
-      closeBtn.addEventListener('click', closeChat);
-
-      // Prevent clicks inside iframe from bubbling
-      window.addEventListener('click', function(e) {
-        e.stopPropagation();
-      });
     })();
   </script>
 </body>
