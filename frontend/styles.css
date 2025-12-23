@@ -530,18 +530,6 @@ button {
   position: relative;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
-  overflow-anchor: none;
-  /* CSS scroll snap - forces scroll to top */
-  scroll-snap-type: y mandatory;
-}
-
-.chat-scroll > *:first-child {
-  scroll-snap-align: start;
-  scroll-margin-top: 0;
-}
-
-.chat-scroll > * {
-  scroll-snap-align: none;
 }
 
 .chat-scroll * {

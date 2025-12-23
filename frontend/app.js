@@ -109,38 +109,17 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 54 loaded');
+console.log('[FF-CHATBOT] Version 55 loaded');
 
 function forceScrollToTop() {
-  // Method 1: Scroll anchor into view (works with CSS scroll-snap)
-  const anchor = document.getElementById('scroll-anchor');
-  if (anchor) {
-    anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
-  }
-  
-  // Method 2: Direct scrollTop
   const container = document.getElementById('chatMessages');
   if (container) {
     container.scrollTop = 0;
+    // A few more attempts to ensure it sticks
+    setTimeout(() => { container.scrollTop = 0; }, 50);
+    setTimeout(() => { container.scrollTop = 0; }, 150);
+    setTimeout(() => { container.scrollTop = 0; }, 300);
   }
-  
-  // Method 3: Delayed attempts
-  setTimeout(() => {
-    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
-    if (container) container.scrollTop = 0;
-  }, 50);
-  
-  setTimeout(() => {
-    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
-    if (container) container.scrollTop = 0;
-  }, 200);
-  
-  setTimeout(() => {
-    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
-    if (container) container.scrollTop = 0;
-  }, 500);
-  
-  // Notify parent
   notifyParentPreventScroll();
 }
 
