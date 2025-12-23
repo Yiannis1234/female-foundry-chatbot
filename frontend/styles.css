@@ -530,21 +530,11 @@ button {
   position: relative;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   min-height: 0; /* Important for flex scrolling */
+  overflow-anchor: none; /* Disable browser scroll anchoring (prevents jumpy repositioning) */
 }
 
-/* AGGRESSIVE: Prevent ALL scrolling when prevent-scroll class is active */
-.chat-scroll.prevent-scroll {
-  overflow: hidden !important;
-  scroll-behavior: auto !important;
-}
-
-.chat-scroll.prevent-scroll * {
-  scroll-behavior: auto !important;
-}
-
-/* Prevent auto-scroll when clicking options */
-.chat-scroll.no-auto-scroll {
-  scroll-behavior: auto !important;
+.chat-scroll * {
+  overflow-anchor: none;
 }
 
 .chat-message {

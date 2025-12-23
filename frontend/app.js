@@ -109,26 +109,53 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-// Flag to prevent auto-scroll when clicking options
+// We pin the chat to the TOP briefly after option clicks (to defeat focus-scroll).
+// We do NOT permanently disable scrolling.
 let preventAutoScroll = false;
-let scrollLockInterval = null;
+let lockToTopUntil = 0;
+let lockToTopRaf = null;
 
-// Continuous scroll lock - runs every frame to keep scroll at top
-function startScrollLock() {
-  if (scrollLockInterval) return; // Already running
-  scrollLockInterval = setInterval(() => {
-    if (preventAutoScroll && chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.classList.add('prevent-scroll');
+function lockToTop(ms = 900) {
+  if (!chatMessages) return;
+  lockToTopUntil = Math.max(lockToTopUntil, Date.now() + ms);
+  preventAutoScroll = true;
+
+  if (lockToTopRaf) return;
+
+  const tick = () => {
+    if (!chatMessages) {
+      lockToTopRaf = null;
+      return;
     }
-  }, 16); // ~60fps
+    if (Date.now() < lockToTopUntil) {
+      chatMessages.scrollTop = 0;
+      lockToTopRaf = requestAnimationFrame(tick);
+    } else {
+      lockToTopRaf = null;
+      preventAutoScroll = false;
+    }
+  };
+
+  lockToTopRaf = requestAnimationFrame(tick);
 }
 
-function stopScrollLock() {
-  if (scrollLockInterval) {
-    clearInterval(scrollLockInterval);
-    scrollLockInterval = null;
+function blurActiveElement() {
+  const el = document.activeElement;
+  if (el && el instanceof HTMLElement) {
+    try {
+      el.blur();
+    } catch (_) {}
+  }
+}
+
+function focusChatWithoutScroll() {
+  if (!chatMessages) return;
+  try {
+    chatMessages.focus({ preventScroll: true });
+  } catch (_) {
+    try {
+      chatMessages.focus();
+    } catch (_) {}
   }
 }
 
@@ -146,74 +173,12 @@ function notifyParentPreventScroll() {
 // MutationObserver to prevent auto-scroll when content is added
 let scrollObserver = null;
 if (chatMessages) {
-  // AGGRESSIVE: Prevent ALL scroll events when preventAutoScroll is true
-  chatMessages.addEventListener('scroll', (e) => {
-    if (preventAutoScroll) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      chatMessages.scrollTop = 0;
-      return false;
-    }
-  }, { passive: false, capture: true });
-  
-  // Also prevent wheel events
-  chatMessages.addEventListener('wheel', (e) => {
-    if (preventAutoScroll) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      return false;
-    }
-  }, { passive: false, capture: true });
-  
-  // Prevent touchmove events
-  chatMessages.addEventListener('touchmove', (e) => {
-    if (preventAutoScroll) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      return false;
-    }
-  }, { passive: false, capture: true });
+  // Make focusable so we can steal focus away from clicked option buttons without scrolling.
+  chatMessages.setAttribute("tabindex", "-1");
   
   scrollObserver = new MutationObserver(() => {
-    if (preventAutoScroll && chatMessages) {
-      // IMMEDIATELY reset scroll to top when content changes - BEFORE browser can scroll
+    if (Date.now() < lockToTopUntil && chatMessages) {
       chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.classList.add('prevent-scroll');
-      // Force it multiple times synchronously
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-      // Also use requestAnimationFrame for immediate effect
-      requestAnimationFrame(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-          chatMessages.classList.add('prevent-scroll');
-        }
-      });
-      // Multiple attempts to ensure it stays at top
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 0);
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 10);
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 50);
     }
   });
   
@@ -285,51 +250,11 @@ function switchView(viewName) {
 
   currentView = viewName;
 
-  // When switching to chat view, scroll to top IMMEDIATELY to show the start
+  // When switching to chat view, pin to TOP briefly (prevents focus-scroll jumps).
   if (viewName === "chat") {
-    // Lock scroll immediately
-    preventAutoScroll = true;
-    if (chatMessages) {
-      chatMessages.classList.add('prevent-scroll');
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      // Multiple synchronous resets
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-    }
-    
-    // Multiple timeouts to ensure it stays at top
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-        chatMessages.classList.add('prevent-scroll');
-      }
-    }, 0);
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    }, 50);
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    }, 100);
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    }, 200);
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    }, 400);
+    blurActiveElement();
+    focusChatWithoutScroll();
+    lockToTop(900);
   }
 }
 
@@ -452,54 +377,12 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
-  // AGGRESSIVE: Lock scroll IMMEDIATELY - show BEGINNING of chat
-  preventAutoScroll = true;
-  startScrollLock(); // Start continuous lock
-  if (chatMessages) {
-    chatMessages.classList.add('prevent-scroll');
-    chatMessages.scrollTop = 0;
-    chatMessages.style.overflow = 'hidden';
-    chatMessages.style.scrollBehavior = 'auto';
-    // Lock multiple times synchronously
-    chatMessages.scrollTop = 0;
-    chatMessages.scrollTop = 0;
-  }
-  
+  blurActiveElement();
+  focusChatWithoutScroll();
+  lockToTop(900);
   switchView("chat");
-  
-  // Force scroll to top IMMEDIATELY - show BEGINNING
-  requestAnimationFrame(() => {
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.classList.add('prevent-scroll');
-    }
-  });
-  
-  setTimeout(() => {
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-    }
-  }, 0);
-  
   addMessage("user", text, false); // Don't scroll when clicking from dashboard
-  
-  // Keep locked during API call
-  if (chatMessages) {
-    chatMessages.scrollTop = 0;
-    chatMessages.style.overflow = 'hidden';
-  }
-  
-  await sendMessageToApi(text);
-  
-  // Keep locked after API call - show BEGINNING
-  setTimeout(() => {
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-    }
-  }, 0);
+  await sendMessageToApi(text, { pinTop: true });
 }
 
 if (dashboardSearchBtn) {
@@ -519,7 +402,7 @@ if (dashboardSearch) {
 }
 
 // --- Chat Logic ---
-async function sendMessageToApi(text) {
+async function sendMessageToApi(text, { pinTop = false } = {}) {
   if (OPTION_LINKS[text]) {
     openExternal(OPTION_LINKS[text]);
     return;
@@ -534,109 +417,21 @@ async function sendMessageToApi(text) {
     });
     const data = await res.json();
     hideTyping();
-    
-    // AGGRESSIVE: Keep scroll locked - show BEGINNING of chat
-    preventAutoScroll = true;
-    startScrollLock(); // Start continuous lock
-    if (chatMessages) {
-      chatMessages.classList.add('prevent-scroll');
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.style.scrollBehavior = 'auto';
-      // Lock multiple times synchronously
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-    }
-    notifyParentPreventScroll();
-    
-    // Force scroll to top BEFORE adding messages - show BEGINNING
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
+
+    if (pinTop) {
+      blurActiveElement();
+      focusChatWithoutScroll();
+      lockToTop(1100);
+      notifyParentPreventScroll();
     }
     
     if (data.messages) {
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
-    
-    // Keep locked AFTER adding messages - stay at BEGINNING
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.scrollTop = 0;
-    }
-    
+
     renderChatOptions(data.options);
-    
-    // Keep locked - NEVER unlock unless user types - show BEGINNING
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.scrollTop = 0;
-    }
-    
-    // AGGRESSIVE: Continuous lock - check EVERY frame
-    let lockInterval = null;
-    const keepLocked = () => {
-      if (chatMessages && preventAutoScroll) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-        chatMessages.classList.add('prevent-scroll');
-        // Keep checking continuously
-        requestAnimationFrame(keepLocked);
-      }
-    };
-    
-    // Start continuous locking immediately
-    keepLocked();
-    requestAnimationFrame(keepLocked);
-    
-    // Also use interval as backup
-    if (lockInterval) clearInterval(lockInterval);
-    lockInterval = setInterval(() => {
-      if (chatMessages && preventAutoScroll) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-        chatMessages.classList.add('prevent-scroll');
-      } else {
-        clearInterval(lockInterval);
-        lockInterval = null;
-      }
-    }, 16); // ~60fps
-    
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 0);
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 10);
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 50);
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 100);
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 200);
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        keepLocked();
-      }
-    }, 400);
+
+    if (pinTop) lockToTop(1100);
   } catch (err) {
     console.error(err);
     hideTyping();
@@ -646,9 +441,6 @@ async function sendMessageToApi(text) {
 
 function addMessage(role, content, shouldScroll = false) {
   if (!chatMessages) return;
-
-  // Store scroll position to prevent auto-scroll
-  const oldScrollTop = chatMessages.scrollTop;
 
   const segments =
     role === "bot" ? splitBotContent(content) : [content];
@@ -667,76 +459,16 @@ function addMessage(role, content, shouldScroll = false) {
 
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(bubble);
-    
-    // Store scroll position before adding
-    const scrollBefore = chatMessages.scrollTop;
-    
     chatMessages.appendChild(msgDiv);
-    
-    // Immediately prevent scroll after each message is added
-    if (!shouldScroll && preventAutoScroll) {
-      chatMessages.scrollTop = 0;
-      // Use multiple methods to prevent scroll
-      requestAnimationFrame(() => {
-        if (chatMessages) {
-          chatMessages.scrollTop = 0;
-        }
-      });
-    }
   });
 
   // Only scroll to bottom if explicitly requested (user typing)
   if (shouldScroll) {
-    preventAutoScroll = false; // Allow scrolling when user types
-    stopScrollLock(); // Stop continuous lock
-    if (chatMessages) {
-      chatMessages.classList.remove('prevent-scroll');
-      chatMessages.style.overflow = 'auto';
-    }
     requestAnimationFrame(() => {
       if (chatMessages) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
     });
-  } else {
-    // AGGRESSIVE: Force stay at top - lock it COMPLETELY
-    if (preventAutoScroll && chatMessages) {
-      chatMessages.classList.add('prevent-scroll');
-      chatMessages.scrollTop = 0;
-      chatMessages.style.overflow = 'hidden';
-      chatMessages.style.scrollBehavior = 'auto';
-      // Multiple synchronous resets
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-      chatMessages.scrollTop = 0;
-      // Use requestAnimationFrame for immediate lock
-      requestAnimationFrame(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-          chatMessages.classList.add('prevent-scroll');
-        }
-      });
-      // Multiple timeouts to keep locked
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 0);
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 10);
-      setTimeout(() => {
-        if (chatMessages && preventAutoScroll) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 50);
-    }
   }
 }
 
@@ -832,39 +564,14 @@ function renderChatOptions(options) {
         return;
       }
       
-      // AGGRESSIVE: Lock scroll IMMEDIATELY before anything else
-      preventAutoScroll = true;
-      startScrollLock(); // Start continuous lock
-      if (chatMessages) {
-        chatMessages.classList.add('prevent-scroll');
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-        chatMessages.style.scrollBehavior = 'auto';
-        // Lock it multiple times synchronously
-        chatMessages.scrollTop = 0;
-        chatMessages.scrollTop = 0;
-        chatMessages.scrollTop = 0;
-      }
-      
+      // Prevent browser focus-scroll (especially inside Wix iframes)
+      blurActiveElement();
+      focusChatWithoutScroll();
+      lockToTop(1100);
       notifyParentPreventScroll();
       
       addMessage("user", opt, false);
-      
-      // Keep locked during API call
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-      
-      sendMessageToApi(opt);
-      
-      // Keep locked after API call
-      setTimeout(() => {
-        if (chatMessages) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 0);
+      sendMessageToApi(opt, { pinTop: true });
     };
 
     bubble.appendChild(chip);
@@ -876,24 +583,8 @@ function renderChatOptions(options) {
   // Don't auto-scroll when showing options - let user see the start
   // requestAnimationFrame(() => scrollToBottom());
   
-  // AGGRESSIVE: Force stay at top after rendering options
-  if (chatMessages && preventAutoScroll) {
-    chatMessages.scrollTop = 0;
-    chatMessages.style.overflow = 'hidden';
-    chatMessages.classList.add('prevent-scroll');
-    requestAnimationFrame(() => {
-      if (chatMessages && preventAutoScroll) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    });
-    setTimeout(() => {
-      if (chatMessages && preventAutoScroll) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-    }, 0);
-  }
+  // If we are in a "pin to top" window, keep pinned briefly after inserting options.
+  if (Date.now() < lockToTopUntil) lockToTop(700);
 }
 
 function renderPrimaryFooterOptions(options) {
@@ -921,39 +612,14 @@ function renderPrimaryFooterOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
-      // AGGRESSIVE: Lock scroll IMMEDIATELY before anything else
-      preventAutoScroll = true;
-      startScrollLock(); // Start continuous lock
-      if (chatMessages) {
-        chatMessages.classList.add('prevent-scroll');
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-        chatMessages.style.scrollBehavior = 'auto';
-        // Lock it multiple times synchronously
-        chatMessages.scrollTop = 0;
-        chatMessages.scrollTop = 0;
-        chatMessages.scrollTop = 0;
-      }
-      
+      // Prevent browser focus-scroll (especially inside Wix iframes)
+      blurActiveElement();
+      focusChatWithoutScroll();
+      lockToTop(1100);
       notifyParentPreventScroll();
       
       addMessage("user", opt, false);
-      
-      // Keep locked during API call
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-        chatMessages.style.overflow = 'hidden';
-      }
-      
-      sendMessageToApi(opt);
-      
-      // Keep locked after API call
-      setTimeout(() => {
-        if (chatMessages) {
-          chatMessages.scrollTop = 0;
-          chatMessages.style.overflow = 'hidden';
-        }
-      }, 0);
+      sendMessageToApi(opt, { pinTop: true });
     };
     primaryFooterOptions.appendChild(btn);
   });
