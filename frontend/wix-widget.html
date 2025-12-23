@@ -419,7 +419,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=46"
+          src="https://srv1079042.hstgr.cloud/?v=47"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -573,12 +573,7 @@
           console.error('Close button not found!');
         }
 
-        // Prevent clicks inside iframe from bubbling
-        if (chatWindow) {
-          chatWindow.addEventListener('click', function(e) {
-        e.stopPropagation();
-          }, true);
-        }
+        // NOTE: Removed problematic click capture that was blocking header buttons
 
         console.log('Widget initialized successfully');
       }

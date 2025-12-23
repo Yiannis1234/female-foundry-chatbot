@@ -109,34 +109,38 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-// We pin the chat to the TOP briefly after option clicks (to defeat focus-scroll).
-// We do NOT permanently disable scrolling.
+// AGGRESSIVE scroll lock using setInterval (RAF can be throttled in iframes)
 let preventAutoScroll = false;
-let lockToTopUntil = 0;
-let lockToTopRaf = null;
+let lockToTopInterval = null;
+let lockToTopTimeout = null;
 
-function lockToTop(ms = 900) {
+function lockToTop(ms = 1500) {
   if (!chatMessages) return;
-  lockToTopUntil = Math.max(lockToTopUntil, Date.now() + ms);
   preventAutoScroll = true;
-
-  if (lockToTopRaf) return;
-
-  const tick = () => {
-    if (!chatMessages) {
-      lockToTopRaf = null;
-      return;
-    }
-    if (Date.now() < lockToTopUntil) {
+  
+  // Immediately scroll to top
+  chatMessages.scrollTop = 0;
+  chatMessages.style.scrollBehavior = 'auto';
+  
+  // Clear any existing interval/timeout
+  if (lockToTopInterval) clearInterval(lockToTopInterval);
+  if (lockToTopTimeout) clearTimeout(lockToTopTimeout);
+  
+  // Use setInterval - more reliable than RAF in iframes
+  lockToTopInterval = setInterval(() => {
+    if (chatMessages && preventAutoScroll) {
       chatMessages.scrollTop = 0;
-      lockToTopRaf = requestAnimationFrame(tick);
-    } else {
-      lockToTopRaf = null;
-      preventAutoScroll = false;
     }
-  };
-
-  lockToTopRaf = requestAnimationFrame(tick);
+  }, 10); // Every 10ms
+  
+  // Stop after ms milliseconds
+  lockToTopTimeout = setTimeout(() => {
+    if (lockToTopInterval) {
+      clearInterval(lockToTopInterval);
+      lockToTopInterval = null;
+    }
+    preventAutoScroll = false;
+  }, ms);
 }
 
 function blurActiveElement() {
