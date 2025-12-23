@@ -173,7 +173,21 @@ function switchView(viewName) {
 
   // When switching to chat view, scroll to top to show the start
   if (viewName === "chat") {
-    setTimeout(() => scrollToTop(), 100);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 50);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 200);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 400);
   }
 }
 
@@ -337,8 +351,22 @@ async function sendMessageToApi(text) {
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
     renderChatOptions(data.options);
-    // Scroll to top after showing options so user sees the start
-    setTimeout(() => scrollToTop(), 200);
+    // Force scroll to top after showing options so user sees the start
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 50);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 200);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
+    }, 400);
   } catch (err) {
     console.error(err);
     hideTyping();
@@ -348,6 +376,10 @@ async function sendMessageToApi(text) {
 
 function addMessage(role, content, shouldScroll = false) {
   if (!chatMessages) return;
+
+  // Store scroll position to prevent auto-scroll
+  const oldScrollTop = chatMessages.scrollTop;
+  const wasAtTop = oldScrollTop < 50; // Consider "at top" if within 50px
 
   const segments =
     role === "bot" ? splitBotContent(content) : [content];
@@ -371,7 +403,23 @@ function addMessage(role, content, shouldScroll = false) {
 
   // Only scroll to bottom if explicitly requested (user typing)
   if (shouldScroll) {
-    scrollToBottom();
+    requestAnimationFrame(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    });
+  } else {
+    // Prevent auto-scroll - keep at top or maintain position
+    requestAnimationFrame(() => {
+      if (chatMessages) {
+        if (wasAtTop) {
+          chatMessages.scrollTop = 0;
+        } else {
+          // Maintain relative position
+          chatMessages.scrollTop = oldScrollTop;
+        }
+      }
+    });
   }
 }
 
@@ -567,7 +615,8 @@ function scrollToTop() {
   }
 }
 
-window.addEventListener("resize", scrollToBottom);
+// Removed auto-scroll on resize - let user control scrolling
+// window.addEventListener("resize", scrollToBottom);
 
 // Chat Input Handlers
 if (chatSendBtn) {
