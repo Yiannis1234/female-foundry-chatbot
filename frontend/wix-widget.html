@@ -42,15 +42,18 @@
       background: linear-gradient(135deg, #7c63ff, #fd72c7);
       color: white;
       border: none;
-      cursor: pointer;
+      cursor: pointer !important;
+      pointer-events: auto !important;
       box-shadow: 0 4px 20px rgba(124, 99, 255, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
       font-weight: bold;
-      z-index: 10;
+      z-index: 999999 !important;
       transition: transform 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     #ff-chatbot-button:hover {
@@ -330,7 +333,7 @@
 <body>
   <div id="ff-chatbot-widget">
     <!-- Chat Button (Always visible when minimized or closed) -->
-    <button id="ff-chatbot-button" aria-label="Open chat">
+    <button id="ff-chatbot-button" aria-label="Open chat" onclick="window.ffOpenChat && window.ffOpenChat(event)">
       💬
     </button>
 
@@ -358,79 +361,99 @@
 
   <script>
     (function() {
-      // Wait for DOM to be ready
-      function init() {
-        const widget = document.getElementById('ff-chatbot-widget');
-        const button = document.getElementById('ff-chatbot-button');
-        const chatWindow = document.getElementById('ff-chatbot-window');
-        const minimizeBtn = document.getElementById('ff-minimize-btn');
-        const closeBtn = document.getElementById('ff-close-btn');
-        const iframe = document.getElementById('ff-chatbot-iframe');
+      const widget = document.getElementById('ff-chatbot-widget');
+      const button = document.getElementById('ff-chatbot-button');
+      const chatWindow = document.getElementById('ff-chatbot-window');
+      const minimizeBtn = document.getElementById('ff-minimize-btn');
+      const closeBtn = document.getElementById('ff-close-btn');
+      const iframe = document.getElementById('ff-chatbot-iframe');
 
-        if (!widget || !button || !chatWindow) {
-          console.error('Widget elements not found');
-          return;
-        }
-
-        // Open chat
-        function openChat(e) {
+      // Open chat function - make it global for inline onclick
+      window.ffOpenChat = function(e) {
+        if (e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Opening chat');
+        }
+        console.log('Opening chat');
+        if (widget) {
           widget.classList.add('open');
           widget.classList.remove('minimized');
-          // Reset iframe to ensure fresh state
-          if (iframe) {
-            iframe.src = iframe.src;
-          }
         }
+        // Reset iframe to ensure fresh state
+        if (iframe) {
+          iframe.src = iframe.src;
+        }
+        return false;
+      };
 
-        // Minimize chat (hide window, show button)
-        function minimizeChat(e) {
+      // Minimize chat function
+      function minimizeChat(e) {
+        if (e) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('Minimizing chat');
+        }
+        console.log('Minimizing chat');
+        if (widget) {
           widget.classList.add('minimized');
           widget.classList.remove('open');
         }
+        return false;
+      }
 
-        // Close chat (same as minimize)
-        function closeChat(e) {
+      // Close chat function
+      function closeChat(e) {
+        if (e) {
           e.preventDefault();
           e.stopPropagation();
-          minimizeChat(e);
+        }
+        minimizeChat(e);
+        return false;
+      }
+
+      // Wait for DOM and attach listeners
+      function init() {
+        if (!widget || !button || !chatWindow) {
+          console.error('Widget elements not found', {widget, button, chatWindow});
+          setTimeout(init, 100); // Retry after 100ms
+          return;
         }
 
-        // Event listeners
-        button.addEventListener('click', openChat);
-        button.addEventListener('touchend', openChat); // For mobile touch
+        // Multiple ways to attach events
+        button.onclick = window.ffOpenChat;
+        button.addEventListener('click', window.ffOpenChat, true);
+        button.addEventListener('touchend', window.ffOpenChat, true);
         
         if (minimizeBtn) {
-          minimizeBtn.addEventListener('click', minimizeChat);
-          minimizeBtn.addEventListener('touchend', minimizeChat);
+          minimizeBtn.onclick = minimizeChat;
+          minimizeBtn.addEventListener('click', minimizeChat, true);
+          minimizeBtn.addEventListener('touchend', minimizeChat, true);
         }
         
         if (closeBtn) {
-          closeBtn.addEventListener('click', closeChat);
-          closeBtn.addEventListener('touchend', closeChat);
+          closeBtn.onclick = closeChat;
+          closeBtn.addEventListener('click', closeChat, true);
+          closeBtn.addEventListener('touchend', closeChat, true);
         }
 
         // Prevent clicks inside iframe from bubbling
         if (chatWindow) {
           chatWindow.addEventListener('click', function(e) {
             e.stopPropagation();
-          });
+          }, true);
         }
 
-        console.log('Widget initialized');
+        console.log('Widget initialized successfully');
       }
 
-      // Run when DOM is ready
+      // Run immediately and also on DOM ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
-        init();
+        setTimeout(init, 0);
       }
+      
+      // Also try after a short delay in case Wix loads things late
+      setTimeout(init, 500);
     })();
   </script>
 </body>
