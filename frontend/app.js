@@ -109,17 +109,45 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-// Simple scroll to top helper - call this after adding content
+// Lock scrolling during content updates, then scroll to top
+let scrollLocked = false;
+
+function lockScroll() {
+  if (!chatMessages) return;
+  scrollLocked = true;
+  chatMessages.style.overflow = 'hidden';
+  chatMessages.scrollTop = 0;
+}
+
+function unlockScrollAndGoTop() {
+  if (!chatMessages) return;
+  chatMessages.scrollTop = 0;
+  chatMessages.style.overflow = 'auto';
+  scrollLocked = false;
+  // Extra attempts after unlock
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 10);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 50);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 100);
+}
+
 function forceScrollToTop() {
   if (!chatMessages) return;
   chatMessages.scrollTop = 0;
-  // Do it multiple times with delays to beat browser rendering
   setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 0);
   setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 50);
   setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 100);
   setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 200);
-  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 300);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 500);
   requestAnimationFrame(() => { if (chatMessages) chatMessages.scrollTop = 0; });
+}
+
+// Prevent any scroll events when locked
+if (chatMessages) {
+  chatMessages.addEventListener('scroll', () => {
+    if (scrollLocked) {
+      chatMessages.scrollTop = 0;
+    }
+  }, { passive: false });
 }
 
 
@@ -324,11 +352,11 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
+  lockScroll();
   switchView("chat");
-  forceScrollToTop();
   addMessage("user", text, false);
   await sendMessageToApi(text, { pinTop: true });
-  forceScrollToTop();
+  unlockScrollAndGoTop();
 }
 
 if (dashboardSearchBtn) {
@@ -349,48 +377,74 @@ if (dashboardSearch) {
 
 // --- Chat Logic ---
 async function sendMessageToApi(text, { pinTop = false } = {}) {
+  console.log('[DEBUG] sendMessageToApi called with:', text, 'sessionId:', sessionId);
+  
   if (OPTION_LINKS[text]) {
+    console.log('[DEBUG] Opening external link for:', text);
     openExternal(OPTION_LINKS[text]);
+    return;
+  }
+
+  if (!sessionId) {
+    console.error('[DEBUG] No sessionId! Cannot send message.');
+    addMessage("bot", "Session not started. Please refresh and try again.", false);
     return;
   }
 
   showTyping();
   try {
+    console.log('[DEBUG] Fetching API...');
     const res = await fetch(`${API_BASE}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ session_id: sessionId, message: text }),
     });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
     const data = await res.json();
+    console.log('[DEBUG] API response:', data);
     hideTyping();
 
     if (pinTop) {
-      forceScrollToTop();
+      lockScroll();
       notifyParentPreventScroll();
     }
     
-    if (data.messages) {
+    if (data.messages && data.messages.length > 0) {
+      console.log('[DEBUG] Adding', data.messages.length, 'messages');
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
+    } else {
+      console.log('[DEBUG] No messages in response');
     }
-
-    if (pinTop) forceScrollToTop();
 
     renderChatOptions(data.options);
 
-    if (pinTop) forceScrollToTop();
+    if (pinTop) {
+      unlockScrollAndGoTop();
+    }
   } catch (err) {
-    console.error(err);
+    console.error('[DEBUG] API error:', err);
     hideTyping();
-    addMessage("bot", "Sorry, something went wrong.", false);
+    addMessage("bot", "Sorry, something went wrong. Error: " + err.message, false);
     if (pinTop) forceScrollToTop();
   }
 }
 
 function addMessage(role, content, shouldScroll = false) {
-  if (!chatMessages) return;
+  console.log('[DEBUG] addMessage called:', role, content?.substring(0, 50));
+  
+  if (!chatMessages) {
+    console.error('[DEBUG] chatMessages element not found!');
+    return;
+  }
 
   const segments =
     role === "bot" ? splitBotContent(content) : [content];
+
+  console.log('[DEBUG] Adding', segments.length, 'message segments');
 
   segments.forEach((segment) => {
     const msgDiv = document.createElement("div");
@@ -407,6 +461,7 @@ function addMessage(role, content, shouldScroll = false) {
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(bubble);
     chatMessages.appendChild(msgDiv);
+    console.log('[DEBUG] Message appended to chatMessages');
   });
 
   // Only scroll to bottom if explicitly requested (user typing)
@@ -511,10 +566,9 @@ function renderChatOptions(options) {
         return;
       }
       
-      forceScrollToTop();
+      lockScroll();
       notifyParentPreventScroll();
       addMessage("user", opt, false);
-      forceScrollToTop();
       sendMessageToApi(opt, { pinTop: true });
     };
 
@@ -544,20 +598,22 @@ function renderPrimaryFooterOptions(options) {
     btn.className = "footer-chip";
     btn.textContent = `💬 ${opt}`;
     btn.onclick = () => {
+      console.log('[DEBUG] Footer button clicked:', opt);
+      
       // Clear any pending prompts/bubbles when switching primary via footer
       if (chatMessages) {
         const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
         oldOptionBubbles.forEach((el) => el.remove());
       }
       if (OPTION_LINKS[opt]) {
+        console.log('[DEBUG] Opening external link');
         openExternal(OPTION_LINKS[opt]);
         return;
       }
       
-      forceScrollToTop();
+      lockScroll();
       notifyParentPreventScroll();
       addMessage("user", opt, false);
-      forceScrollToTop();
       sendMessageToApi(opt, { pinTop: true });
     };
     primaryFooterOptions.appendChild(btn);
