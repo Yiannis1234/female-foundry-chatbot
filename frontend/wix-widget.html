@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Female Foundry Chatbot</title>
+  <style>
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Floating Widget Container */
+    #ff-chatbot-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999999;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Chat Button (Always Visible) */
+    #ff-chatbot-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c63ff, #fd72c7);
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(124, 99, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    #ff-chatbot-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(124, 99, 255, 0.5);
+    }
+
+    #ff-chatbot-button .close-icon {
+      display: none;
+    }
+
+    #ff-chatbot-widget.open #ff-chatbot-button .chat-icon {
+      display: none;
+    }
+
+    #ff-chatbot-widget.open #ff-chatbot-button .close-icon {
+      display: block;
+    }
+
+    /* Chat Window */
+    #ff-chatbot-window {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 380px;
+      height: 600px;
+      max-height: calc(100vh - 100px);
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    #ff-chatbot-widget.open #ff-chatbot-window {
+      display: flex;
+    }
+
+    /* Chat Window Header */
+    .chat-window-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #7c63ff, #fd72c7);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .chat-window-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .chat-window-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .chat-window-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Chat Content Area */
+    .chat-window-content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      #ff-chatbot-window {
+        width: calc(100vw - 40px);
+        right: 0;
+        bottom: 80px;
+      }
+
+      #ff-chatbot-widget {
+        bottom: 15px;
+        right: 15px;
+      }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="ff-chatbot-widget">
+    <!-- Floating Button -->
+    <button id="ff-chatbot-button" aria-label="Open chat">
+      <span class="chat-icon">💬</span>
+      <span class="close-icon">✕</span>
+    </button>
+
+    <!-- Chat Window (Hidden by default) -->
+    <div id="ff-chatbot-window">
+      <div class="chat-window-header">
+        <h3>Female Foundry Assistant</h3>
+        <button class="chat-window-close" aria-label="Close chat">✕</button>
+      </div>
+      <div class="chat-window-content">
+        <iframe 
+          id="ff-chatbot-iframe"
+          src="https://srv1079042.hstgr.cloud/"
+          style="width: 100%; height: 100%; border: none; flex: 1;"
+          allow="microphone; camera"
+          title="Female Foundry Chatbot"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const widget = document.getElementById('ff-chatbot-widget');
+      const button = document.getElementById('ff-chatbot-button');
+      const window = document.getElementById('ff-chatbot-window');
+      const closeBtn = document.querySelector('.chat-window-close');
+      const iframe = document.getElementById('ff-chatbot-iframe');
+
+      function toggleChat() {
+        widget.classList.toggle('open');
+        if (widget.classList.contains('open')) {
+          // Reset iframe when opening to ensure fresh state
+          iframe.src = iframe.src;
+        }
+      }
+
+      function closeChat() {
+        widget.classList.remove('open');
+      }
+
+      button.addEventListener('click', toggleChat);
+      closeBtn.addEventListener('click', closeChat);
+
+      // Close when clicking outside (optional)
+      document.addEventListener('click', function(e) {
+        if (widget.classList.contains('open') && 
+            !widget.contains(e.target) && 
+            e.target !== button) {
+          closeChat();
+        }
+      });
+
+      // Prevent iframe clicks from closing
+      window.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    })();
+  </script>
+</body>
+</html>
+
