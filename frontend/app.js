@@ -126,35 +126,60 @@ function notifyParentPreventScroll() {
 // MutationObserver to prevent auto-scroll when content is added
 let scrollObserver = null;
 if (chatMessages) {
-  // Prevent scroll events when preventAutoScroll is true
+  // AGGRESSIVE: Prevent ALL scroll events when preventAutoScroll is true
   chatMessages.addEventListener('scroll', (e) => {
-    if (preventAutoScroll && chatMessages.scrollTop > 0) {
+    if (preventAutoScroll) {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       chatMessages.scrollTop = 0;
       return false;
     }
-  }, { passive: false });
+  }, { passive: false, capture: true });
+  
+  // Also prevent wheel events
+  chatMessages.addEventListener('wheel', (e) => {
+    if (preventAutoScroll) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }, { passive: false, capture: true });
+  
+  // Prevent touchmove events
+  chatMessages.addEventListener('touchmove', (e) => {
+    if (preventAutoScroll) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }, { passive: false, capture: true });
   
   scrollObserver = new MutationObserver(() => {
     if (preventAutoScroll && chatMessages) {
       // Immediately reset scroll to top when content changes
       chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
       // Also use requestAnimationFrame for immediate effect
       requestAnimationFrame(() => {
         if (chatMessages) {
           chatMessages.scrollTop = 0;
+          chatMessages.style.overflow = 'hidden';
         }
       });
       // Multiple attempts to ensure it stays at top
       setTimeout(() => {
         if (chatMessages) {
           chatMessages.scrollTop = 0;
+          chatMessages.style.overflow = 'hidden';
         }
       }, 0);
       setTimeout(() => {
         if (chatMessages) {
           chatMessages.scrollTop = 0;
+          chatMessages.style.overflow = 'hidden';
         }
       }, 10);
     }
@@ -440,21 +465,65 @@ async function sendMessageToApi(text) {
       chatMessages.style.overflow = 'hidden';
     }
     
-    // Multiple attempts to keep locked
+    // AGGRESSIVE: Continuous lock - check EVERY frame
+    let lockInterval = null;
     const keepLocked = () => {
       if (chatMessages && preventAutoScroll) {
         chatMessages.scrollTop = 0;
         chatMessages.style.overflow = 'hidden';
+        chatMessages.classList.add('prevent-scroll');
+        // Keep checking continuously
+        requestAnimationFrame(keepLocked);
       }
     };
     
+    // Start continuous locking immediately
+    keepLocked();
     requestAnimationFrame(keepLocked);
-    setTimeout(keepLocked, 0);
-    setTimeout(keepLocked, 10);
-    setTimeout(keepLocked, 50);
-    setTimeout(keepLocked, 100);
-    setTimeout(keepLocked, 200);
-    setTimeout(keepLocked, 400);
+    
+    // Also use interval as backup
+    if (lockInterval) clearInterval(lockInterval);
+    lockInterval = setInterval(() => {
+      if (chatMessages && preventAutoScroll) {
+        chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
+        chatMessages.classList.add('prevent-scroll');
+      } else {
+        clearInterval(lockInterval);
+        lockInterval = null;
+      }
+    }, 16); // ~60fps
+    
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 0);
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 10);
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 50);
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 100);
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 200);
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        keepLocked();
+      }
+    }, 400);
   } catch (err) {
     console.error(err);
     hideTyping();
@@ -516,7 +585,7 @@ function addMessage(role, content, shouldScroll = false) {
       }
     });
   } else {
-    // AGGRESSIVE: Force stay at top - lock it
+    // AGGRESSIVE: Force stay at top - lock it COMPLETELY
     if (preventAutoScroll && chatMessages) {
       chatMessages.classList.add('prevent-scroll');
       chatMessages.scrollTop = 0;
@@ -525,24 +594,34 @@ function addMessage(role, content, shouldScroll = false) {
       // Multiple synchronous resets
       chatMessages.scrollTop = 0;
       chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
+      // Use requestAnimationFrame for immediate lock
       requestAnimationFrame(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
+          chatMessages.classList.add('prevent-scroll');
         }
       });
+      // Multiple timeouts to keep locked
       setTimeout(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
         }
       }, 0);
       setTimeout(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
         }
       }, 10);
+      setTimeout(() => {
+        if (chatMessages && preventAutoScroll) {
+          chatMessages.scrollTop = 0;
+          chatMessages.style.overflow = 'hidden';
+        }
+      }, 50);
     }
   }
 }
@@ -681,6 +760,25 @@ function renderChatOptions(options) {
 
   // Don't auto-scroll when showing options - let user see the start
   // requestAnimationFrame(() => scrollToBottom());
+  
+  // AGGRESSIVE: Force stay at top after rendering options
+  if (chatMessages && preventAutoScroll) {
+    chatMessages.scrollTop = 0;
+    chatMessages.style.overflow = 'hidden';
+    chatMessages.classList.add('prevent-scroll');
+    requestAnimationFrame(() => {
+      if (chatMessages && preventAutoScroll) {
+        chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
+      }
+    });
+    setTimeout(() => {
+      if (chatMessages && preventAutoScroll) {
+        chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
+      }
+    }, 0);
+  }
 }
 
 function renderPrimaryFooterOptions(options) {
