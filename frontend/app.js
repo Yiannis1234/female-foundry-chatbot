@@ -109,17 +109,41 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 55 loaded');
+console.log('[FF-CHATBOT] Version 56 loaded');
+
+function scrollAllToTop() {
+  // Scroll the chat container
+  const chat = document.getElementById('chatMessages');
+  if (chat) {
+    chat.scrollTop = 0;
+    chat.scroll({ top: 0, left: 0, behavior: 'instant' });
+  }
+  
+  // Scroll all parent elements
+  let el = chat;
+  while (el && el.parentElement) {
+    el = el.parentElement;
+    if (el.scrollTop > 0) {
+      el.scrollTop = 0;
+    }
+  }
+  
+  // Scroll window/document
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
 
 function forceScrollToTop() {
-  const container = document.getElementById('chatMessages');
-  if (container) {
-    container.scrollTop = 0;
-    // A few more attempts to ensure it sticks
-    setTimeout(() => { container.scrollTop = 0; }, 50);
-    setTimeout(() => { container.scrollTop = 0; }, 150);
-    setTimeout(() => { container.scrollTop = 0; }, 300);
-  }
+  // Immediate
+  scrollAllToTop();
+  
+  // Keep trying for 1 second
+  const times = [10, 30, 50, 100, 150, 200, 300, 500, 750, 1000];
+  times.forEach(t => {
+    setTimeout(scrollAllToTop, t);
+  });
+  
   notifyParentPreventScroll();
 }
 
