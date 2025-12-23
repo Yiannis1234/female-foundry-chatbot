@@ -109,59 +109,19 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-// AGGRESSIVE scroll lock using setInterval (RAF can be throttled in iframes)
-let preventAutoScroll = false;
-let lockToTopInterval = null;
-let lockToTopTimeout = null;
-
-function lockToTop(ms = 1500) {
+// Simple scroll to top helper - call this after adding content
+function forceScrollToTop() {
   if (!chatMessages) return;
-  preventAutoScroll = true;
-  
-  // Immediately scroll to top
   chatMessages.scrollTop = 0;
-  chatMessages.style.scrollBehavior = 'auto';
-  
-  // Clear any existing interval/timeout
-  if (lockToTopInterval) clearInterval(lockToTopInterval);
-  if (lockToTopTimeout) clearTimeout(lockToTopTimeout);
-  
-  // Use setInterval - more reliable than RAF in iframes
-  lockToTopInterval = setInterval(() => {
-    if (chatMessages && preventAutoScroll) {
-      chatMessages.scrollTop = 0;
-    }
-  }, 10); // Every 10ms
-  
-  // Stop after ms milliseconds
-  lockToTopTimeout = setTimeout(() => {
-    if (lockToTopInterval) {
-      clearInterval(lockToTopInterval);
-      lockToTopInterval = null;
-    }
-    preventAutoScroll = false;
-  }, ms);
+  // Do it multiple times with delays to beat browser rendering
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 0);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 50);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 100);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 200);
+  setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 300);
+  requestAnimationFrame(() => { if (chatMessages) chatMessages.scrollTop = 0; });
 }
 
-function blurActiveElement() {
-  const el = document.activeElement;
-  if (el && el instanceof HTMLElement) {
-    try {
-      el.blur();
-    } catch (_) {}
-  }
-}
-
-function focusChatWithoutScroll() {
-  if (!chatMessages) return;
-  try {
-    chatMessages.focus({ preventScroll: true });
-  } catch (_) {
-    try {
-      chatMessages.focus();
-    } catch (_) {}
-  }
-}
 
 // Notify parent iframe (if in Wix) to prevent scroll
 function notifyParentPreventScroll() {
@@ -175,22 +135,7 @@ function notifyParentPreventScroll() {
 }
 
 // MutationObserver to prevent auto-scroll when content is added
-let scrollObserver = null;
-if (chatMessages) {
-  // Make focusable so we can steal focus away from clicked option buttons without scrolling.
-  chatMessages.setAttribute("tabindex", "-1");
-  
-  scrollObserver = new MutationObserver(() => {
-    if (Date.now() < lockToTopUntil && chatMessages) {
-      chatMessages.scrollTop = 0;
-    }
-  });
-  
-  scrollObserver.observe(chatMessages, {
-    childList: true,
-    subtree: true
-  });
-}
+// No MutationObserver needed - we scroll to top explicitly after adding content
 
 window.addEventListener("load", () => {
   setInitialView();
@@ -254,11 +199,9 @@ function switchView(viewName) {
 
   currentView = viewName;
 
-  // When switching to chat view, pin to TOP briefly (prevents focus-scroll jumps).
+  // When switching to chat view, scroll to top
   if (viewName === "chat") {
-    blurActiveElement();
-    focusChatWithoutScroll();
-    lockToTop(900);
+    forceScrollToTop();
   }
 }
 
@@ -381,12 +324,11 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
-  blurActiveElement();
-  focusChatWithoutScroll();
-  lockToTop(900);
   switchView("chat");
-  addMessage("user", text, false); // Don't scroll when clicking from dashboard
+  forceScrollToTop();
+  addMessage("user", text, false);
   await sendMessageToApi(text, { pinTop: true });
+  forceScrollToTop();
 }
 
 if (dashboardSearchBtn) {
@@ -423,9 +365,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     hideTyping();
 
     if (pinTop) {
-      blurActiveElement();
-      focusChatWithoutScroll();
-      lockToTop(1100);
+      forceScrollToTop();
       notifyParentPreventScroll();
     }
     
@@ -433,13 +373,16 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
 
+    if (pinTop) forceScrollToTop();
+
     renderChatOptions(data.options);
 
-    if (pinTop) lockToTop(1100);
+    if (pinTop) forceScrollToTop();
   } catch (err) {
     console.error(err);
     hideTyping();
     addMessage("bot", "Sorry, something went wrong.", false);
+    if (pinTop) forceScrollToTop();
   }
 }
 
@@ -568,13 +511,10 @@ function renderChatOptions(options) {
         return;
       }
       
-      // Prevent browser focus-scroll (especially inside Wix iframes)
-      blurActiveElement();
-      focusChatWithoutScroll();
-      lockToTop(1100);
+      forceScrollToTop();
       notifyParentPreventScroll();
-      
       addMessage("user", opt, false);
+      forceScrollToTop();
       sendMessageToApi(opt, { pinTop: true });
     };
 
@@ -584,11 +524,8 @@ function renderChatOptions(options) {
     chatMessages.appendChild(msgDiv);
   });
 
-  // Don't auto-scroll when showing options - let user see the start
-  // requestAnimationFrame(() => scrollToBottom());
-  
-  // If we are in a "pin to top" window, keep pinned briefly after inserting options.
-  if (Date.now() < lockToTopUntil) lockToTop(700);
+  // Scroll to top after adding options
+  forceScrollToTop();
 }
 
 function renderPrimaryFooterOptions(options) {
@@ -616,13 +553,11 @@ function renderPrimaryFooterOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
-      // Prevent browser focus-scroll (especially inside Wix iframes)
-      blurActiveElement();
-      focusChatWithoutScroll();
-      lockToTop(1100);
-      notifyParentPreventScroll();
       
+      forceScrollToTop();
+      notifyParentPreventScroll();
       addMessage("user", opt, false);
+      forceScrollToTop();
       sendMessageToApi(opt, { pinTop: true });
     };
     primaryFooterOptions.appendChild(btn);
