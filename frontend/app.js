@@ -109,39 +109,26 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 56 loaded');
+console.log('[FF-CHATBOT] Version 57 loaded');
 
-function scrollAllToTop() {
-  // Scroll the chat container
-  const chat = document.getElementById('chatMessages');
-  if (chat) {
-    chat.scrollTop = 0;
-    chat.scroll({ top: 0, left: 0, behavior: 'instant' });
+// Store reference to the latest user message for scrolling
+let latestUserMessage = null;
+
+function scrollToLatestUserMessage() {
+  if (latestUserMessage) {
+    // Scroll the user's message into view at the top
+    latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
-  
-  // Scroll all parent elements
-  let el = chat;
-  while (el && el.parentElement) {
-    el = el.parentElement;
-    if (el.scrollTop > 0) {
-      el.scrollTop = 0;
-    }
-  }
-  
-  // Scroll window/document
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
 }
 
 function forceScrollToTop() {
-  // Immediate
-  scrollAllToTop();
+  // Scroll to the latest user message (not the absolute top)
+  scrollToLatestUserMessage();
   
   // Keep trying for 1 second
   const times = [10, 30, 50, 100, 150, 200, 300, 500, 750, 1000];
   times.forEach(t => {
-    setTimeout(scrollAllToTop, t);
+    setTimeout(scrollToLatestUserMessage, t);
   });
   
   notifyParentPreventScroll();
@@ -443,7 +430,9 @@ function addMessage(role, content, shouldScroll = false) {
 
   console.log('[DEBUG] Adding', segments.length, 'message segments');
 
-  segments.forEach((segment) => {
+  let firstMsgDiv = null;
+  
+  segments.forEach((segment, index) => {
     const msgDiv = document.createElement("div");
     msgDiv.className = `chat-message ${role}`;
 
@@ -459,7 +448,17 @@ function addMessage(role, content, shouldScroll = false) {
     msgDiv.appendChild(bubble);
     chatMessages.appendChild(msgDiv);
     console.log('[DEBUG] Message appended to chatMessages');
+    
+    // Store reference to first message of this batch
+    if (index === 0) {
+      firstMsgDiv = msgDiv;
+    }
   });
+  
+  // If this is a user message, store it for scroll targeting
+  if (role === "user" && firstMsgDiv) {
+    latestUserMessage = firstMsgDiv;
+  }
 
   // Only scroll to bottom if explicitly requested (user typing)
   if (shouldScroll) {
