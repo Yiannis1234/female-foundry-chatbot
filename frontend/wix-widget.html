@@ -145,6 +145,61 @@
     #ff-chatbot-widget.minimized #ff-chatbot-button {
       display: flex;
     }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      /* Larger button on mobile */
+      #ff-chatbot-button {
+        width: 64px;
+        height: 64px;
+        font-size: 28px;
+        bottom: 15px;
+        right: 15px;
+      }
+
+      /* Full screen chat on mobile */
+      #ff-chatbot-window {
+        border-radius: 0;
+      }
+
+      /* Larger header text on mobile */
+      .chat-window-header h3 {
+        font-size: 1rem;
+      }
+
+      /* Larger buttons in header */
+      .chat-window-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      /* Even larger button on small phones */
+      #ff-chatbot-button {
+        width: 70px;
+        height: 70px;
+        font-size: 30px;
+        bottom: 10px;
+        right: 10px;
+      }
+
+      .chat-window-header {
+        padding: 16px;
+        min-height: 60px;
+      }
+
+      .chat-window-header h3 {
+        font-size: 1.1rem;
+      }
+
+      .chat-window-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
