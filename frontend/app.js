@@ -109,60 +109,38 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 53 loaded');
-
-// AGGRESSIVE scroll control for Wix embed environment
-let scrollLockTimer = null;
-
-function getScrollContainer() {
-  // Always get fresh reference
-  return document.getElementById("chatMessages");
-}
+console.log('[FF-CHATBOT] Version 54 loaded');
 
 function forceScrollToTop() {
-  const container = getScrollContainer();
-  if (!container) {
-    console.log('[FF-CHATBOT] ERROR: chatMessages not found!');
-    return;
+  // Method 1: Scroll anchor into view (works with CSS scroll-snap)
+  const anchor = document.getElementById('scroll-anchor');
+  if (anchor) {
+    anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
   
-  console.log('[FF-CHATBOT] forceScrollToTop - current scrollTop:', container.scrollTop, 'scrollHeight:', container.scrollHeight);
-  
-  // Clear any existing timer
-  if (scrollLockTimer) {
-    clearInterval(scrollLockTimer);
+  // Method 2: Direct scrollTop
+  const container = document.getElementById('chatMessages');
+  if (container) {
+    container.scrollTop = 0;
   }
   
-  // IMMEDIATELY scroll to top and lock overflow
-  container.style.overflow = 'hidden';
-  container.scrollTop = 0;
+  // Method 3: Delayed attempts
+  setTimeout(() => {
+    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (container) container.scrollTop = 0;
+  }, 50);
   
-  // Force scroll to 0 every frame for 5 seconds
-  let frame = 0;
-  const maxFrames = 500; // 5 seconds at 10ms
+  setTimeout(() => {
+    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (container) container.scrollTop = 0;
+  }, 200);
   
-  scrollLockTimer = setInterval(() => {
-    const el = getScrollContainer();
-    if (el) {
-      // Force to 0 no matter what
-      if (el.scrollTop !== 0) {
-        console.log('[FF-CHATBOT] Frame', frame, '- scrollTop was', el.scrollTop, ', forcing to 0');
-      }
-      el.scrollTop = 0;
-    }
-    frame++;
-    if (frame >= maxFrames) {
-      clearInterval(scrollLockTimer);
-      scrollLockTimer = null;
-      // Re-enable scrolling
-      if (el) {
-        el.style.overflow = 'auto';
-      }
-      console.log('[FF-CHATBOT] Scroll lock released after 5 seconds');
-    }
-  }, 10);
+  setTimeout(() => {
+    if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (container) container.scrollTop = 0;
+  }, 500);
   
-  // Also notify parent iframe
+  // Notify parent
   notifyParentPreventScroll();
 }
 
