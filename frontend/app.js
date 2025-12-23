@@ -109,45 +109,66 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
+console.log('[FF-CHATBOT] Version 51 loaded - aggressive scroll fix');
+
 // AGGRESSIVE scroll control for Wix embed environment
 let scrollLockTimer = null;
+let scrollLockRaf = null;
 
 function forceScrollToTop() {
   if (!chatMessages) return;
   
-  // Immediately set scroll
+  console.log('[FF-CHATBOT] forceScrollToTop called');
+  
+  // NUCLEAR OPTION: Set overflow hidden, scroll to 0, then restore
+  const originalOverflow = chatMessages.style.overflow;
+  chatMessages.style.overflow = 'hidden';
   chatMessages.scrollTop = 0;
   
-  // Clear any existing timer
+  // Clear any existing timers
   if (scrollLockTimer) clearInterval(scrollLockTimer);
+  if (scrollLockRaf) cancelAnimationFrame(scrollLockRaf);
   
-  // Keep forcing scroll to top for 2 seconds (handles delayed iframe behaviors)
+  // Keep forcing scroll to top for 3 seconds
   let attempts = 0;
+  const maxAttempts = 300; // 3 seconds at 10ms
+  
   scrollLockTimer = setInterval(() => {
     if (chatMessages) {
       chatMessages.scrollTop = 0;
+      // Log occasionally to debug
+      if (attempts % 50 === 0) {
+        console.log('[FF-CHATBOT] Forcing scrollTop=0, attempt', attempts);
+      }
     }
     attempts++;
-    if (attempts > 200) { // 2 seconds at 10ms intervals
+    if (attempts >= maxAttempts) {
       clearInterval(scrollLockTimer);
       scrollLockTimer = null;
+      // Restore overflow after lock period
+      chatMessages.style.overflow = originalOverflow || 'auto';
+      console.log('[FF-CHATBOT] Scroll lock released');
     }
   }, 10);
   
-  // Also use requestAnimationFrame for immediate visual update
+  // Also use RAF
   const rafLoop = () => {
     if (chatMessages && scrollLockTimer) {
       chatMessages.scrollTop = 0;
-      requestAnimationFrame(rafLoop);
+      scrollLockRaf = requestAnimationFrame(rafLoop);
     }
   };
-  requestAnimationFrame(rafLoop);
+  scrollLockRaf = requestAnimationFrame(rafLoop);
 }
 
 function stopScrollLock() {
   if (scrollLockTimer) {
     clearInterval(scrollLockTimer);
     scrollLockTimer = null;
+  }
+  if (scrollLockRaf) {
+    cancelAnimationFrame(scrollLockRaf);
+    scrollLockRaf = null;
   }
 }
 
