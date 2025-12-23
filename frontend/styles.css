@@ -526,10 +526,15 @@ button {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto !important; /* Changed from smooth to prevent auto-scroll */
   position: relative;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   min-height: 0; /* Important for flex scrolling */
+}
+
+/* Prevent auto-scroll when clicking options */
+.chat-scroll.no-auto-scroll {
+  scroll-behavior: auto !important;
 }
 
 .chat-message {

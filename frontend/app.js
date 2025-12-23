@@ -109,6 +109,31 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
+// Flag to prevent auto-scroll when clicking options
+let preventAutoScroll = false;
+
+// MutationObserver to prevent auto-scroll when content is added
+let scrollObserver = null;
+if (chatMessages) {
+  scrollObserver = new MutationObserver(() => {
+    if (preventAutoScroll && chatMessages) {
+      // Immediately reset scroll to top when content changes
+      chatMessages.scrollTop = 0;
+      // Also use requestAnimationFrame for immediate effect
+      requestAnimationFrame(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      });
+    }
+  });
+  
+  scrollObserver.observe(chatMessages, {
+    childList: true,
+    subtree: true
+  });
+}
+
 window.addEventListener("load", () => {
   setInitialView();
   attachWelcomeListeners();
@@ -348,6 +373,9 @@ async function sendMessageToApi(text) {
     const data = await res.json();
     hideTyping();
     
+    // Keep scroll prevention enabled
+    preventAutoScroll = true;
+    
     // Force scroll to top BEFORE adding messages
     if (chatMessages) {
       chatMessages.scrollTop = 0;
@@ -391,6 +419,10 @@ async function sendMessageToApi(text) {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      // Disable scroll prevention after a delay (only re-enable when user types)
+      setTimeout(() => {
+        preventAutoScroll = false;
+      }, 100);
     }, 400);
   } catch (err) {
     console.error(err);
@@ -432,6 +464,7 @@ function addMessage(role, content, shouldScroll = false) {
 
   // Only scroll to bottom if explicitly requested (user typing)
   if (shouldScroll) {
+    preventAutoScroll = false; // Allow scrolling when user types
     requestAnimationFrame(() => {
       if (chatMessages) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -439,22 +472,26 @@ function addMessage(role, content, shouldScroll = false) {
     });
   } else {
     // Force stay at top - don't allow any scrolling
-    requestAnimationFrame(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-      }
-    });
-    // Multiple attempts to force stay at top
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-      }
-    }, 0);
-    setTimeout(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-      }
-    }, 10);
+    if (preventAutoScroll) {
+      // Immediately reset scroll
+      chatMessages.scrollTop = 0;
+      requestAnimationFrame(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      });
+      // Multiple attempts to force stay at top
+      setTimeout(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      }, 0);
+      setTimeout(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      }, 10);
+    }
   }
 }
 
@@ -546,6 +583,10 @@ function renderChatOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
+      // Enable scroll prevention
+      preventAutoScroll = true;
+      // Enable scroll prevention
+      preventAutoScroll = true;
       // Force scroll to top BEFORE adding message
       if (chatMessages) {
         chatMessages.scrollTop = 0;
@@ -595,6 +636,8 @@ function renderPrimaryFooterOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
+      // Enable scroll prevention
+      preventAutoScroll = true;
       // Force scroll to top BEFORE adding message
       if (chatMessages) {
         chatMessages.scrollTop = 0;
