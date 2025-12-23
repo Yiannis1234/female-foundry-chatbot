@@ -253,21 +253,49 @@ function switchView(viewName) {
 
   currentView = viewName;
 
-  // When switching to chat view, scroll to top to show the start
+  // When switching to chat view, scroll to top IMMEDIATELY to show the start
   if (viewName === "chat") {
+    // Lock scroll immediately
+    preventAutoScroll = true;
+    if (chatMessages) {
+      chatMessages.classList.add('prevent-scroll');
+      chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
+      // Multiple synchronous resets
+      chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
+    }
+    
+    // Multiple timeouts to ensure it stays at top
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
+        chatMessages.classList.add('prevent-scroll');
+      }
+    }, 0);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
       }
     }, 50);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
+      }
+    }, 100);
+    setTimeout(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
       }
     }, 200);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
+        chatMessages.style.overflow = 'hidden';
       }
     }, 400);
   }
@@ -392,9 +420,53 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
+  // AGGRESSIVE: Lock scroll IMMEDIATELY - show BEGINNING of chat
+  preventAutoScroll = true;
+  if (chatMessages) {
+    chatMessages.classList.add('prevent-scroll');
+    chatMessages.scrollTop = 0;
+    chatMessages.style.overflow = 'hidden';
+    chatMessages.style.scrollBehavior = 'auto';
+    // Lock multiple times synchronously
+    chatMessages.scrollTop = 0;
+    chatMessages.scrollTop = 0;
+  }
+  
   switchView("chat");
+  
+  // Force scroll to top IMMEDIATELY - show BEGINNING
+  requestAnimationFrame(() => {
+    if (chatMessages) {
+      chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
+      chatMessages.classList.add('prevent-scroll');
+    }
+  });
+  
+  setTimeout(() => {
+    if (chatMessages) {
+      chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
+    }
+  }, 0);
+  
   addMessage("user", text, false); // Don't scroll when clicking from dashboard
+  
+  // Keep locked during API call
+  if (chatMessages) {
+    chatMessages.scrollTop = 0;
+    chatMessages.style.overflow = 'hidden';
+  }
+  
   await sendMessageToApi(text);
+  
+  // Keep locked after API call - show BEGINNING
+  setTimeout(() => {
+    if (chatMessages) {
+      chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
+    }
+  }, 0);
 }
 
 if (dashboardSearchBtn) {
@@ -430,19 +502,24 @@ async function sendMessageToApi(text) {
     const data = await res.json();
     hideTyping();
     
-    // AGGRESSIVE: Keep scroll locked
+    // AGGRESSIVE: Keep scroll locked - show BEGINNING of chat
     preventAutoScroll = true;
     if (chatMessages) {
       chatMessages.classList.add('prevent-scroll');
       chatMessages.scrollTop = 0;
       chatMessages.style.overflow = 'hidden';
       chatMessages.style.scrollBehavior = 'auto';
+      // Lock multiple times synchronously
+      chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
     }
     notifyParentPreventScroll();
     
-    // Force scroll to top BEFORE adding messages - multiple times
+    // Force scroll to top BEFORE adding messages - show BEGINNING
     if (chatMessages) {
       chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
       chatMessages.scrollTop = 0;
       chatMessages.scrollTop = 0;
     }
@@ -451,18 +528,20 @@ async function sendMessageToApi(text) {
       data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
     }
     
-    // Keep locked AFTER adding messages
+    // Keep locked AFTER adding messages - stay at BEGINNING
     if (chatMessages) {
       chatMessages.scrollTop = 0;
       chatMessages.style.overflow = 'hidden';
+      chatMessages.scrollTop = 0;
     }
     
     renderChatOptions(data.options);
     
-    // Keep locked - NEVER unlock unless user types
+    // Keep locked - NEVER unlock unless user types - show BEGINNING
     if (chatMessages) {
       chatMessages.scrollTop = 0;
       chatMessages.style.overflow = 'hidden';
+      chatMessages.scrollTop = 0;
     }
     
     // AGGRESSIVE: Continuous lock - check EVERY frame
