@@ -112,6 +112,17 @@ const OPTION_LINKS = {
 // Flag to prevent auto-scroll when clicking options
 let preventAutoScroll = false;
 
+// Notify parent iframe (if in Wix) to prevent scroll
+function notifyParentPreventScroll() {
+  if (window.parent && window.parent !== window) {
+    try {
+      window.parent.postMessage({ type: 'prevent-scroll' }, '*');
+    } catch(e) {
+      // Cross-origin restriction - ignore
+    }
+  }
+}
+
 // MutationObserver to prevent auto-scroll when content is added
 let scrollObserver = null;
 if (chatMessages) {
@@ -396,6 +407,7 @@ async function sendMessageToApi(text) {
     
     // Keep scroll prevention enabled
     preventAutoScroll = true;
+    notifyParentPreventScroll(); // Notify parent iframe (Wix)
     
     // Force scroll to top BEFORE adding messages
     if (chatMessages) {
@@ -411,6 +423,7 @@ async function sendMessageToApi(text) {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
     });
     
     renderChatOptions(data.options);
@@ -420,26 +433,31 @@ async function sendMessageToApi(text) {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
     }, 0);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
     }, 50);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
     }, 100);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
     }, 200);
     setTimeout(() => {
       if (chatMessages) {
         chatMessages.scrollTop = 0;
       }
+      notifyParentPreventScroll();
       // Disable scroll prevention after a delay (only re-enable when user types)
       setTimeout(() => {
         preventAutoScroll = false;
@@ -673,9 +691,9 @@ function renderPrimaryFooterOptions(options) {
         openExternal(OPTION_LINKS[opt]);
         return;
       }
-      // Enable scroll prevention
       // Enable scroll prevention FIRST
       preventAutoScroll = true;
+      notifyParentPreventScroll(); // Notify parent iframe (Wix)
       // Force scroll to top BEFORE adding message
       if (chatMessages) {
         chatMessages.scrollTop = 0;
@@ -689,11 +707,13 @@ function renderPrimaryFooterOptions(options) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'auto';
         }
+        notifyParentPreventScroll();
       });
       setTimeout(() => {
         if (chatMessages) {
           chatMessages.scrollTop = 0;
         }
+        notifyParentPreventScroll();
       }, 0);
       sendMessageToApi(opt);
     };

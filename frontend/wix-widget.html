@@ -163,6 +163,13 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      /* Prevent iframe from scrolling */
+      overflow: hidden !important;
+    }
+    
+    /* Prevent any scroll on the widget container itself */
+    #ff-chatbot-widget {
+      overflow: hidden !important;
     }
 
     /* Minimized state - hide window, show button */
@@ -451,12 +458,42 @@
         return false;
       };
 
+      // Listen for messages from iframe to prevent scroll
+      window.addEventListener('message', function(event) {
+        // Only accept messages from our chatbot domain
+        if (event.origin !== 'https://srv1079042.hstgr.cloud' && 
+            event.origin !== 'http://localhost:8001' &&
+            event.origin !== 'http://127.0.0.1:8001') {
+          return;
+        }
+        
+        if (event.data && event.data.type === 'prevent-scroll') {
+          // Prevent scroll at widget level
+          if (widget) {
+            widget.scrollTop = 0;
+          }
+          if (chatWindow) {
+            chatWindow.scrollTop = 0;
+          }
+        }
+      });
+
       // Wait for DOM and attach listeners
       function init() {
         if (!widget || !button || !chatWindow) {
           console.error('Widget elements not found', {widget, button, chatWindow});
           setTimeout(init, 100); // Retry after 100ms
           return;
+        }
+        
+        // Prevent scroll on widget container
+        if (widget) {
+          widget.addEventListener('scroll', function(e) {
+            if (widget.scrollTop > 0) {
+              e.preventDefault();
+              widget.scrollTop = 0;
+            }
+          }, { passive: false });
         }
 
         // Multiple ways to attach events
