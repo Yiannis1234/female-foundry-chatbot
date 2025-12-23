@@ -236,33 +236,40 @@
         padding: 0;
       }
 
-      /* Widget container - ensure it fills the iframe */
+      /* BREAK OUT OF IFRAME - Widget always breaks out on mobile */
       #ff-chatbot-widget {
-        position: relative !important;
-        width: 100% !important;
-        height: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999999 !important;
         margin: 0;
         padding: 0;
       }
 
-      /* Button - larger and more visible on mobile */
+      /* Button - breaks out and floats on mobile */
       #ff-chatbot-button {
+        position: fixed !important;
         width: 56px !important;
         height: 56px !important;
         font-size: 24px !important;
         bottom: 20px !important;
         right: 20px !important;
         box-shadow: 0 6px 24px rgba(124, 99, 255, 0.5) !important;
+        z-index: 99999999 !important;
       }
 
-      /* When window is open - fullscreen */
+      /* When window is open - fullscreen (already broken out) */
       #ff-chatbot-widget.open #ff-chatbot-window {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        z-index: 9999999 !important;
+        z-index: 99999999 !important;
         border-radius: 0 !important;
       }
 
@@ -305,21 +312,28 @@
         font-size: 16px !important;
       }
 
-      /* Widget container */
+      /* BREAK OUT OF IFRAME - Widget always breaks out on small phones */
       #ff-chatbot-widget {
-        position: relative !important;
-        width: 100% !important;
-        height: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999999 !important;
       }
 
-      /* Larger button on small phones */
+      /* Larger button on small phones - breaks out */
       #ff-chatbot-button {
+        position: fixed !important;
         width: 60px !important;
         height: 60px !important;
         font-size: 26px !important;
         bottom: 20px !important;
         right: 20px !important;
         box-shadow: 0 6px 24px rgba(124, 99, 255, 0.5) !important;
+        z-index: 99999999 !important;
       }
 
       /* Fullscreen window when open */
@@ -428,7 +442,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=64"
+          src="https://srv1079042.hstgr.cloud/?v=65"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
