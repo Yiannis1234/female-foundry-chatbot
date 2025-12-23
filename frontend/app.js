@@ -111,6 +111,26 @@ const OPTION_LINKS = {
 // --- Initialization ---
 // Flag to prevent auto-scroll when clicking options
 let preventAutoScroll = false;
+let scrollLockInterval = null;
+
+// Continuous scroll lock - runs every frame to keep scroll at top
+function startScrollLock() {
+  if (scrollLockInterval) return; // Already running
+  scrollLockInterval = setInterval(() => {
+    if (preventAutoScroll && chatMessages) {
+      chatMessages.scrollTop = 0;
+      chatMessages.style.overflow = 'hidden';
+      chatMessages.classList.add('prevent-scroll');
+    }
+  }, 16); // ~60fps
+}
+
+function stopScrollLock() {
+  if (scrollLockInterval) {
+    clearInterval(scrollLockInterval);
+    scrollLockInterval = null;
+  }
+}
 
 // Notify parent iframe (if in Wix) to prevent scroll
 function notifyParentPreventScroll() {
@@ -159,29 +179,41 @@ if (chatMessages) {
   
   scrollObserver = new MutationObserver(() => {
     if (preventAutoScroll && chatMessages) {
-      // Immediately reset scroll to top when content changes
+      // IMMEDIATELY reset scroll to top when content changes - BEFORE browser can scroll
       chatMessages.scrollTop = 0;
       chatMessages.style.overflow = 'hidden';
+      chatMessages.classList.add('prevent-scroll');
+      // Force it multiple times synchronously
+      chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
+      chatMessages.scrollTop = 0;
       // Also use requestAnimationFrame for immediate effect
       requestAnimationFrame(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
+          chatMessages.classList.add('prevent-scroll');
         }
       });
       // Multiple attempts to ensure it stays at top
       setTimeout(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
         }
       }, 0);
       setTimeout(() => {
-        if (chatMessages) {
+        if (chatMessages && preventAutoScroll) {
           chatMessages.scrollTop = 0;
           chatMessages.style.overflow = 'hidden';
         }
       }, 10);
+      setTimeout(() => {
+        if (chatMessages && preventAutoScroll) {
+          chatMessages.scrollTop = 0;
+          chatMessages.style.overflow = 'hidden';
+        }
+      }, 50);
     }
   });
   
@@ -422,6 +454,7 @@ async function restartExperience() {
 async function handleDashboardSelection(text) {
   // AGGRESSIVE: Lock scroll IMMEDIATELY - show BEGINNING of chat
   preventAutoScroll = true;
+  startScrollLock(); // Start continuous lock
   if (chatMessages) {
     chatMessages.classList.add('prevent-scroll');
     chatMessages.scrollTop = 0;
@@ -504,6 +537,7 @@ async function sendMessageToApi(text) {
     
     // AGGRESSIVE: Keep scroll locked - show BEGINNING of chat
     preventAutoScroll = true;
+    startScrollLock(); // Start continuous lock
     if (chatMessages) {
       chatMessages.classList.add('prevent-scroll');
       chatMessages.scrollTop = 0;
@@ -654,6 +688,7 @@ function addMessage(role, content, shouldScroll = false) {
   // Only scroll to bottom if explicitly requested (user typing)
   if (shouldScroll) {
     preventAutoScroll = false; // Allow scrolling when user types
+    stopScrollLock(); // Stop continuous lock
     if (chatMessages) {
       chatMessages.classList.remove('prevent-scroll');
       chatMessages.style.overflow = 'auto';
@@ -798,8 +833,9 @@ function renderChatOptions(options) {
       }
       
       // AGGRESSIVE: Lock scroll IMMEDIATELY before anything else
+      preventAutoScroll = true;
+      startScrollLock(); // Start continuous lock
       if (chatMessages) {
-        preventAutoScroll = true;
         chatMessages.classList.add('prevent-scroll');
         chatMessages.scrollTop = 0;
         chatMessages.style.overflow = 'hidden';
@@ -886,8 +922,9 @@ function renderPrimaryFooterOptions(options) {
         return;
       }
       // AGGRESSIVE: Lock scroll IMMEDIATELY before anything else
+      preventAutoScroll = true;
+      startScrollLock(); // Start continuous lock
       if (chatMessages) {
-        preventAutoScroll = true;
         chatMessages.classList.add('prevent-scroll');
         chatMessages.scrollTop = 0;
         chatMessages.style.overflow = 'hidden';

@@ -99,6 +99,9 @@
       min-height: 36px;
       margin: 0;
       box-sizing: border-box;
+      position: relative;
+      z-index: 1000 !important;
+      pointer-events: auto !important;
     }
 
     .chat-window-header h3 {
@@ -114,6 +117,9 @@
       gap: 6px;
       align-items: center;
       flex-shrink: 0;
+      position: relative;
+      z-index: 1001 !important;
+      pointer-events: auto !important;
     }
 
     .chat-window-btn {
@@ -123,7 +129,8 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      cursor: pointer;
+      cursor: pointer !important;
+      pointer-events: auto !important;
       font-size: 12px;
       display: flex;
       align-items: center;
@@ -133,6 +140,24 @@
       flex-shrink: 0;
       margin: 0;
       padding: 0;
+      z-index: 1002 !important;
+      position: relative;
+    }
+    
+    .chat-window-btn:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    .chat-window-btn:active {
+      background: rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    .chat-window-btn:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    .chat-window-btn:active {
+      background: rgba(255, 255, 255, 0.4) !important;
     }
 
     .chat-window-btn:hover {
@@ -404,6 +429,54 @@
   </div>
 
   <script>
+    // Define functions IMMEDIATELY so inline onclick works
+    window.ffOpenChat = function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      console.log('Opening chat');
+      const widget = document.getElementById('ff-chatbot-widget');
+      const iframe = document.getElementById('ff-chatbot-iframe');
+      if (widget) {
+        widget.classList.add('open');
+        widget.classList.remove('minimized');
+      }
+      // Reset iframe to ensure fresh state
+      if (iframe) {
+        iframe.src = iframe.src;
+      }
+      return false;
+    };
+
+    window.ffMinimizeChat = function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      console.log('Minimizing chat');
+      const widget = document.getElementById('ff-chatbot-widget');
+      if (widget) {
+        widget.classList.add('minimized');
+        widget.classList.remove('open');
+      }
+      return false;
+    };
+
+    window.ffCloseChat = function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      console.log('Closing chat');
+      const widget = document.getElementById('ff-chatbot-widget');
+      if (widget) {
+        widget.classList.add('minimized');
+        widget.classList.remove('open');
+      }
+      return false;
+    };
+
     (function() {
       const widget = document.getElementById('ff-chatbot-widget');
       const button = document.getElementById('ff-chatbot-button');
@@ -411,52 +484,6 @@
       const minimizeBtn = document.getElementById('ff-minimize-btn');
       const closeBtn = document.getElementById('ff-close-btn');
       const iframe = document.getElementById('ff-chatbot-iframe');
-
-      // Open chat function - make it global for inline onclick
-      window.ffOpenChat = function(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        console.log('Opening chat');
-        if (widget) {
-          widget.classList.add('open');
-          widget.classList.remove('minimized');
-        }
-        // Reset iframe to ensure fresh state
-        if (iframe) {
-          iframe.src = iframe.src;
-        }
-        return false;
-      };
-
-      // Minimize chat function - make it global for inline onclick
-      window.ffMinimizeChat = function(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        console.log('Minimizing chat');
-        if (widget) {
-          widget.classList.add('minimized');
-          widget.classList.remove('open');
-        }
-        return false;
-      };
-
-      // Close chat function - make it global for inline onclick
-      window.ffCloseChat = function(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        console.log('Closing chat');
-        if (widget) {
-          widget.classList.add('minimized');
-          widget.classList.remove('open');
-        }
-        return false;
-      };
 
       // Listen for messages from iframe to prevent scroll
       window.addEventListener('message', function(event) {
@@ -502,15 +529,47 @@
         button.addEventListener('touchend', window.ffOpenChat, true);
         
         if (minimizeBtn) {
-          minimizeBtn.onclick = window.ffMinimizeChat;
-          minimizeBtn.addEventListener('click', window.ffMinimizeChat, true);
-          minimizeBtn.addEventListener('touchend', window.ffMinimizeChat, true);
+          console.log('Attaching minimize button handlers');
+          minimizeBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffMinimizeChat(e);
+            return false;
+          };
+          minimizeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffMinimizeChat(e);
+          }, true);
+          minimizeBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffMinimizeChat(e);
+          }, true);
+        } else {
+          console.error('Minimize button not found!');
         }
         
         if (closeBtn) {
-          closeBtn.onclick = window.ffCloseChat;
-          closeBtn.addEventListener('click', window.ffCloseChat, true);
-          closeBtn.addEventListener('touchend', window.ffCloseChat, true);
+          console.log('Attaching close button handlers');
+          closeBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffCloseChat(e);
+            return false;
+          };
+          closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffCloseChat(e);
+          }, true);
+          closeBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.ffCloseChat(e);
+          }, true);
+        } else {
+          console.error('Close button not found!');
         }
 
         // Prevent clicks inside iframe from bubbling
