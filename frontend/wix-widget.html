@@ -81,6 +81,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      pointer-events: auto !important;
     }
 
     #ff-chatbot-widget.open #ff-chatbot-window {
@@ -418,7 +419,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/"
+          src="https://srv1079042.hstgr.cloud/?v=46"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -575,7 +576,7 @@
         // Prevent clicks inside iframe from bubbling
         if (chatWindow) {
           chatWindow.addEventListener('click', function(e) {
-            e.stopPropagation();
+        e.stopPropagation();
           }, true);
         }
 
