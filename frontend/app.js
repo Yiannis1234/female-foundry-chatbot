@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 59 loaded');
+console.log('[FF-CHATBOT] Version 60 loaded - mobile scroll fix');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -121,12 +121,39 @@ function scrollToShowOptions() {
   // Find the last options bubble or prompt
   const optionsBubbles = chat.querySelectorAll('.options-bubble, .options-prompt');
   if (optionsBubbles.length > 0) {
-    // Scroll to show the options (at the end)
     const lastOption = optionsBubbles[optionsBubbles.length - 1];
-    lastOption.scrollIntoView({ behavior: 'instant', block: 'end' });
+    
+    // Method 1: scrollIntoView (works on desktop)
+    try {
+      lastOption.scrollIntoView({ behavior: 'instant', block: 'end' });
+    } catch (e) {
+      // Fallback for older browsers
+      lastOption.scrollIntoView(false);
+    }
+    
+    // Method 2: Direct scrollTop calculation (works better on mobile)
+    setTimeout(() => {
+      const optionRect = lastOption.getBoundingClientRect();
+      const chatRect = chat.getBoundingClientRect();
+      const scrollOffset = optionRect.bottom - chatRect.bottom + chat.scrollTop;
+      
+      // Scroll to show the option at the bottom of visible area
+      chat.scrollTop = scrollOffset;
+    }, 10);
+    
+    // Method 3: Scroll to bottom minus option height (mobile fallback)
+    setTimeout(() => {
+      const optionHeight = lastOption.offsetHeight;
+      chat.scrollTop = chat.scrollHeight - chat.clientHeight - optionHeight;
+    }, 50);
+    
   } else if (latestUserMessage) {
     // Fallback: scroll user message to top
-    latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    try {
+      latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    } catch (e) {
+      latestUserMessage.scrollIntoView(true);
+    }
   }
 }
 
@@ -134,8 +161,8 @@ function forceScrollToTop() {
   // Scroll to show options
   scrollToShowOptions();
   
-  // Keep trying for 1 second
-  const times = [10, 30, 50, 100, 150, 200, 300, 500, 750, 1000];
+  // Keep trying for 1.5 seconds (longer for mobile)
+  const times = [10, 30, 50, 100, 150, 200, 300, 500, 750, 1000, 1500];
   times.forEach(t => {
     setTimeout(scrollToShowOptions, t);
   });

@@ -532,6 +532,9 @@ button {
   -webkit-overflow-scrolling: touch;
   min-height: 0;
   max-height: 100%;
+  /* Mobile scroll fixes */
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 .chat-scroll * {
@@ -820,6 +823,17 @@ button {
     height: calc(100vh - 100px);
     margin-bottom: 0;
   }
+  
+  /* Mobile scroll fixes */
+  .chat-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+    /* Ensure scrolling works on iOS */
+    position: relative !important;
+    will-change: scroll-position;
+  }
 
   /* Normal text on mobile */
   body {
@@ -863,6 +877,16 @@ button {
   /* Normal size on small phones */
   body {
     font-size: 16px !important;
+  }
+  
+  /* Mobile scroll fixes for small phones */
+  .chat-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+    position: relative !important;
+    will-change: scroll-position;
   }
 
   .chat-message .bubble {
