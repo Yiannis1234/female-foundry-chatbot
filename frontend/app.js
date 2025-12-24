@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 62 loaded - optimized scroll');
+console.log('[FF-CHATBOT] Version 68 loaded - scroll to last selected');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -118,15 +118,17 @@ function scrollToShowOptions() {
   const chat = document.getElementById('chatMessages');
   if (!chat) return;
   
-  // Find the last options bubble or prompt
+  // 1) Prefer the last user message (the selection they just made)
+  if (latestUserMessage) {
+    latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    return;
+  }
+
+  // 2) Fallback: last options bubble/prompt
   const optionsBubbles = chat.querySelectorAll('.options-bubble, .options-prompt');
   if (optionsBubbles.length > 0) {
     const lastOption = optionsBubbles[optionsBubbles.length - 1];
-    // Single scroll action - no multiple retries
-    lastOption.scrollIntoView({ behavior: 'instant', block: 'end' });
-  } else if (latestUserMessage) {
-    // Fallback: scroll user message to top
-    latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    lastOption.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 }
 
