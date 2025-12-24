@@ -109,48 +109,65 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 68 loaded - scroll to last selected');
+console.log('[FF-CHATBOT] Version 69 - mobile touch scroll');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
+
+// Detect mobile
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+}
 
 function scrollToShowOptions() {
   const chat = document.getElementById('chatMessages');
   if (!chat) return;
   
-  // 1) Prefer the last user message (the selection they just made)
   if (latestUserMessage) {
-    latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
-    return;
-  }
-
-  // 2) Fallback: last options bubble/prompt
-  const optionsBubbles = chat.querySelectorAll('.options-bubble, .options-prompt');
-  if (optionsBubbles.length > 0) {
-    const lastOption = optionsBubbles[optionsBubbles.length - 1];
-    lastOption.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (isMobile()) {
+      // MOBILE: Use direct scrollTop calculation for touch devices
+      setTimeout(() => {
+        const msgRect = latestUserMessage.getBoundingClientRect();
+        const chatRect = chat.getBoundingClientRect();
+        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
+        chat.scrollTop = targetScroll;
+        console.log('[FF-CHATBOT] Mobile scroll to:', targetScroll);
+      }, 0);
+      
+      setTimeout(() => {
+        const msgRect = latestUserMessage.getBoundingClientRect();
+        const chatRect = chat.getBoundingClientRect();
+        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
+        chat.scrollTop = targetScroll;
+      }, 150);
+      
+      setTimeout(() => {
+        const msgRect = latestUserMessage.getBoundingClientRect();
+        const chatRect = chat.getBoundingClientRect();
+        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
+        chat.scrollTop = targetScroll;
+      }, 400);
+    } else {
+      // DESKTOP: Use scrollIntoView
+      latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
   }
 }
 
 function forceScrollToTop() {
-  // Single scroll attempt - no lag
   scrollToShowOptions();
-  // One delayed attempt in case content is still rendering
-  setTimeout(scrollToShowOptions, 100);
-  
-  notifyParentPreventScroll();
+  if (!isMobile()) {
+    setTimeout(scrollToShowOptions, 100);
+  }
 }
 
-
-// Notify parent iframe (if in Wix) to prevent scroll
 function notifyParentPreventScroll() {
-  if (window.parent && window.parent !== window) {
-    try {
-      window.parent.postMessage({ type: 'prevent-scroll' }, '*');
-    } catch(e) {
-      // Cross-origin restriction - ignore
-    }
-  }
+  // Disabled - was blocking mobile scroll
+  // if (window.parent && window.parent !== window) {
+  //   try {
+  //     window.parent.postMessage({ type: 'prevent-scroll' }, '*');
+  //   } catch(e) {}
+  // }
 }
 
 // MutationObserver to prevent auto-scroll when content is added

@@ -312,6 +312,7 @@
         height: 100% !important;
         zoom: 1 !important;
         transform: none !important;
+        overflow: auto !important; /* allow inner scroll */
       }
     }
 
@@ -450,7 +451,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=66"
+          src="https://srv1079042.hstgr.cloud/?v=69"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -517,25 +518,7 @@
       const closeBtn = document.getElementById('ff-close-btn');
       const iframe = document.getElementById('ff-chatbot-iframe');
 
-      // Listen for messages from iframe to prevent scroll
-      window.addEventListener('message', function(event) {
-        // Only accept messages from our chatbot domain
-        if (event.origin !== 'https://srv1079042.hstgr.cloud' && 
-            event.origin !== 'http://localhost:8001' &&
-            event.origin !== 'http://127.0.0.1:8001') {
-          return;
-        }
-        
-        if (event.data && event.data.type === 'prevent-scroll') {
-          // Prevent scroll at widget level
-          if (widget) {
-            widget.scrollTop = 0;
-          }
-          if (chatWindow) {
-            chatWindow.scrollTop = 0;
-          }
-        }
-      });
+      // NOTE: We no longer block scroll via postMessage; allow natural scrolling on all devices.
 
       // Detect if we're in Wix
       const isWix = window.parent !== window || window.location !== window.parent.location;
@@ -596,16 +579,6 @@
         // Force mobile breakout after init
         forceMobileBreakout();
         
-        // Prevent scroll on widget container
-        if (widget) {
-          widget.addEventListener('scroll', function(e) {
-            if (widget.scrollTop > 0) {
-              e.preventDefault();
-              widget.scrollTop = 0;
-            }
-          }, { passive: false });
-        }
-
         // Multiple ways to attach events
         button.onclick = window.ffOpenChat;
         button.addEventListener('click', window.ffOpenChat, true);
