@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 72 - layout fixes');
+console.log('[FF-CHATBOT] Version 73 - fixed footer at bottom');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
