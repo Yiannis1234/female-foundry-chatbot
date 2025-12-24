@@ -493,12 +493,13 @@ button {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
   width: 100%;
   background: white;
   border-radius: 0;
@@ -669,8 +670,10 @@ button {
 
 .chat-input-area {
   padding: 0;
+  margin: 0;
   border-top: none;
   background: transparent;
+  display: none; /* Hidden since we don't use text input */
 }
 
 .chat-suggestions {
@@ -751,7 +754,8 @@ button {
   bottom: 0;
   width: 100%;
   background: white;
-  padding: 4px 0;
+  padding: 0;
+  margin: 0;
   flex-shrink: 0;
 }
 
@@ -762,8 +766,8 @@ button {
   flex-wrap: wrap;
   max-width: 100%;
   margin: 0 auto;
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.98);
   border-top: 1px solid #eee;
   border-radius: 0;
   box-shadow: none;

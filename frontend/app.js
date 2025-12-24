@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 71 - SIMPLE scrollIntoView');
+console.log('[FF-CHATBOT] Version 72 - layout fixes');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
