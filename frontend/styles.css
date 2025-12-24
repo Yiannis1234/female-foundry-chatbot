@@ -198,10 +198,12 @@ button {
   margin: 0 auto;
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 #name-input {
   width: 100%;
+  flex: 1;
   padding: 16px 20px;
   font-size: 1.1rem;
   border: 1px solid #ccc;
@@ -213,6 +215,30 @@ button {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+.name-submit-btn {
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #7c63ff, #fd72c7);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 20px rgba(124, 99, 255, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.name-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124, 99, 255, 0.4);
+}
+
+.name-submit-btn:active {
+  transform: translateY(0);
 }
 
 @media screen and (max-width: 768px) {
@@ -744,12 +770,12 @@ button {
 }
 
 .footer-chip {
-  padding: 6px 12px;
-  border-radius: 14px;
+  padding: 4px 8px;
+  border-radius: 12px;
   border: 1px solid #dde1ff;
   background: #fff;
   color: #1f1f33;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
