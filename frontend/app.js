@@ -109,56 +109,32 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 69 - mobile touch scroll');
+console.log('[FF-CHATBOT] Version 71 - SIMPLE scrollIntoView');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
 
-// Detect mobile
-function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-}
-
+// SIMPLE scroll: just use scrollIntoView - works on all devices
 function scrollToShowOptions() {
-  const chat = document.getElementById('chatMessages');
-  if (!chat) return;
+  if (!latestUserMessage) {
+    console.log('[FF-CHATBOT] No user message to scroll to');
+    return;
+  }
   
-  if (latestUserMessage) {
-    if (isMobile()) {
-      // MOBILE: Use direct scrollTop calculation for touch devices
-      setTimeout(() => {
-        const msgRect = latestUserMessage.getBoundingClientRect();
-        const chatRect = chat.getBoundingClientRect();
-        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
-        chat.scrollTop = targetScroll;
-        console.log('[FF-CHATBOT] Mobile scroll to:', targetScroll);
-      }, 0);
-      
-      setTimeout(() => {
-        const msgRect = latestUserMessage.getBoundingClientRect();
-        const chatRect = chat.getBoundingClientRect();
-        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
-        chat.scrollTop = targetScroll;
-      }, 150);
-      
-      setTimeout(() => {
-        const msgRect = latestUserMessage.getBoundingClientRect();
-        const chatRect = chat.getBoundingClientRect();
-        const targetScroll = msgRect.top - chatRect.top + chat.scrollTop - 10;
-        chat.scrollTop = targetScroll;
-      }, 400);
-    } else {
-      // DESKTOP: Use scrollIntoView
-      latestUserMessage.scrollIntoView({ behavior: 'instant', block: 'start' });
-    }
+  try {
+    latestUserMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+    console.log('[FF-CHATBOT] scrollIntoView executed');
+  } catch(e) {
+    console.error('[FF-CHATBOT] scrollIntoView error:', e);
   }
 }
 
 function forceScrollToTop() {
+  // Immediate
   scrollToShowOptions();
-  if (!isMobile()) {
-    setTimeout(scrollToShowOptions, 100);
-  }
+  // Retry after layout settles
+  setTimeout(scrollToShowOptions, 100);
+  setTimeout(scrollToShowOptions, 300);
 }
 
 function notifyParentPreventScroll() {
