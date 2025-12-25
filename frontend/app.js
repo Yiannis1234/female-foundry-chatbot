@@ -109,7 +109,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 74 - smooth scrolling');
+console.log('[FF-CHATBOT] Version 75 - better mobile scrolling');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;

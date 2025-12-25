@@ -551,7 +551,7 @@ button {
 
 .chat-scroll {
   flex: 1 1 auto;
-  overflow-y: auto !important;
+  overflow-y: scroll !important;
   overflow-x: hidden;
   padding: 8px 12px 70px 12px; /* Extra bottom padding for fixed footer */
   display: flex;
@@ -563,8 +563,9 @@ button {
   min-height: 0;
   max-height: 100%;
   /* Mobile scroll fixes */
-  touch-action: pan-y;
-  overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior-y: contain;
+  will-change: scroll-position;
 }
 
 .chat-scroll * {
@@ -873,11 +874,15 @@ button {
   .chat-scroll {
     -webkit-overflow-scrolling: touch !important;
     overflow-y: scroll !important;
-    touch-action: pan-y !important;
-    overscroll-behavior: contain !important;
+    touch-action: pan-y pinch-zoom !important;
+    overscroll-behavior-y: contain !important;
     /* Ensure scrolling works on iOS */
     position: relative !important;
     will-change: scroll-position;
+    scroll-behavior: smooth !important;
+    /* Prevent momentum issues */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   /* Normal text on mobile */
@@ -928,10 +933,13 @@ button {
   .chat-scroll {
     -webkit-overflow-scrolling: touch !important;
     overflow-y: scroll !important;
-    touch-action: pan-y !important;
-    overscroll-behavior: contain !important;
+    touch-action: pan-y pinch-zoom !important;
+    overscroll-behavior-y: contain !important;
     position: relative !important;
     will-change: scroll-position;
+    scroll-behavior: smooth !important;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   #view-chat {
