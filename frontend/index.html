@@ -26,7 +26,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script defer src="/app.js?v=88"></script>
+    <script defer src="/app.js?v=89"></script>
   </head>
   <body>
     <div class="app-container">
@@ -61,7 +61,8 @@
         <section id="view-dashboard" class="view hidden">
             <div class="dashboard-container-inner">
               <div class="dashboard-top-row">
-                <button id="restartFlow" class="ghost-back-btn" type="button">← Back</button>
+                <!-- Back button hidden on dashboard -->
+                <button id="restartFlow" class="ghost-back-btn" type="button" style="display:none;">← Back</button>
                 <div class="dashboard-header">
                   <h1>Hi, <span id="user-name-display">there</span>!</h1>
                   <p class="subtitle">

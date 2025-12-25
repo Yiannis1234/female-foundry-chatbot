@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 88 - responsive buttons + option restoration');
+console.log('[FF-CHATBOT] Version 89 - robust dashboard rendering + hide back button');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -378,13 +378,18 @@ async function resetSession() {
 function renderDashboard(options) {
   if (!dashboardOptions) return;
 
+  // Fallback to PRIMARY_LIST if options is missing or empty
+  const optsToRender = (options && options.length > 0) ? options : PRIMARY_LIST;
+  
+  console.log('[FF-CHATBOT] Rendering dashboard with:', optsToRender);
+
   dashboardOptions.innerHTML = "";
-  if (!options || options.length === 0) return;
+  if (!optsToRender || optsToRender.length === 0) return;
 
   // Always show the primary 6 in footer on dashboard
   renderPrimaryFooterOptions(PRIMARY_LIST);
 
-  options.forEach((opt) => {
+  optsToRender.forEach((opt) => {
     const meta =
       DASHBOARD_CARD_META[opt] || {
         icon: "💡",
