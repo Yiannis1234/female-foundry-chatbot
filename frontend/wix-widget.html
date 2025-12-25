@@ -451,7 +451,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=80"
+          src="https://srv1079042.hstgr.cloud/?v=81"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -644,26 +644,7 @@
       setTimeout(init, 500);
       
       // Listen for messages from iframe to open external links
-      window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'ff-open-external' && event.data.url) {
-          console.log('[FF-WIDGET] Opening external URL from iframe:', event.data.url);
-          // Use window.top to break out of ALL iframes (including Wix's)
-          try {
-            window.top.open(event.data.url, '_blank', 'noopener,noreferrer');
-          } catch (e) {
-            console.log('[FF-WIDGET] top.open failed, trying window.open');
-            window.open(event.data.url, '_blank', 'noopener,noreferrer');
-          }
-        }
-        if (event.data && event.data.type === 'ff-refresh-parent') {
-          console.log('[FF-WIDGET] Refresh request from iframe');
-          try {
-            window.top.location.reload();
-          } catch (e) {
-            window.location.reload();
-          }
-        }
-      });
+      // No cross-frame navigation; keep everything self-contained in iframe
     })();
   </script>
 </body>
