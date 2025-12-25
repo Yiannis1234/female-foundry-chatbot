@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 92 - defensive dashboard rendering');
+console.log('[FF-CHATBOT] Version 93 - forced visibility and re-fetch of container');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -376,7 +376,12 @@ async function resetSession() {
 
 // --- Dashboard Logic ---
 function renderDashboard(options) {
-  if (!dashboardOptions) return;
+  // Re-fetch element to ensure it's not stale
+  const container = document.getElementById("dashboard-options");
+  if (!container) {
+    console.error("Dashboard options container not found!");
+    return;
+  }
 
   const DEFAULT_LIST = [
     "The Era of Abundance", "Key Insights", "Idea", 
@@ -388,9 +393,14 @@ function renderDashboard(options) {
   
   console.log('[FF-CHATBOT] Rendering dashboard with:', optsToRender);
 
-  dashboardOptions.innerHTML = "";
+  // Force styles to ensure visibility
+  container.style.display = "grid";
+  container.style.opacity = "1";
+  container.style.visibility = "visible";
+  container.innerHTML = ""; // Clear
+
   if (!optsToRender || optsToRender.length === 0) {
-    dashboardOptions.innerHTML = "<p style='color:red'>No options available to render.</p>";
+    container.innerHTML = "<p style='color:red; padding:20px;'>No options available to render.</p>";
     return;
   }
 
@@ -417,6 +427,10 @@ function renderDashboard(options) {
         card.target = "_top"; // This breaks out of the iframe
         card.style.textDecoration = "none";
         card.style.color = "inherit";
+        card.style.display = "flex"; // Ensure flex layout for card
+        card.style.flexDirection = "column";
+        card.style.visibility = "visible";
+        card.style.opacity = "1";
         
         // Fast touch for links
         card.addEventListener('touchend', (e) => {
@@ -428,10 +442,14 @@ function renderDashboard(options) {
           <div class="card-title">${opt}</div>
           <p class="card-desc">${meta.description}</p>
         `;
-        dashboardOptions.appendChild(card);
+        container.appendChild(card);
       } else {
         const card = document.createElement("div");
         card.className = "card";
+        card.style.display = "flex";
+        card.style.flexDirection = "column";
+        card.style.visibility = "visible";
+        card.style.opacity = "1";
         card.innerHTML = `
           <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
           <div class="card-title">${opt}</div>
@@ -448,7 +466,7 @@ function renderDashboard(options) {
            clickHandler();
         };
         
-        dashboardOptions.appendChild(card);
+        container.appendChild(card);
       }
     } catch (err) {
       console.error('[FF-CHATBOT] Error rendering card:', opt, err);
