@@ -109,8 +109,68 @@ const OPTION_LINKS = {
   "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
 };
 
+// --- Session Management ---
+async function restoreSession() {
+  try {
+    const savedId = localStorage.getItem('ff_session_id');
+    const savedName = localStorage.getItem('ff_user_name');
+    
+    if (savedId && savedName) {
+      console.log('[FF-CHATBOT] Found saved session:', savedId);
+      
+      // Verify session with server
+      const res = await fetch(`${API_BASE}/session/${savedId}`);
+      if (res.ok) {
+        const state = await res.json();
+        sessionId = savedId;
+        userName = savedName;
+        if (userNameDisplay) userNameDisplay.textContent = userName;
+        
+        console.log('[FF-CHATBOT] Session restored successfully');
+        
+        // Restore history if available
+        if (state.history && state.history.length > 0) {
+          // If they were chatting, go to chat
+          if (state.stage === 'chat' || state.stage === 'menu_secondary') {
+             switchView('chat');
+             // Replay history
+             chatMessages.innerHTML = ''; // Clear default
+             // Skip the first few welcome messages if they are redundant
+             state.history.forEach(msg => {
+               if (msg[0] === 'user') addMessage('user', msg[1], false);
+               else addMessage('bot', msg[1], false);
+             });
+          } else {
+             // Otherwise go to dashboard
+             switchView('dashboard');
+          }
+        } else {
+          switchView('dashboard');
+        }
+        
+        // Re-render dashboard options if needed
+        renderDashboard(PRIMARY_OPTIONS); 
+      } else {
+        console.log('[FF-CHATBOT] Saved session expired or not found');
+        localStorage.removeItem('ff_session_id');
+        localStorage.removeItem('ff_user_name');
+      }
+    }
+  } catch (e) {
+    console.error('[FF-CHATBOT] Error restoring session:', e);
+  }
+}
+
+function saveSession(id, name) {
+  if (id && name) {
+    localStorage.setItem('ff_session_id', id);
+    localStorage.setItem('ff_user_name', name);
+    console.log('[FF-CHATBOT] Session saved');
+  }
+}
+
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 83 - use target="_top" for navigation');
+console.log('[FF-CHATBOT] Version 84 - persistent session support + target=_top');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -151,6 +211,9 @@ window.addEventListener("load", () => {
   setInitialView();
   attachWelcomeListeners();
   if (nameInput) nameInput.focus();
+  
+  // Try to restore previous session
+  restoreSession();
 
   // NOTE: Previously had a click interceptor here that broke links in Wix sandboxed iframes.
   // Now using native anchor tags with target="_blank" which work in sandboxes.
@@ -228,6 +291,9 @@ async function submitName() {
 
   try {
     await startSession();
+    // Save session immediately after creation
+    saveSession(sessionId, name);
+    
     await sendNameToApi(name);
     switchView("dashboard");
   } catch (err) {
