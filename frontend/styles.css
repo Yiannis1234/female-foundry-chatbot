@@ -557,7 +557,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  scroll-behavior: auto !important;
+  scroll-behavior: smooth;
   position: relative;
   -webkit-overflow-scrolling: touch;
   min-height: 0;

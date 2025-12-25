@@ -109,12 +109,12 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 73 - fixed footer at bottom');
+console.log('[FF-CHATBOT] Version 74 - smooth scrolling');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
 
-// SIMPLE scroll: just use scrollIntoView - works on all devices
+// Smooth scroll to latest message
 function scrollToShowOptions() {
   if (!latestUserMessage) {
     console.log('[FF-CHATBOT] No user message to scroll to');
@@ -122,19 +122,16 @@ function scrollToShowOptions() {
   }
   
   try {
-    latestUserMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
-    console.log('[FF-CHATBOT] scrollIntoView executed');
+    latestUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('[FF-CHATBOT] smooth scrollIntoView executed');
   } catch(e) {
     console.error('[FF-CHATBOT] scrollIntoView error:', e);
   }
 }
 
 function forceScrollToTop() {
-  // Immediate
-  scrollToShowOptions();
-  // Retry after layout settles
-  setTimeout(scrollToShowOptions, 100);
-  setTimeout(scrollToShowOptions, 300);
+  // Single smooth scroll after a brief delay for layout to settle
+  setTimeout(scrollToShowOptions, 50);
 }
 
 function notifyParentPreventScroll() {
