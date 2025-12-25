@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 91 - fast touch for dashboard cards');
+console.log('[FF-CHATBOT] Version 92 - defensive dashboard rendering');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -378,67 +378,80 @@ async function resetSession() {
 function renderDashboard(options) {
   if (!dashboardOptions) return;
 
-  // Fallback to PRIMARY_LIST if options is missing or empty
-  const optsToRender = (options && options.length > 0) ? options : PRIMARY_LIST;
+  const DEFAULT_LIST = [
+    "The Era of Abundance", "Key Insights", "Idea", 
+    "Fundraising trends", "Behind the Index", "About Female Foundry"
+  ];
+
+  // Fallback to DEFAULT_LIST if options is missing or empty
+  const optsToRender = (options && options.length > 0) ? options : DEFAULT_LIST;
   
   console.log('[FF-CHATBOT] Rendering dashboard with:', optsToRender);
 
   dashboardOptions.innerHTML = "";
-  if (!optsToRender || optsToRender.length === 0) return;
+  if (!optsToRender || optsToRender.length === 0) {
+    dashboardOptions.innerHTML = "<p style='color:red'>No options available to render.</p>";
+    return;
+  }
 
   // Always show the primary 6 in footer on dashboard
-  renderPrimaryFooterOptions(PRIMARY_LIST);
+  try {
+    renderPrimaryFooterOptions(DEFAULT_LIST);
+  } catch(e) { console.error(e); }
 
   optsToRender.forEach((opt) => {
-    const meta =
-      DASHBOARD_CARD_META[opt] || {
-        icon: "💡",
-        gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
-        description: "Tap to explore this topic.",
-        link: null,
-      };
+    try {
+      const meta =
+        DASHBOARD_CARD_META[opt] || {
+          icon: "💡",
+          gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
+          description: "Tap to explore this topic.",
+          link: null,
+        };
 
-    // Method 1: Use anchor tag with target="_top" for links
-    if (OPTION_LINKS[opt]) {
-      const card = document.createElement("a");
-      card.className = "card";
-      card.href = OPTION_LINKS[opt];
-      card.target = "_top"; // This breaks out of the iframe
-      card.style.textDecoration = "none";
-      card.style.color = "inherit";
-      
-      // Fast touch for links
-      card.addEventListener('touchend', (e) => {
-         // Standard links don't need preventDefault, usually.
-         // But we can ensure it triggers.
-      });
-      
-      card.innerHTML = `
-        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-        <div class="card-title">${opt}</div>
-        <p class="card-desc">${meta.description}</p>
-      `;
-      dashboardOptions.appendChild(card);
-    } else {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-        <div class="card-title">${opt}</div>
-        <p class="card-desc">${meta.description}</p>
-      `;
-      
-      const clickHandler = () => {
-         handleDashboardSelection(opt);
-      };
-      
-      card.onclick = clickHandler;
-      card.ontouchend = (e) => {
-         if (e.cancelable) e.preventDefault();
-         clickHandler();
-      };
-      
-      dashboardOptions.appendChild(card);
+      // Method 1: Use anchor tag with target="_top" for links
+      if (OPTION_LINKS && OPTION_LINKS[opt]) {
+        const card = document.createElement("a");
+        card.className = "card";
+        card.href = OPTION_LINKS[opt];
+        card.target = "_top"; // This breaks out of the iframe
+        card.style.textDecoration = "none";
+        card.style.color = "inherit";
+        
+        // Fast touch for links
+        card.addEventListener('touchend', (e) => {
+           // Allow default
+        });
+        
+        card.innerHTML = `
+          <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+          <div class="card-title">${opt}</div>
+          <p class="card-desc">${meta.description}</p>
+        `;
+        dashboardOptions.appendChild(card);
+      } else {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+          <div class="card-title">${opt}</div>
+          <p class="card-desc">${meta.description}</p>
+        `;
+        
+        const clickHandler = () => {
+           handleDashboardSelection(opt);
+        };
+        
+        card.onclick = clickHandler;
+        card.ontouchend = (e) => {
+           if (e.cancelable) e.preventDefault();
+           clickHandler();
+        };
+        
+        dashboardOptions.appendChild(card);
+      }
+    } catch (err) {
+      console.error('[FF-CHATBOT] Error rendering card:', opt, err);
     }
   });
 }
