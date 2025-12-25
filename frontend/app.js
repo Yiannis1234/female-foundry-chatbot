@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 89 - robust dashboard rendering + hide back button');
+console.log('[FF-CHATBOT] Version 91 - fast touch for dashboard cards');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -407,6 +407,12 @@ function renderDashboard(options) {
       card.style.textDecoration = "none";
       card.style.color = "inherit";
       
+      // Fast touch for links
+      card.addEventListener('touchend', (e) => {
+         // Standard links don't need preventDefault, usually.
+         // But we can ensure it triggers.
+      });
+      
       card.innerHTML = `
         <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
         <div class="card-title">${opt}</div>
@@ -421,9 +427,17 @@ function renderDashboard(options) {
         <div class="card-title">${opt}</div>
         <p class="card-desc">${meta.description}</p>
       `;
-      card.onclick = () => {
-        handleDashboardSelection(opt);
+      
+      const clickHandler = () => {
+         handleDashboardSelection(opt);
       };
+      
+      card.onclick = clickHandler;
+      card.ontouchend = (e) => {
+         if (e.cancelable) e.preventDefault();
+         clickHandler();
+      };
+      
       dashboardOptions.appendChild(card);
     }
   });
