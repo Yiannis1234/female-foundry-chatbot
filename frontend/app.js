@@ -281,29 +281,49 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 98 - restore session correctly + keep 6 sub-options visible');
+console.log('[FF-CHATBOT] Version 99 - mobile scroll fix (container-based, no scrollIntoView)');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
 
-// Smooth scroll to latest message
-function scrollToShowOptions() {
-  if (!latestUserMessage) {
-    console.log('[FF-CHATBOT] No user message to scroll to');
-    return;
-  }
-  
-  try {
-    latestUserMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    console.log('[FF-CHATBOT] smooth scrollIntoView executed');
-  } catch(e) {
-    console.error('[FF-CHATBOT] scrollIntoView error:', e);
-  }
+// Robust scrolling inside the chat container (mobile-safe; avoids page-level scroll jumps)
+let latestScrollTarget = null;
+let latestScrollAlign = "start"; // "start" | "end"
+let _pendingAutoScroll = false;
+
+function setScrollTarget(el, align = "start") {
+  latestScrollTarget = el;
+  latestScrollAlign = align;
+}
+
+function scrollChatToTarget() {
+  if (!chatMessages || !latestScrollTarget) return;
+  if (!chatMessages.contains(latestScrollTarget)) return;
+
+  const cRect = chatMessages.getBoundingClientRect();
+  const eRect = latestScrollTarget.getBoundingClientRect();
+  const current = chatMessages.scrollTop;
+
+  const delta =
+    latestScrollAlign === "end"
+      ? eRect.bottom - cRect.bottom
+      : eRect.top - cRect.top;
+
+  // Small padding so content isn't flush against edges
+  const padding = latestScrollAlign === "end" ? 8 : -8;
+  chatMessages.scrollTop = Math.max(0, current + delta + padding);
 }
 
 function forceScrollToTop() {
-  // Single smooth scroll after a brief delay for layout to settle
-  setTimeout(scrollToShowOptions, 50);
+  // Keep name for legacy calls: this now scrolls to the latest target (user selection or options)
+  if (_pendingAutoScroll) return;
+  _pendingAutoScroll = true;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _pendingAutoScroll = false;
+      scrollChatToTarget();
+    });
+  });
 }
 
 function notifyParentPreventScroll() {
@@ -681,6 +701,7 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
   // If this is a user message, store it for scroll targeting
   if (role === "user" && firstMsgDiv) {
     latestUserMessage = firstMsgDiv;
+    setScrollTarget(latestUserMessage, "start");
   }
 
   // Only scroll to bottom if explicitly requested (user typing)
@@ -768,6 +789,8 @@ function renderChatOptions(options) {
   promptDiv.appendChild(promptBubble);
   chatMessages.appendChild(promptDiv);
 
+  let lastOptionEl = promptDiv;
+
   // Each option as its own bubble (separate clouds)
   options.forEach((opt) => {
     const msgDiv = document.createElement("div");
@@ -816,9 +839,12 @@ function renderChatOptions(options) {
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(bubble);
     chatMessages.appendChild(msgDiv);
+    lastOptionEl = msgDiv;
   });
 
   // Scroll to top after adding options
+  // On mobile, scrolling to the END of the options block is more reliable than scrollIntoView.
+  setScrollTarget(lastOptionEl, "end");
   forceScrollToTop();
 }
 

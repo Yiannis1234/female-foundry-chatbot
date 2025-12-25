@@ -560,7 +560,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   position: relative;
   -webkit-overflow-scrolling: touch;
   min-height: 0;
