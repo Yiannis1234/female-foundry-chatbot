@@ -29,22 +29,14 @@ const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
-// Request the parent Wix page to refresh (stay in same tab)
-function openExternal(_url) {
-  console.log('[FF-CHATBOT] Requesting parent page refresh');
-  const isInIframe = window.parent && window.parent !== window;
-  if (isInIframe) {
-    try {
-      window.parent.postMessage({ type: 'ff-refresh-parent' }, '*');
-      return;
-    } catch (e) {
-      console.log('[FF-CHATBOT] postMessage failed, trying top reload', e);
-    }
-  }
+// Fallback method if JS navigation is ever needed
+function openExternal(url) {
+  console.log('[FF-CHATBOT] Attempting JS top navigation to:', url);
   try {
-    window.top.location.reload();
-  } catch (e2) {
-    window.location.reload();
+    window.top.location.href = url;
+  } catch (e) {
+    console.log('[FF-CHATBOT] top.location blocked, trying regular open', e);
+    window.open(url, '_top');
   }
 }
 
@@ -118,7 +110,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 82 - refresh parent Wix page on link options');
+console.log('[FF-CHATBOT] Version 83 - use target="_top" for navigation');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -296,21 +288,34 @@ function renderDashboard(options) {
         link: null,
       };
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-      <div class="card-title">${opt}</div>
-      <p class="card-desc">${meta.description}</p>
-    `;
-    card.onclick = () => {
-      if (OPTION_LINKS[opt]) {
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
-      handleDashboardSelection(opt);
-    };
-    dashboardOptions.appendChild(card);
+    // Method 1: Use anchor tag with target="_top" for links
+    if (OPTION_LINKS[opt]) {
+      const card = document.createElement("a");
+      card.className = "card";
+      card.href = OPTION_LINKS[opt];
+      card.target = "_top"; // This breaks out of the iframe
+      card.style.textDecoration = "none";
+      card.style.color = "inherit";
+      
+      card.innerHTML = `
+        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+        <div class="card-title">${opt}</div>
+        <p class="card-desc">${meta.description}</p>
+      `;
+      dashboardOptions.appendChild(card);
+    } else {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+        <div class="card-title">${opt}</div>
+        <p class="card-desc">${meta.description}</p>
+      `;
+      card.onclick = () => {
+        handleDashboardSelection(opt);
+      };
+      dashboardOptions.appendChild(card);
+    }
   });
 }
 
@@ -352,12 +357,6 @@ if (dashboardSearch) {
 async function sendMessageToApi(text, { pinTop = false } = {}) {
   console.log('[DEBUG] sendMessageToApi called with:', text, 'sessionId:', sessionId);
   
-  if (OPTION_LINKS[text]) {
-    console.log('[DEBUG] Option is a link, refreshing parent page');
-    openExternal(OPTION_LINKS[text]);
-    return;
-  }
-
   if (!sessionId) {
     console.error('[DEBUG] No sessionId! Cannot send message.');
     addMessage("bot", "Session not started. Please refresh and try again.", false);
@@ -539,23 +538,32 @@ function renderChatOptions(options) {
     const bubble = document.createElement("div");
     bubble.className = "bubble bubble-options";
 
-    const chip = document.createElement("button");
-    chip.className = "suggestion-chip";
-    chip.textContent = `💬 ${opt}`;
-    chip.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (OPTION_LINKS[opt]) {
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
-      
-      forceScrollToTop();
-      notifyParentPreventScroll();
-      addMessage("user", opt, false);
-      sendMessageToApi(opt, { pinTop: true });
-    };
+    let chip;
+    if (OPTION_LINKS[opt]) {
+      // Use anchor tag with target="_top" for links
+      chip = document.createElement("a");
+      chip.className = "suggestion-chip";
+      chip.textContent = `💬 ${opt}`;
+      chip.href = OPTION_LINKS[opt];
+      chip.target = "_top";
+      chip.style.textDecoration = "none";
+      chip.style.display = "inline-flex";
+      chip.style.alignItems = "center";
+      chip.style.justifyContent = "center";
+    } else {
+      chip = document.createElement("button");
+      chip.className = "suggestion-chip";
+      chip.textContent = `💬 ${opt}`;
+      chip.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        forceScrollToTop();
+        notifyParentPreventScroll();
+        addMessage("user", opt, false);
+        sendMessageToApi(opt, { pinTop: true });
+      };
+    }
 
     bubble.appendChild(chip);
     msgDiv.appendChild(avatar);
@@ -579,28 +587,44 @@ function renderPrimaryFooterOptions(options) {
   primaryFooterOptions.style.display = "flex";
 
   options.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "footer-chip";
-    btn.textContent = `💬 ${opt}`;
-    btn.onclick = () => {
-      console.log('[DEBUG] Footer button clicked:', opt);
+    // If it's a link, use Method 1: <a target="_top">
+    if (OPTION_LINKS[opt]) {
+      const link = document.createElement("a");
+      link.className = "footer-chip";
+      link.textContent = `💬 ${opt}`;
+      link.href = OPTION_LINKS[opt];
+      link.target = "_top"; // Breaks out of iframe and navigates top window
       
-      // Clear any pending prompts/bubbles when switching primary via footer
-      if (chatMessages) {
-        const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
-        oldOptionBubbles.forEach((el) => el.remove());
-      }
-      if (OPTION_LINKS[opt]) {
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
+      // Styling to match buttons
+      link.style.textDecoration = "none"; 
+      link.style.display = "inline-flex";
+      link.style.alignItems = "center";
       
-      forceScrollToTop();
-      notifyParentPreventScroll();
-      addMessage("user", opt, false);
-      sendMessageToApi(opt, { pinTop: true });
-    };
-    primaryFooterOptions.appendChild(btn);
+      link.onclick = (e) => {
+        // Let the anchor tag do its job natively
+        console.log('[DEBUG] Footer link clicked with target=_top:', opt);
+      };
+      primaryFooterOptions.appendChild(link);
+    } else {
+      const btn = document.createElement("button");
+      btn.className = "footer-chip";
+      btn.textContent = `💬 ${opt}`;
+      btn.onclick = () => {
+        console.log('[DEBUG] Footer button clicked:', opt);
+        
+        // Clear any pending prompts/bubbles when switching primary via footer
+        if (chatMessages) {
+          const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
+          oldOptionBubbles.forEach((el) => el.remove());
+        }
+        
+        forceScrollToTop();
+        notifyParentPreventScroll();
+        addMessage("user", opt, false);
+        sendMessageToApi(opt, { pinTop: true });
+      };
+      primaryFooterOptions.appendChild(btn);
+    }
   });
 }
 
