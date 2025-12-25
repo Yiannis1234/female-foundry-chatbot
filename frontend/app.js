@@ -281,7 +281,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 99 - mobile scroll fix (container-based, no scrollIntoView)');
+console.log('[FF-CHATBOT] Version 101 - fix mobile/desktop scroll: tap-only handlers + no scroll hijack');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -476,18 +476,55 @@ async function resetSession() {
 // --- Dashboard Logic ---
 let _dashboardCardDelegationAttached = false;
 let _dashboardLastTouchTs = 0;
+let _dashboardTouchStartX = 0;
+let _dashboardTouchStartY = 0;
+let _dashboardTouchMoved = false;
+let _dashboardActiveCard = null;
 
 function _attachDashboardCardDelegation() {
   if (_dashboardCardDelegationAttached) return;
   const container = document.getElementById("dashboard-options");
   if (!container) return;
 
-  // Fast touch handling for dashboard cards (prevents needing multiple taps on mobile)
+  // Tap-only touch handling (prevents "scrolling triggers taps" on mobile)
+  container.addEventListener(
+    "touchstart",
+    (e) => {
+      const card = e.target && e.target.closest ? e.target.closest(".card[data-opt]") : null;
+      if (!card) {
+        _dashboardActiveCard = null;
+        return;
+      }
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      _dashboardActiveCard = card;
+      _dashboardTouchMoved = false;
+      _dashboardTouchStartX = t.clientX;
+      _dashboardTouchStartY = t.clientY;
+    },
+    { passive: true }
+  );
+
+  container.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!_dashboardActiveCard) return;
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      const dx = Math.abs(t.clientX - _dashboardTouchStartX);
+      const dy = Math.abs(t.clientY - _dashboardTouchStartY);
+      if (dx > 10 || dy > 10) _dashboardTouchMoved = true;
+    },
+    { passive: true }
+  );
+
   container.addEventListener(
     "touchend",
     (e) => {
-      const card = e.target && e.target.closest ? e.target.closest('.card[data-opt]') : null;
-      if (!card) return;
+      if (!_dashboardActiveCard) return;
+      const card = _dashboardActiveCard;
+      _dashboardActiveCard = null;
+      if (_dashboardTouchMoved) return; // it was a scroll, not a tap
       _dashboardLastTouchTs = Date.now();
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
@@ -495,6 +532,11 @@ function _attachDashboardCardDelegation() {
     },
     { passive: false }
   );
+
+  container.addEventListener("touchcancel", () => {
+    _dashboardActiveCard = null;
+    _dashboardTouchMoved = false;
+  });
 
   container.addEventListener("click", (e) => {
     const card = e.target && e.target.closest ? e.target.closest('.card[data-opt]') : null;
@@ -820,19 +862,40 @@ function renderChatOptions(options) {
       chip = document.createElement("button");
       chip.className = "suggestion-chip";
       chip.textContent = `💬 ${opt}`;
-      
-      const clickHandler = (e) => {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        
+
+      const run = () => {
         forceScrollToTop();
         notifyParentPreventScroll();
         addMessage("user", opt, false);
         sendMessageToApi(opt, { pinTop: true });
       };
 
-      chip.onclick = clickHandler;
-      chip.ontouchend = clickHandler; // Fast touch response
+      chip.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        run();
+      });
+
+      // Tap-only (ignore scroll gestures)
+      let sx = 0, sy = 0, moved = false;
+      chip.addEventListener("touchstart", (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        moved = false;
+        sx = t.clientX;
+        sy = t.clientY;
+      }, { passive: true });
+      chip.addEventListener("touchmove", (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
+      }, { passive: true });
+      chip.addEventListener("touchend", (e) => {
+        if (moved) return;
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        run();
+      }, { passive: false });
     }
 
     bubble.appendChild(chip);
@@ -898,11 +961,30 @@ function renderPrimaryFooterOptions(options) {
         sendMessageToApi(opt, { pinTop: true });
       };
       
-      btn.onclick = clickHandler;
-      btn.ontouchend = (e) => {
-         if (e.cancelable) e.preventDefault();
-         clickHandler();
-      };
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        clickHandler();
+      });
+
+      // Tap-only for mobile (ignore scroll gestures)
+      let sx = 0, sy = 0, moved = false;
+      btn.addEventListener("touchstart", (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        moved = false;
+        sx = t.clientX;
+        sy = t.clientY;
+      }, { passive: true });
+      btn.addEventListener("touchmove", (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        if (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10) moved = true;
+      }, { passive: true });
+      btn.addEventListener("touchend", (e) => {
+        if (moved) return;
+        if (e.cancelable) e.preventDefault();
+        clickHandler();
+      }, { passive: false });
       
       primaryFooterOptions.appendChild(btn);
     }

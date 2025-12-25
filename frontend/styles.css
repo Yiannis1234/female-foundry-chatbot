@@ -9,7 +9,7 @@ body {
   background-color: #f9f9fc;
   color: #1a1a1a;
   height: 100vh;
-  overflow: auto !important; /* Force scrolling when embedded */
+  overflow: hidden !important; /* Prevent page-level scrolling; use internal scroll areas */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
   -webkit-text-size-adjust: 100% !important;
   -ms-text-size-adjust: 100% !important;
@@ -132,11 +132,11 @@ button {
 #main-content {
   flex: 1;
   position: relative;
-  overflow: visible; /* Allow scrolling when embedded */
+  overflow: hidden; /* Only allow scroll in dedicated containers */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   min-height: 0; /* Important for flex scrolling */
 }
 
@@ -292,6 +292,8 @@ button {
   padding: 20px 0;
   justify-content: flex-start;
   align-items: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dashboard-container-inner {
@@ -568,7 +570,7 @@ button {
   /* Mobile scroll fixes */
   touch-action: pan-y pinch-zoom;
   overscroll-behavior-y: contain;
-  will-change: scroll-position;
+  will-change: auto;
 }
 
 .chat-scroll * {
@@ -874,7 +876,7 @@ button {
   }
   
   .chat-container {
-    height: calc(100vh - 100px);
+    height: 100%;
     margin-bottom: 0;
     width: 100% !important;
     max-width: 100vw !important;
@@ -895,11 +897,8 @@ button {
     overscroll-behavior-y: contain !important;
     /* Ensure scrolling works on iOS */
     position: relative !important;
-    will-change: scroll-position;
-    scroll-behavior: smooth !important;
-    /* Prevent momentum issues */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    will-change: auto;
+    scroll-behavior: auto !important;
   }
 
   /* Normal text on mobile */
@@ -953,10 +952,8 @@ button {
     touch-action: pan-y pinch-zoom !important;
     overscroll-behavior-y: contain !important;
     position: relative !important;
-    will-change: scroll-position;
-    scroll-behavior: smooth !important;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    will-change: auto;
+    scroll-behavior: auto !important;
   }
 
   #view-chat {
