@@ -146,6 +146,11 @@ async function restoreSession() {
              const content = Array.isArray(msg) ? msg[1] : msg.content;
              addMessage(role, content, false, true); // true = skip saving to avoid dupes
           });
+          
+          // Restore active options if any
+          if (state.options && state.options.length > 0) {
+            renderChatOptions(state.options);
+          }
         } else {
           switchView('dashboard');
         }
@@ -204,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 87 - fixed dashboard options rendering on restore');
+console.log('[FF-CHATBOT] Version 88 - responsive buttons + option restoration');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -655,12 +660,14 @@ function renderChatOptions(options) {
       chip.style.display = "inline-flex";
       chip.style.alignItems = "center";
       chip.style.justifyContent = "center";
+      // Fast click for links handled natively by browser
     } else {
       chip = document.createElement("button");
       chip.className = "suggestion-chip";
       chip.textContent = `💬 ${opt}`;
-      chip.onclick = (e) => {
-        e.preventDefault();
+      
+      const clickHandler = (e) => {
+        if (e.cancelable) e.preventDefault();
         e.stopPropagation();
         
         forceScrollToTop();
@@ -668,6 +675,9 @@ function renderChatOptions(options) {
         addMessage("user", opt, false);
         sendMessageToApi(opt, { pinTop: true });
       };
+
+      chip.onclick = clickHandler;
+      chip.ontouchend = clickHandler; // Fast touch response
     }
 
     bubble.appendChild(chip);
@@ -714,7 +724,8 @@ function renderPrimaryFooterOptions(options) {
       const btn = document.createElement("button");
       btn.className = "footer-chip";
       btn.textContent = `💬 ${opt}`;
-      btn.onclick = () => {
+      
+      const clickHandler = () => {
         console.log('[DEBUG] Footer button clicked:', opt);
         
         // Clear any pending prompts/bubbles when switching primary via footer
@@ -728,6 +739,13 @@ function renderPrimaryFooterOptions(options) {
         addMessage("user", opt, false);
         sendMessageToApi(opt, { pinTop: true });
       };
+      
+      btn.onclick = clickHandler;
+      btn.ontouchend = (e) => {
+         if (e.cancelable) e.preventDefault();
+         clickHandler();
+      };
+      
       primaryFooterOptions.appendChild(btn);
     }
   });
