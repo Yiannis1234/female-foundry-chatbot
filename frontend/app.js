@@ -112,13 +112,65 @@ const OPTION_LINKS = {
 // --- Session Management ---
 let localHistory = []; // Local cache of chat history
 
+// IMPORTANT: Use sessionStorage (per-tab/per-device) so progress is NOT shared across devices.
+// Some browsers can sync localStorage via account sync; sessionStorage does not.
+const FF_PERSIST = (() => {
+  try {
+    const k = "__ff_persist_test__";
+    window.sessionStorage.setItem(k, "1");
+    window.sessionStorage.removeItem(k);
+    return window.sessionStorage;
+  } catch (e) {
+    return null;
+  }
+})();
+
+function ffGet(key) {
+  try {
+    return FF_PERSIST ? FF_PERSIST.getItem(key) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function ffSet(key, value) {
+  try {
+    if (FF_PERSIST) FF_PERSIST.setItem(key, value);
+  } catch (e) {
+    // ignore
+  }
+}
+
+function ffRemove(key) {
+  try {
+    if (FF_PERSIST) FF_PERSIST.removeItem(key);
+  } catch (e) {
+    // ignore
+  }
+}
+
+function ffClearPersistedSession() {
+  ["ff_session_id", "ff_user_name", "ff_chat_history", "ff_last_options", "ff_last_view"].forEach((k) => {
+    ffRemove(k);
+    // Also clear legacy localStorage so it doesn't sync across devices
+    try { localStorage.removeItem(k); } catch (e) {}
+  });
+}
+
 async function restoreSession() {
   try {
-    const savedId = localStorage.getItem('ff_session_id');
-    const savedName = localStorage.getItem('ff_user_name');
-    const savedHistory = JSON.parse(localStorage.getItem('ff_chat_history') || '[]');
-    const savedLastOptions = JSON.parse(localStorage.getItem('ff_last_options') || '[]');
-    const savedLastView = localStorage.getItem('ff_last_view') || '';
+    // Clear legacy localStorage keys (pre-v97) so progress doesn't sync across devices.
+    try {
+      ["ff_session_id", "ff_user_name", "ff_chat_history", "ff_last_options", "ff_last_view"].forEach((k) =>
+        localStorage.removeItem(k)
+      );
+    } catch (e) {}
+
+    const savedId = ffGet("ff_session_id");
+    const savedName = ffGet("ff_user_name");
+    const savedHistory = JSON.parse(ffGet("ff_chat_history") || "[]");
+    const savedLastOptions = JSON.parse(ffGet("ff_last_options") || "[]");
+    const savedLastView = ffGet("ff_last_view") || "";
     
     if (savedId && savedName) {
       console.log('[FF-CHATBOT] Found saved session:', savedId);
@@ -200,9 +252,7 @@ async function restoreSession() {
           }
         } catch (err) {
           console.error('[FF-CHATBOT] Failed to silent-start session:', err);
-          localStorage.removeItem('ff_session_id');
-          localStorage.removeItem('ff_user_name');
-          localStorage.removeItem('ff_chat_history');
+          ffClearPersistedSession();
         }
       }
     }
@@ -213,16 +263,16 @@ async function restoreSession() {
 
 function saveSession(id, name) {
   if (id && name) {
-    localStorage.setItem('ff_session_id', id);
-    localStorage.setItem('ff_user_name', name);
+    ffSet("ff_session_id", id);
+    ffSet("ff_user_name", name);
     // Also save current localHistory
-    localStorage.setItem('ff_chat_history', JSON.stringify(localHistory));
+    ffSet("ff_chat_history", JSON.stringify(localHistory));
     console.log('[FF-CHATBOT] Session & History saved');
   }
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 96 - stable dashboard rendering + progress restore');
+console.log('[FF-CHATBOT] Version 97 - per-device progress (sessionStorage only)');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -311,7 +361,7 @@ function switchView(viewName) {
 
   // Persist last view so we can restore UX after navigating between Wix pages
   try {
-    localStorage.setItem("ff_last_view", viewName);
+    ffSet("ff_last_view", viewName);
   } catch (e) {
     // ignore
   }
@@ -491,6 +541,8 @@ function renderDashboard(options) {
 async function restartExperience() {
   sessionId = null;
   userName = "";
+  localHistory = [];
+  ffClearPersistedSession();
   clearChat();
   if (nameInput) nameInput.value = "";
   if (userNameDisplay) userNameDisplay.textContent = "there";
@@ -673,7 +725,7 @@ function renderChatOptions(options) {
 
   // Persist last shown options so they can be restored after page navigation
   try {
-    localStorage.setItem("ff_last_options", JSON.stringify(options || []));
+    ffSet("ff_last_options", JSON.stringify(options || []));
   } catch (e) {
     // ignore
   }
