@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 93 - forced visibility and re-fetch of container');
+console.log('[FF-CHATBOT] Version 94 - innerHTML string injection + visual confirm');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -378,10 +378,13 @@ async function resetSession() {
 function renderDashboard(options) {
   // Re-fetch element to ensure it's not stale
   const container = document.getElementById("dashboard-options");
+  const title = document.getElementById("user-name-display");
   if (!container) {
     console.error("Dashboard options container not found!");
     return;
   }
+  
+  if (title) title.innerText += " (Ready)"; // VISUAL DEBUG: confirm this ran
 
   const DEFAULT_LIST = [
     "The Era of Abundance", "Key Insights", "Idea", 
@@ -397,17 +400,10 @@ function renderDashboard(options) {
   container.style.display = "grid";
   container.style.opacity = "1";
   container.style.visibility = "visible";
-  container.innerHTML = ""; // Clear
-
-  if (!optsToRender || optsToRender.length === 0) {
-    container.innerHTML = "<p style='color:red; padding:20px;'>No options available to render.</p>";
-    return;
-  }
-
-  // Always show the primary 6 in footer on dashboard
-  try {
-    renderPrimaryFooterOptions(DEFAULT_LIST);
-  } catch(e) { console.error(e); }
+  // container.style.border = "2px solid red"; // DEBUG: Show container bounds
+  
+  // BUILD HTML STRING instead of appendChild (safer in weird iframes)
+  let html = "";
 
   optsToRender.forEach((opt) => {
     try {
@@ -419,60 +415,31 @@ function renderDashboard(options) {
           link: null,
         };
 
-      // Method 1: Use anchor tag with target="_top" for links
-      if (OPTION_LINKS && OPTION_LINKS[opt]) {
-        const card = document.createElement("a");
-        card.className = "card";
-        card.href = OPTION_LINKS[opt];
-        card.target = "_top"; // This breaks out of the iframe
-        card.style.textDecoration = "none";
-        card.style.color = "inherit";
-        card.style.display = "flex"; // Ensure flex layout for card
-        card.style.flexDirection = "column";
-        card.style.visibility = "visible";
-        card.style.opacity = "1";
-        
-        // Fast touch for links
-        card.addEventListener('touchend', (e) => {
-           // Allow default
-        });
-        
-        card.innerHTML = `
+      // Determine if it's a link or button
+      const isLink = (OPTION_LINKS && OPTION_LINKS[opt]);
+      const tag = isLink ? "a" : "div";
+      const hrefAttr = isLink ? `href="${OPTION_LINKS[opt]}" target="_top"` : "";
+      const onclickAttr = isLink ? "" : `onclick="window.handleDashboardClick('${opt}')"`;
+      
+      html += `
+        <${tag} class="card" ${hrefAttr} ${onclickAttr} style="display:flex; flex-direction:column; text-decoration:none; color:inherit; cursor:pointer;">
           <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
           <div class="card-title">${opt}</div>
           <p class="card-desc">${meta.description}</p>
-        `;
-        container.appendChild(card);
-      } else {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.display = "flex";
-        card.style.flexDirection = "column";
-        card.style.visibility = "visible";
-        card.style.opacity = "1";
-        card.innerHTML = `
-          <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-          <div class="card-title">${opt}</div>
-          <p class="card-desc">${meta.description}</p>
-        `;
-        
-        const clickHandler = () => {
-           handleDashboardSelection(opt);
-        };
-        
-        card.onclick = clickHandler;
-        card.ontouchend = (e) => {
-           if (e.cancelable) e.preventDefault();
-           clickHandler();
-        };
-        
-        container.appendChild(card);
-      }
+        </${tag}>
+      `;
     } catch (err) {
       console.error('[FF-CHATBOT] Error rendering card:', opt, err);
     }
   });
+  
+  container.innerHTML = html;
 }
+
+// Global handler for string-based onclick
+window.handleDashboardClick = function(opt) {
+  handleDashboardSelection(opt);
+};
 
 async function restartExperience() {
   sessionId = null;
