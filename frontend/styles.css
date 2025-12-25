@@ -426,6 +426,9 @@ button {
   flex-direction: column;
   gap: 16px;
   text-align: left;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .card:hover {
@@ -706,6 +709,9 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 @media screen and (max-width: 768px) {
@@ -800,6 +806,9 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .footer-chip:hover {
@@ -1003,6 +1012,13 @@ button {
   button {
     min-height: 48px !important;
     min-width: 48px !important;
+  }
+
+  /* Avoid "first tap triggers hover" issues on mobile */
+  .card:hover,
+  .suggestion-chip:hover,
+  .footer-chip:hover {
+    transform: none !important;
   }
 
   #name-input {

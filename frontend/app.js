@@ -117,6 +117,8 @@ async function restoreSession() {
     const savedId = localStorage.getItem('ff_session_id');
     const savedName = localStorage.getItem('ff_user_name');
     const savedHistory = JSON.parse(localStorage.getItem('ff_chat_history') || '[]');
+    const savedLastOptions = JSON.parse(localStorage.getItem('ff_last_options') || '[]');
+    const savedLastView = localStorage.getItem('ff_last_view') || '';
     
     if (savedId && savedName) {
       console.log('[FF-CHATBOT] Found saved session:', savedId);
@@ -147,12 +149,20 @@ async function restoreSession() {
              addMessage(role, content, false, true); // true = skip saving to avoid dupes
           });
           
-          // Restore active options if any
-          if (state.options && state.options.length > 0) {
-            renderChatOptions(state.options);
-          }
+          // Restore active options (server) or last known options (local)
+          const optsToRestore =
+            (state.options && state.options.length > 0)
+              ? state.options
+              : (Array.isArray(savedLastOptions) && savedLastOptions.length > 0)
+                ? savedLastOptions
+                : PRIMARY_LIST;
+          renderChatOptions(optsToRestore);
         } else {
-          switchView('dashboard');
+          // No history - return to dashboard by default (or last view if you prefer)
+          switchView(savedLastView === 'chat' ? 'chat' : 'dashboard');
+          if (savedLastView === 'chat') {
+            renderChatOptions(Array.isArray(savedLastOptions) && savedLastOptions.length > 0 ? savedLastOptions : PRIMARY_LIST);
+          }
         }
         
         renderDashboard(PRIMARY_LIST);
@@ -177,6 +187,9 @@ async function restoreSession() {
                 const content = Array.isArray(msg) ? msg[1] : msg.content;
                 addMessage(role, content, false, true);
              });
+
+             // Restore last known options (since server session is new)
+             renderChatOptions(Array.isArray(savedLastOptions) && savedLastOptions.length > 0 ? savedLastOptions : PRIMARY_LIST);
              
              // Important: We need to inform the server of this history context? 
              // Ideally yes, but for MVP just showing it is enough.
@@ -209,7 +222,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 95 - on-screen debug for dashboard rendering');
+console.log('[FF-CHATBOT] Version 96 - stable dashboard rendering + progress restore');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -296,6 +309,13 @@ function switchView(viewName) {
 
   currentView = viewName;
 
+  // Persist last view so we can restore UX after navigating between Wix pages
+  try {
+    localStorage.setItem("ff_last_view", viewName);
+  } catch (e) {
+    // ignore
+  }
+
   // When switching to chat view, scroll to top
   if (viewName === "chat") {
     forceScrollToTop();
@@ -375,38 +395,63 @@ async function resetSession() {
 }
 
 // --- Dashboard Logic ---
-function renderDashboard(options) {
-  // Re-fetch element to ensure it's not stale
+let _dashboardCardDelegationAttached = false;
+let _dashboardLastTouchTs = 0;
+
+function _attachDashboardCardDelegation() {
+  if (_dashboardCardDelegationAttached) return;
   const container = document.getElementById("dashboard-options");
-  const title = document.getElementById("user-name-display");
+  if (!container) return;
+
+  // Fast touch handling for dashboard cards (prevents needing multiple taps on mobile)
+  container.addEventListener(
+    "touchend",
+    (e) => {
+      const card = e.target && e.target.closest ? e.target.closest('.card[data-opt]') : null;
+      if (!card) return;
+      _dashboardLastTouchTs = Date.now();
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      handleDashboardSelection(card.dataset.opt);
+    },
+    { passive: false }
+  );
+
+  container.addEventListener("click", (e) => {
+    const card = e.target && e.target.closest ? e.target.closest('.card[data-opt]') : null;
+    if (!card) return;
+    // Ignore ghost click after touch
+    if (Date.now() - _dashboardLastTouchTs < 700) {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+    handleDashboardSelection(card.dataset.opt);
+  });
+
+  _dashboardCardDelegationAttached = true;
+}
+
+function renderDashboard(options) {
+  const container = document.getElementById("dashboard-options");
   if (!container) {
     console.error("Dashboard options container not found!");
     return;
   }
-  
-  if (title) title.innerText += " (Ready)"; // VISUAL DEBUG: confirm this ran
 
-  const DEFAULT_LIST = [
-    "The Era of Abundance", "Key Insights", "Idea", 
-    "Fundraising trends", "Behind the Index", "About Female Foundry"
-  ];
+  _attachDashboardCardDelegation();
 
-  // Fallback to DEFAULT_LIST if options is missing or empty
-  const optsToRender = (options && options.length > 0) ? options : DEFAULT_LIST;
-  
-  console.log('[FF-CHATBOT] Rendering dashboard with:', optsToRender);
+  const optsToRender = (options && options.length > 0) ? options : PRIMARY_LIST;
+  console.log("[FF-CHATBOT] Rendering dashboard with:", optsToRender);
 
-  // Force styles to ensure visibility
+  // Force styles to ensure visibility (Wix iframe edge cases)
   container.style.display = "grid";
   container.style.opacity = "1";
   container.style.visibility = "visible";
-  container.style.border = "2px solid rgba(255, 0, 0, 0.35)";
-  container.style.background = "rgba(255, 255, 0, 0.06)";
-  // container.style.border = "2px solid red"; // DEBUG: Show container bounds
-  
-  // BUILD HTML STRING instead of appendChild (safer in weird iframes)
-  let html = "";
+  container.style.border = "";
+  container.style.background = "";
 
+  let html = "";
   optsToRender.forEach((opt) => {
     try {
       const meta =
@@ -417,36 +462,31 @@ function renderDashboard(options) {
           link: null,
         };
 
-      // Determine if it's a link or button
-      const isLink = (OPTION_LINKS && OPTION_LINKS[opt]);
-      const tag = isLink ? "a" : "div";
-      const hrefAttr = isLink ? `href="${OPTION_LINKS[opt]}" target="_top"` : "";
-      const onclickAttr = isLink ? "" : `onclick="window.handleDashboardClick('${opt}')"`;
-      
-      html += `
-        <${tag} class="card" ${hrefAttr} ${onclickAttr} style="display:flex; flex-direction:column; text-decoration:none; color:inherit; cursor:pointer; background:#fff; border:2px solid #111; padding:18px; border-radius:18px; gap:12px;">
-          <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-          <div class="card-title" style="font-weight:700; font-size:18px;">${opt}</div>
-          <p class="card-desc" style="color:#333; font-size:14px; line-height:1.4; margin:0;">${meta.description}</p>
-        </${tag}>
-      `;
+      const url = OPTION_LINKS && OPTION_LINKS[opt];
+      if (url) {
+        html += `
+          <a class="card" href="${url}" target="_top" rel="noopener noreferrer">
+            <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+            <div class="card-title">${opt}</div>
+            <p class="card-desc">${meta.description}</p>
+          </a>
+        `;
+      } else {
+        html += `
+          <div class="card" data-opt="${opt}">
+            <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+            <div class="card-title">${opt}</div>
+            <p class="card-desc">${meta.description}</p>
+          </div>
+        `;
+      }
     } catch (err) {
-      console.error('[FF-CHATBOT] Error rendering card:', opt, err);
+      console.error("[FF-CHATBOT] Error rendering card:", opt, err);
     }
   });
-  
-  container.innerHTML = `
-    <div style="grid-column:1/-1; background:#fffbcc; border:1px solid #e6d66a; padding:10px; border-radius:10px; color:#1a1a1a; font-size:12px;">
-      DEBUG: renderDashboard ran. cards=${optsToRender.length} htmlLen=${html.length}
-    </div>
-    ${html}
-  `;
-}
 
-// Global handler for string-based onclick
-window.handleDashboardClick = function(opt) {
-  handleDashboardSelection(opt);
-};
+  container.innerHTML = html;
+}
 
 async function restartExperience() {
   sessionId = null;
@@ -630,6 +670,13 @@ function splitBotContent(content) {
 
 function renderChatOptions(options) {
   if (!chatMessages) return;
+
+  // Persist last shown options so they can be restored after page navigation
+  try {
+    localStorage.setItem("ff_last_options", JSON.stringify(options || []));
+  } catch (e) {
+    // ignore
+  }
 
   // Footer should always show the primary 6
   renderPrimaryFooterOptions(PRIMARY_LIST);
