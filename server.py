@@ -98,7 +98,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_blank' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
+        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
     ),
     "Key Insights Analysis": ( 
         # This corresponds to the "Key Insights" button inside the flow. 
@@ -157,33 +157,33 @@ INFO_MAP: Dict[str, str] = {
     ),
     "The Team": (
         "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' class='chat-link-btn'>Meet the Team</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Team</a>"
     ),
     "The Sponsors": (
         "Our sponsors provide the critical support needed to keep this research independent and open-source.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' class='chat-link-btn'>Meet the Sponsors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors</a>"
     ),
     "The Contributors": (
         "Over 100 industry experts contributed their data and perspectives to this year's Index.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' class='chat-link-btn'>Meet the Contributors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Contributors</a>"
     ),
     "The Partners": (
         "Our partners help amplify the reach of the Index across the European ecosystem.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' class='chat-link-btn'>Meet the Partners</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Partners</a>"
     ),
 
     # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
     "The Era of Abundance": (
-        "<script>window.open('https://www.femaleinnovationindex.com/innovation', '_blank');</script>"
-        "Opening The Era of Abundance..."
+        "Opening The Era of Abundance in a new tab.<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/innovation' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open The Era of Abundance</a>"
     ),
     "Idea": (
-        "<script>window.open('https://www.femaleinnovationindex.com/idea?target=section100', '_blank');</script>"
-        "Opening Idea..."
+        "Opening Idea in a new tab.<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open Idea</a>"
     ),
     "About Female Foundry": (
-        "<script>window.open('https://www.femalefoundry.co/', '_blank');</script>"
-        "Opening Female Foundry..."
+        "Opening Female Foundry in a new tab.<br><br>"
+        "<a href='https://www.femalefoundry.co/' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open Female Foundry</a>"
     ),
 }
 
@@ -198,6 +198,14 @@ class SessionResponse(BaseModel):
     messages: List[Dict[str, str]]
     options: List[str]
     stage: str
+
+class SessionSnapshot(BaseModel):
+    session_id: str
+    visitor_name: str | None
+    stage: str
+    primary_choice: str | None
+    history: List[Tuple[str, str]]
+    options: List[str]
 
 # --- HELPERS ---
 
@@ -276,10 +284,24 @@ def deliver_info(state: SessionState, choice: str) -> SessionResponse:
     state.history.append(("bot", formatted))
     state.history.append(("bot", follow_up))
     
-    # Reset to primary menu after delivering info
+    # If they selected a SECONDARY option, keep them in the secondary menu so the 6 options remain visible.
+    current_primary = state.primary_choice
+    secondary_opts = SECONDARY_OPTIONS.get(current_primary, []) if current_primary else []
+    is_secondary_choice = bool(current_primary and choice in secondary_opts)
+
+    if is_secondary_choice:
+        state.stage = "menu_secondary"
+        return SessionResponse(
+            session_id=state.session_id,
+            messages=[{"role": "bot", "content": formatted}, {"role": "bot", "content": follow_up}],
+            options=secondary_opts,
+            stage=state.stage,
+        )
+
+    # Otherwise (primary info), reset to primary menu after delivering info
     state.stage = "menu_primary"
     state.primary_choice = None
-    
+
     return SessionResponse(
         session_id=state.session_id,
         messages=[{"role": "bot", "content": formatted}, {"role": "bot", "content": follow_up}],
@@ -442,6 +464,18 @@ app.add_middleware(
 def start_session() -> SessionResponse:
     state = create_session()
     return state.to_initial_response()
+
+@app.get("/api/session/{session_id}", response_model=SessionSnapshot)
+def get_session_snapshot(session_id: str) -> SessionSnapshot:
+    state = get_session(session_id)
+    return SessionSnapshot(
+        session_id=state.session_id,
+        visitor_name=state.visitor_name,
+        stage=state.stage,
+        primary_choice=state.primary_choice,
+        history=state.history,
+        options=_current_options(state),
+    )
 
 @app.post("/api/session/{session_id}/reset", response_model=SessionResponse)
 def reset(session_id: str) -> SessionResponse:

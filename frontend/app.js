@@ -180,11 +180,18 @@ async function restoreSession() {
       if (res.ok) {
         const state = await res.json();
         sessionId = savedId;
-        userName = savedName;
+        userName = (state && state.visitor_name) ? state.visitor_name : savedName;
         if (userNameDisplay) userNameDisplay.textContent = userName;
         
         console.log('[FF-CHATBOT] Session restored successfully');
         
+        // If server session is still in ask_name, prime it with the saved name.
+        if (state && state.stage === "ask_name") {
+          try {
+            await sendNameToApi(userName);
+          } catch (e) {}
+        }
+
         // Restore history: Prefer server history, fallback to local
         const historyToReplay = (state.history && state.history.length > 0) ? state.history : savedHistory;
         
@@ -225,6 +232,8 @@ async function restoreSession() {
         
         try {
           await startSession();
+          // Prime server session so next button press is not treated as the name
+          await sendNameToApi(userName);
           
           // REPLAY LOCAL HISTORY if available!
           if (savedHistory && savedHistory.length > 0) {
@@ -272,7 +281,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 97 - per-device progress (sessionStorage only)');
+console.log('[FF-CHATBOT] Version 98 - restore session correctly + keep 6 sub-options visible');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
