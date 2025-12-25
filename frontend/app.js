@@ -125,7 +125,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 77 - fix links with window.top.open');
+console.log('[FF-CHATBOT] Version 78 - use anchor tags for links (works in sandboxed iframes)');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -318,23 +318,34 @@ function renderDashboard(options) {
         link: null,
       };
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-      <div class="card-title">${opt}</div>
-      <p class="card-desc">${meta.description}</p>
-    `;
-
-    card.onclick = () => {
-      if (OPTION_LINKS[opt]) {
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
-      handleDashboardSelection(opt);
-    };
-
-    dashboardOptions.appendChild(card);
+    // If this option has a direct link, wrap in anchor tag (works in sandboxed iframes)
+    if (OPTION_LINKS[opt]) {
+      const card = document.createElement("a");
+      card.className = "card";
+      card.href = OPTION_LINKS[opt];
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.style.textDecoration = "none";
+      card.style.color = "inherit";
+      card.innerHTML = `
+        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+        <div class="card-title">${opt}</div>
+        <p class="card-desc">${meta.description}</p>
+      `;
+      dashboardOptions.appendChild(card);
+    } else {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+        <div class="card-title">${opt}</div>
+        <p class="card-desc">${meta.description}</p>
+      `;
+      card.onclick = () => {
+        handleDashboardSelection(opt);
+      };
+      dashboardOptions.appendChild(card);
+    }
   });
 }
 
@@ -563,23 +574,29 @@ function renderChatOptions(options) {
     const bubble = document.createElement("div");
     bubble.className = "bubble bubble-options";
 
-    const chip = document.createElement("button");
-    chip.className = "suggestion-chip";
-    chip.textContent = `💬 ${opt}`;
-    chip.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (OPTION_LINKS[opt]) {
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
-      
-      forceScrollToTop();
-      notifyParentPreventScroll();
-      addMessage("user", opt, false);
-      sendMessageToApi(opt, { pinTop: true });
-    };
+    let chip;
+    // If this option has a direct link, use anchor tag (works in sandboxed iframes)
+    if (OPTION_LINKS[opt]) {
+      chip = document.createElement("a");
+      chip.className = "suggestion-chip";
+      chip.href = OPTION_LINKS[opt];
+      chip.target = "_blank";
+      chip.rel = "noopener noreferrer";
+      chip.textContent = `💬 ${opt}`;
+    } else {
+      chip = document.createElement("button");
+      chip.className = "suggestion-chip";
+      chip.textContent = `💬 ${opt}`;
+      chip.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        forceScrollToTop();
+        notifyParentPreventScroll();
+        addMessage("user", opt, false);
+        sendMessageToApi(opt, { pinTop: true });
+      };
+    }
 
     bubble.appendChild(chip);
     msgDiv.appendChild(avatar);
@@ -603,29 +620,36 @@ function renderPrimaryFooterOptions(options) {
   primaryFooterOptions.style.display = "flex";
 
   options.forEach((opt) => {
-    const btn = document.createElement("button");
-    btn.className = "footer-chip";
-    btn.textContent = `💬 ${opt}`;
-    btn.onclick = () => {
-      console.log('[DEBUG] Footer button clicked:', opt);
-      
-      // Clear any pending prompts/bubbles when switching primary via footer
-      if (chatMessages) {
-        const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
-        oldOptionBubbles.forEach((el) => el.remove());
-      }
-      if (OPTION_LINKS[opt]) {
-        console.log('[DEBUG] Opening external link');
-        openExternal(OPTION_LINKS[opt]);
-        return;
-      }
-      
-      forceScrollToTop();
-      notifyParentPreventScroll();
-      addMessage("user", opt, false);
-      sendMessageToApi(opt, { pinTop: true });
-    };
-    primaryFooterOptions.appendChild(btn);
+    // If this option has a direct link, use an anchor tag (works in sandboxed iframes)
+    if (OPTION_LINKS[opt]) {
+      const link = document.createElement("a");
+      link.className = "footer-chip";
+      link.href = OPTION_LINKS[opt];
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = `💬 ${opt}`;
+      primaryFooterOptions.appendChild(link);
+    } else {
+      // No link - use button with onclick
+      const btn = document.createElement("button");
+      btn.className = "footer-chip";
+      btn.textContent = `💬 ${opt}`;
+      btn.onclick = () => {
+        console.log('[DEBUG] Footer button clicked:', opt);
+        
+        // Clear any pending prompts/bubbles when switching primary via footer
+        if (chatMessages) {
+          const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
+          oldOptionBubbles.forEach((el) => el.remove());
+        }
+        
+        forceScrollToTop();
+        notifyParentPreventScroll();
+        addMessage("user", opt, false);
+        sendMessageToApi(opt, { pinTop: true });
+      };
+      primaryFooterOptions.appendChild(btn);
+    }
   });
 }
 
