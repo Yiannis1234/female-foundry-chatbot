@@ -155,7 +155,7 @@ async function restoreSession() {
           switchView('dashboard');
         }
         
-        renderDashboard(PRIMARY_OPTIONS); 
+        renderDashboard(PRIMARY_LIST);
       } else {
         console.log('[FF-CHATBOT] Saved session expired, creating new one for:', savedName);
         userName = savedName;
