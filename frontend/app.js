@@ -29,10 +29,23 @@ const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
-// Do NOT navigate away; stay inside the iframe. Links are intentionally no-ops.
-function openExternal(url) {
-  console.log('[FF-CHATBOT] Suppressing external navigation for URL:', url);
-  // Intentionally no navigation to keep user on the same Wix page
+// Request the parent Wix page to refresh (stay in same tab)
+function openExternal(_url) {
+  console.log('[FF-CHATBOT] Requesting parent page refresh');
+  const isInIframe = window.parent && window.parent !== window;
+  if (isInIframe) {
+    try {
+      window.parent.postMessage({ type: 'ff-refresh-parent' }, '*');
+      return;
+    } catch (e) {
+      console.log('[FF-CHATBOT] postMessage failed, trying top reload', e);
+    }
+  }
+  try {
+    window.top.location.reload();
+  } catch (e2) {
+    window.location.reload();
+  }
 }
 
 // UPDATED METADATA FOR NEW BOXES
@@ -105,7 +118,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 81 - fully self-contained; no navigation');
+console.log('[FF-CHATBOT] Version 82 - refresh parent Wix page on link options');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -291,6 +304,10 @@ function renderDashboard(options) {
       <p class="card-desc">${meta.description}</p>
     `;
     card.onclick = () => {
+      if (OPTION_LINKS[opt]) {
+        openExternal(OPTION_LINKS[opt]);
+        return;
+      }
       handleDashboardSelection(opt);
     };
     dashboardOptions.appendChild(card);
@@ -335,6 +352,12 @@ if (dashboardSearch) {
 async function sendMessageToApi(text, { pinTop = false } = {}) {
   console.log('[DEBUG] sendMessageToApi called with:', text, 'sessionId:', sessionId);
   
+  if (OPTION_LINKS[text]) {
+    console.log('[DEBUG] Option is a link, refreshing parent page');
+    openExternal(OPTION_LINKS[text]);
+    return;
+  }
+
   if (!sessionId) {
     console.error('[DEBUG] No sessionId! Cannot send message.');
     addMessage("bot", "Session not started. Please refresh and try again.", false);
@@ -523,6 +546,11 @@ function renderChatOptions(options) {
       e.preventDefault();
       e.stopPropagation();
       
+      if (OPTION_LINKS[opt]) {
+        openExternal(OPTION_LINKS[opt]);
+        return;
+      }
+      
       forceScrollToTop();
       notifyParentPreventScroll();
       addMessage("user", opt, false);
@@ -561,6 +589,10 @@ function renderPrimaryFooterOptions(options) {
       if (chatMessages) {
         const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
         oldOptionBubbles.forEach((el) => el.remove());
+      }
+      if (OPTION_LINKS[opt]) {
+        openExternal(OPTION_LINKS[opt]);
+        return;
       }
       
       forceScrollToTop();
