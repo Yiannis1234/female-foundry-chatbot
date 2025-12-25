@@ -209,7 +209,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 94 - innerHTML string injection + visual confirm');
+console.log('[FF-CHATBOT] Version 95 - on-screen debug for dashboard rendering');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -400,6 +400,8 @@ function renderDashboard(options) {
   container.style.display = "grid";
   container.style.opacity = "1";
   container.style.visibility = "visible";
+  container.style.border = "2px solid rgba(255, 0, 0, 0.35)";
+  container.style.background = "rgba(255, 255, 0, 0.06)";
   // container.style.border = "2px solid red"; // DEBUG: Show container bounds
   
   // BUILD HTML STRING instead of appendChild (safer in weird iframes)
@@ -422,10 +424,10 @@ function renderDashboard(options) {
       const onclickAttr = isLink ? "" : `onclick="window.handleDashboardClick('${opt}')"`;
       
       html += `
-        <${tag} class="card" ${hrefAttr} ${onclickAttr} style="display:flex; flex-direction:column; text-decoration:none; color:inherit; cursor:pointer;">
+        <${tag} class="card" ${hrefAttr} ${onclickAttr} style="display:flex; flex-direction:column; text-decoration:none; color:inherit; cursor:pointer; background:#fff; border:2px solid #111; padding:18px; border-radius:18px; gap:12px;">
           <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
-          <div class="card-title">${opt}</div>
-          <p class="card-desc">${meta.description}</p>
+          <div class="card-title" style="font-weight:700; font-size:18px;">${opt}</div>
+          <p class="card-desc" style="color:#333; font-size:14px; line-height:1.4; margin:0;">${meta.description}</p>
         </${tag}>
       `;
     } catch (err) {
@@ -433,7 +435,12 @@ function renderDashboard(options) {
     }
   });
   
-  container.innerHTML = html;
+  container.innerHTML = `
+    <div style="grid-column:1/-1; background:#fffbcc; border:1px solid #e6d66a; padding:10px; border-radius:10px; color:#1a1a1a; font-size:12px;">
+      DEBUG: renderDashboard ran. cards=${optsToRender.length} htmlLen=${html.length}
+    </div>
+    ${html}
+  `;
 }
 
 // Global handler for string-based onclick
