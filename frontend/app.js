@@ -151,9 +151,30 @@ async function restoreSession() {
         // Re-render dashboard options if needed
         renderDashboard(PRIMARY_OPTIONS); 
       } else {
-        console.log('[FF-CHATBOT] Saved session expired or not found');
-        localStorage.removeItem('ff_session_id');
-        localStorage.removeItem('ff_user_name');
+        console.log('[FF-CHATBOT] Saved session expired, creating new one for:', savedName);
+        // Session lost on server (e.g. restart), but we know the user's name.
+        // Silently start a new session so they don't have to type it again.
+        userName = savedName;
+        if (userNameDisplay) userNameDisplay.textContent = userName;
+        
+        try {
+          await startSession();
+          saveSession(sessionId, userName); // Update ID in storage
+          
+          // We don't need to "send name" to chat again necessarily, 
+          // but we do need the dashboard options.
+          // Let's manually trigger dashboard render using default options.
+          renderDashboard(PRIMARY_OPTIONS);
+          switchView('dashboard');
+          
+          // Optional: Inform server of the name context without generating a bot message?
+          // For now, just getting a session ID is enough to interact.
+        } catch (err) {
+          console.error('[FF-CHATBOT] Failed to silent-start session:', err);
+          // Fallback to name input if everything fails
+          localStorage.removeItem('ff_session_id');
+          localStorage.removeItem('ff_user_name');
+        }
       }
     }
   } catch (e) {
@@ -170,7 +191,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 84 - persistent session support + target=_top');
+console.log('[FF-CHATBOT] Version 85 - auto-restore session even after server restart');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
