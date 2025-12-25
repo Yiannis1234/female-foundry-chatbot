@@ -30,12 +30,32 @@ const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 
 function openExternal(url) {
-  // Ensure the chatbot stays on the current page: always open external navigation in a new tab/window.
-  // Note: this is triggered directly from user clicks, so popup blockers shouldn't interfere.
+  console.log('[FF-CHATBOT] Opening external URL:', url);
+  
+  // Try to notify parent window to open the link (for Wix iframe)
   try {
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'ff-open-external', url: url }, '*');
+    }
   } catch (e) {
-    window.open(url, "_blank");
+    console.log('[FF-CHATBOT] Could not post to parent:', e);
+  }
+  
+  // Also try window.open as fallback
+  try {
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Popup was blocked, try top-level navigation
+      console.log('[FF-CHATBOT] Popup blocked, trying top.location');
+      try {
+        window.top.location.href = url;
+      } catch (e2) {
+        window.location.href = url;
+      }
+    }
+  } catch (e) {
+    console.log('[FF-CHATBOT] window.open failed:', e);
+    window.location.href = url;
   }
 }
 
@@ -109,7 +129,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 75 - better mobile scrolling');
+console.log('[FF-CHATBOT] Version 76 - fix external links in iframe');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;

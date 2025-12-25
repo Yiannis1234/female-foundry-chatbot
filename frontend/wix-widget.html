@@ -451,7 +451,7 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=75"
+          src="https://srv1079042.hstgr.cloud/?v=76"
           allow="microphone; camera"
           title="Female Foundry Chatbot"
           scrolling="yes"
@@ -642,6 +642,14 @@
       
       // Also try after a short delay in case Wix loads things late
       setTimeout(init, 500);
+      
+      // Listen for messages from iframe to open external links
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'ff-open-external' && event.data.url) {
+          console.log('[FF-WIDGET] Opening external URL from iframe:', event.data.url);
+          window.open(event.data.url, '_blank', 'noopener,noreferrer');
+        }
+      });
     })();
   </script>
 </body>
