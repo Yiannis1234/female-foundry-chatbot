@@ -125,7 +125,7 @@ const OPTION_LINKS = {
 };
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 78 - use anchor tags for links (works in sandboxed iframes)');
+console.log('[FF-CHATBOT] Version 79 - removed click interceptor that was blocking anchor tags');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -167,24 +167,9 @@ window.addEventListener("load", () => {
   attachWelcomeListeners();
   if (nameInput) nameInput.focus();
 
-  // Intercept any <a href="..."> clicks inside chat bubbles and always open in a new tab,
-  // so the chatbot page never navigates away (even if the link is "external").
-  if (chatMessages) {
-    chatMessages.addEventListener("click", (e) => {
-      const target = e.target;
-      if (!target || !(target instanceof Element)) return;
-      const anchor = target.closest("a[href]");
-      if (!anchor) return;
-
-      const href = anchor.getAttribute("href") || "";
-      // Only intercept http(s) links. Let mailto/tel behave normally.
-      if (/^https?:\/\//i.test(href)) {
-        e.preventDefault();
-        e.stopPropagation();
-        openExternal(href);
-      }
-    });
-  }
+  // NOTE: Previously had a click interceptor here that broke links in Wix sandboxed iframes.
+  // Now using native anchor tags with target="_blank" which work in sandboxes.
+  // Do NOT intercept anchor clicks - let them work naturally.
 });
 
 function setInitialView() {
