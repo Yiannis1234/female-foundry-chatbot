@@ -110,10 +110,13 @@ const OPTION_LINKS = {
 };
 
 // --- Session Management ---
+let localHistory = []; // Local cache of chat history
+
 async function restoreSession() {
   try {
     const savedId = localStorage.getItem('ff_session_id');
     const savedName = localStorage.getItem('ff_user_name');
+    const savedHistory = JSON.parse(localStorage.getItem('ff_chat_history') || '[]');
     
     if (savedId && savedName) {
       console.log('[FF-CHATBOT] Found saved session:', savedId);
@@ -128,52 +131,60 @@ async function restoreSession() {
         
         console.log('[FF-CHATBOT] Session restored successfully');
         
-        // Restore history if available
-        if (state.history && state.history.length > 0) {
-          // If they were chatting, go to chat
-          if (state.stage === 'chat' || state.stage === 'menu_secondary') {
-             switchView('chat');
-             // Replay history
-             chatMessages.innerHTML = ''; // Clear default
-             // Skip the first few welcome messages if they are redundant
-             state.history.forEach(msg => {
-               if (msg[0] === 'user') addMessage('user', msg[1], false);
-               else addMessage('bot', msg[1], false);
-             });
-          } else {
-             // Otherwise go to dashboard
-             switchView('dashboard');
-          }
+        // Restore history: Prefer server history, fallback to local
+        const historyToReplay = (state.history && state.history.length > 0) ? state.history : savedHistory;
+        
+        if (historyToReplay && historyToReplay.length > 0) {
+          localHistory = historyToReplay; // Sync local
+          saveSession(sessionId, userName); // Resave to be sure
+          
+          switchView('chat');
+          chatMessages.innerHTML = ''; 
+          historyToReplay.forEach(msg => {
+             // Handle both [role, content] (server) and {role, content} (local) formats
+             const role = Array.isArray(msg) ? msg[0] : msg.role;
+             const content = Array.isArray(msg) ? msg[1] : msg.content;
+             addMessage(role, content, false, true); // true = skip saving to avoid dupes
+          });
         } else {
           switchView('dashboard');
         }
         
-        // Re-render dashboard options if needed
         renderDashboard(PRIMARY_OPTIONS); 
       } else {
         console.log('[FF-CHATBOT] Saved session expired, creating new one for:', savedName);
-        // Session lost on server (e.g. restart), but we know the user's name.
-        // Silently start a new session so they don't have to type it again.
         userName = savedName;
         if (userNameDisplay) userNameDisplay.textContent = userName;
         
         try {
           await startSession();
-          saveSession(sessionId, userName); // Update ID in storage
           
-          // We don't need to "send name" to chat again necessarily, 
-          // but we do need the dashboard options.
-          // Let's manually trigger dashboard render using default options.
-          renderDashboard(PRIMARY_OPTIONS);
-          switchView('dashboard');
-          
-          // Optional: Inform server of the name context without generating a bot message?
-          // For now, just getting a session ID is enough to interact.
+          // REPLAY LOCAL HISTORY if available!
+          if (savedHistory && savedHistory.length > 0) {
+             console.log('[FF-CHATBOT] Replaying local history for new session');
+             localHistory = savedHistory;
+             saveSession(sessionId, userName); // Sync new ID with old history
+             
+             switchView('chat');
+             chatMessages.innerHTML = '';
+             savedHistory.forEach(msg => {
+                const role = Array.isArray(msg) ? msg[0] : msg.role;
+                const content = Array.isArray(msg) ? msg[1] : msg.content;
+                addMessage(role, content, false, true);
+             });
+             
+             // Important: We need to inform the server of this history context? 
+             // Ideally yes, but for MVP just showing it is enough.
+             // The user can continue chatting.
+          } else {
+             renderDashboard(PRIMARY_OPTIONS);
+             switchView('dashboard');
+          }
         } catch (err) {
           console.error('[FF-CHATBOT] Failed to silent-start session:', err);
-          // Fallback to name input if everything fails
           localStorage.removeItem('ff_session_id');
           localStorage.removeItem('ff_user_name');
+          localStorage.removeItem('ff_chat_history');
         }
       }
     }
@@ -186,12 +197,14 @@ function saveSession(id, name) {
   if (id && name) {
     localStorage.setItem('ff_session_id', id);
     localStorage.setItem('ff_user_name', name);
-    console.log('[FF-CHATBOT] Session saved');
+    // Also save current localHistory
+    localStorage.setItem('ff_chat_history', JSON.stringify(localHistory));
+    console.log('[FF-CHATBOT] Session & History saved');
   }
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 85 - auto-restore session even after server restart');
+console.log('[FF-CHATBOT] Version 86 - full history persistence (server + local fallback)');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -492,8 +505,13 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
   }
 }
 
-function addMessage(role, content, shouldScroll = false) {
+function addMessage(role, content, shouldScroll = false, skipSave = false) {
   console.log('[DEBUG] addMessage called:', role, content?.substring(0, 50));
+  
+  if (!skipSave) {
+    localHistory.push({ role, content });
+    saveSession(sessionId, userName);
+  }
   
   if (!chatMessages) {
     console.error('[DEBUG] chatMessages element not found!');
