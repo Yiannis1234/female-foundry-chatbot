@@ -177,7 +177,7 @@ async function restoreSession() {
              // Ideally yes, but for MVP just showing it is enough.
              // The user can continue chatting.
           } else {
-             renderDashboard(PRIMARY_OPTIONS);
+             renderDashboard(PRIMARY_LIST);
              switchView('dashboard');
           }
         } catch (err) {
@@ -204,7 +204,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 86 - full history persistence (server + local fallback)');
+console.log('[FF-CHATBOT] Version 87 - fixed dashboard options rendering on restore');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
