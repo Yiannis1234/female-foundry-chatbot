@@ -98,7 +98,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
+        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
     ),
     "Key Insights Analysis": ( 
         # This corresponds to the "Key Insights" button inside the flow. 
@@ -157,33 +157,33 @@ INFO_MAP: Dict[str, str] = {
     ),
     "The Team": (
         "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Team</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Team</a>"
     ),
     "The Sponsors": (
         "Our sponsors provide the critical support needed to keep this research independent and open-source.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors</a>"
     ),
     "The Contributors": (
         "Over 100 industry experts contributed their data and perspectives to this year's Index.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Contributors</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Contributors</a>"
     ),
     "The Partners": (
         "Our partners help amplify the reach of the Index across the European ecosystem.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Meet the Partners</a>"
+        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Partners</a>"
     ),
 
     # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
     "The Era of Abundance": (
         "Opening The Era of Abundance in a new tab.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/innovation' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open The Era of Abundance</a>"
+        "<a href='https://www.femaleinnovationindex.com/innovation' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open The Era of Abundance</a>"
     ),
     "Idea": (
         "Opening Idea in a new tab.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open Idea</a>"
+        "<a href='https://www.femaleinnovationindex.com/idea?target=section100' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open Idea</a>"
     ),
     "About Female Foundry": (
         "Opening Female Foundry in a new tab.<br><br>"
-        "<a href='https://www.femalefoundry.co/' target='_blank' rel='noopener noreferrer' class='chat-link-btn'>Open Female Foundry</a>"
+        "<a href='https://www.femalefoundry.co/' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open Female Foundry</a>"
     ),
 }
 
