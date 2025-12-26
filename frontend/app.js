@@ -289,7 +289,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 105 - scroll alignment fix (show top of options)');
+console.log('[FF-CHATBOT] Version 106 - mobile options horizontal scroll');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
