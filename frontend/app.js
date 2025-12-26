@@ -103,6 +103,7 @@ const OPTION_LINKS = {
   "About Female Foundry": "https://www.femalefoundry.co/",
 
   // Secondary (Chat buttons)
+  "Methodology": "https://www.femaleinnovationindex.com/methodology",
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
   "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=partners",

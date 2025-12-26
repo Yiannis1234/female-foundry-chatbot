@@ -98,7 +98,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Sponsors & Partners</a>"
+        "<a href='https://www.femaleinnovationindex.com/methodology' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Full Methodology</a>"
     ),
     "Key Insights Analysis": ( 
         # This corresponds to the "Key Insights" button inside the flow. 
