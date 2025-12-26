@@ -41,7 +41,7 @@ PRIMARY_OPTIONS = [
 
 # These are the sub-options for the boxes that lead to a chat flow
 SECONDARY_OPTIONS: Dict[str, List[str]] = {
-    "Key Insights": ["Methodology", "Key Insights"],
+    "Key Insights": ["Methodology", "Key Findings"],
     "Fundraising trends": [
         "Funding Data",
         "By Country Analysis",
@@ -93,17 +93,15 @@ SECONDARY_KEYWORDS: Dict[str, str] = {
 INFO_MAP: Dict[str, str] = {
     # --- BOX 2 FLOW ---
     "Key Insights": (
-        "Fantastic! Sounds like you’re on the move— I’ll keep it short and sweet.<br>"
-        "Should we jump straight into the key insights, or do you want the behind-the-scenes scoop on the methodology?"
+        "Fantastic! Sounds like you're on the move— I'll keep it short and sweet.<br>"
+        "Would you like to explore the key findings, or dive into the methodology behind the data?"
     ),
     "Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
         "<a href='https://www.femaleinnovationindex.com/methodology' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Full Methodology</a>"
     ),
-    "Key Insights Analysis": ( 
-        # This corresponds to the "Key Insights" button inside the flow. 
-        # Using a distinct key for the content map to avoid conflict with the Box Title if needed, 
-        # but we will handle exact matches in logic.
+    "Key Findings": ( 
+        # This corresponds to the "Key Findings" button inside the Key Insights flow.
         "• €5.76B raised by female-founded startups in Europe during 2024.\n"
         "• Represents roughly 12% of all European VC.\n"
         "• Deep tech companies capture roughly one-third of the capital."
@@ -271,9 +269,9 @@ def keyword_match(text: str, mapping: Dict[str, str]) -> str | None:
 def deliver_info(state: SessionState, choice: str) -> SessionResponse:
     info = INFO_MAP.get(choice)
     
-    # Special handling for "Key Insights" button inside "Key Insights" flow to avoid loop
-    if choice == "Key Insights" and state.stage == "menu_secondary":
-         info = INFO_MAP.get("Key Insights Analysis")
+    # Special handling for "Key Findings" button inside "Key Insights" flow
+    if choice == "Key Findings" and state.stage == "menu_secondary":
+         info = INFO_MAP.get("Key Findings")
 
     if not info:
         return respond(state, [format_bot_message("I don’t have that snippet yet—try another option.")], [])

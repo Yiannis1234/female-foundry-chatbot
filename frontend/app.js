@@ -99,12 +99,12 @@ const DASHBOARD_CARD_META = {
 const OPTION_LINKS = {
   // Primary (Dashboard)
   "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation",
-  "Key Insights": "https://www.femaleinnovationindex.com/innovation",
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
   "About Female Foundry": "https://www.femalefoundry.co/",
 
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
+  "Key Findings": "https://www.femaleinnovationindex.com/innovation",
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
   "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=partners",
