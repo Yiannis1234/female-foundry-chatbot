@@ -209,12 +209,20 @@ async function restoreSession() {
           });
           
           // Restore active options (server) or last known options (local)
-          const optsToRestore =
-            (state.options && state.options.length > 0)
-              ? state.options
-              : (Array.isArray(savedLastOptions) && savedLastOptions.length > 0)
-                ? savedLastOptions
-                : PRIMARY_LIST;
+          // Prefer local 'savedLastOptions' if server gives us the generic main menu (reset state)
+          let optsToRestore = state.options;
+          const serverIsGeneric = isPrimaryOptions(state.options);
+          const localHasSecondary = savedLastOptions && savedLastOptions.length > 0 && !isPrimaryOptions(savedLastOptions);
+          
+          if (serverIsGeneric && localHasSecondary) {
+             console.log('[FF-CHATBOT] Server returned generic menu, restoring local secondary menu');
+             optsToRestore = savedLastOptions;
+          } else if (!optsToRestore || optsToRestore.length === 0) {
+             optsToRestore = savedLastOptions;
+          }
+          
+          if (!optsToRestore || optsToRestore.length === 0) optsToRestore = PRIMARY_LIST;
+
           renderChatOptions(optsToRestore);
         } else {
           // No history - return to dashboard by default (or last view if you prefer)
@@ -281,7 +289,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 102 - fundraising options: show in one bubble grid (easier mobile scroll)');
+console.log('[FF-CHATBOT] Version 103 - stickier secondary menu persistence');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
