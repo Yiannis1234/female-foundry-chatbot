@@ -1015,7 +1015,7 @@ function isPrimaryOptions(opts) {
 function isKeyInsightsSecondary(opts) {
   if (!Array.isArray(opts) || opts.length !== 2) return false;
   const set = new Set(opts);
-  return set.has("Methodology") && set.has("Key Insights");
+  return set.has("Methodology") && set.has("Key Findings");
 }
 
 let typingIndicator = null;
