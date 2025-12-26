@@ -556,9 +556,9 @@ button {
 
 .chat-scroll {
   flex: 1 1 auto;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
   overflow-x: hidden;
-  padding: 8px 12px 70px 12px; /* Extra bottom padding for fixed footer */
+  padding: 8px 12px 12px 12px; /* Footer is no longer overlaying */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -803,16 +803,14 @@ button {
 }
 
 .primary-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: relative; /* keep it in the layout so it doesn't cover content */
   width: 100%;
   background: white;
   padding: 0;
   margin: 0;
   flex-shrink: 0;
-  z-index: 100;
+  z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .primary-footer-options {

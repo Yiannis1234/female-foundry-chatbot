@@ -289,7 +289,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 106 - mobile options horizontal scroll');
+console.log('[FF-CHATBOT] Version 107 - mobile scroll: footer no longer hides last options');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
