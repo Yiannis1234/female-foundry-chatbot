@@ -281,7 +281,7 @@ function saveSession(id, name) {
 }
 
 // --- Initialization ---
-console.log('[FF-CHATBOT] Version 101 - fix mobile/desktop scroll: tap-only handlers + no scroll hijack');
+console.log('[FF-CHATBOT] Version 102 - fundraising options: show in one bubble grid (easier mobile scroll)');
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -831,33 +831,29 @@ function renderChatOptions(options) {
   promptDiv.appendChild(promptBubble);
   chatMessages.appendChild(promptDiv);
 
-  let lastOptionEl = promptDiv;
+  // Render options in ONE bubble (much shorter on mobile, easier to scroll/see all options)
+  const msgDiv = document.createElement("div");
+  msgDiv.className = "chat-message bot options-bubble options-grid-bubble";
 
-  // Each option as its own bubble (separate clouds)
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = "FF";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble bubble-options";
+
+  const grid = document.createElement("div");
+  grid.className = "options-grid";
+
   options.forEach((opt) => {
-    const msgDiv = document.createElement("div");
-    msgDiv.className = "chat-message bot options-bubble option-chip-bubble";
-
-    const avatar = document.createElement("div");
-    avatar.className = "avatar";
-    avatar.textContent = "FF";
-
-    const bubble = document.createElement("div");
-    bubble.className = "bubble bubble-options";
-
     let chip;
     if (OPTION_LINKS[opt]) {
-      // Use anchor tag with target="_top" for links
       chip = document.createElement("a");
       chip.className = "suggestion-chip";
       chip.textContent = `💬 ${opt}`;
       chip.href = OPTION_LINKS[opt];
       chip.target = "_top";
-      chip.style.textDecoration = "none";
-      chip.style.display = "inline-flex";
-      chip.style.alignItems = "center";
-      chip.style.justifyContent = "center";
-      // Fast click for links handled natively by browser
+      chip.rel = "noopener noreferrer";
     } else {
       chip = document.createElement("button");
       chip.className = "suggestion-chip";
@@ -898,16 +894,17 @@ function renderChatOptions(options) {
       }, { passive: false });
     }
 
-    bubble.appendChild(chip);
-    msgDiv.appendChild(avatar);
-    msgDiv.appendChild(bubble);
-    chatMessages.appendChild(msgDiv);
-    lastOptionEl = msgDiv;
+    grid.appendChild(chip);
   });
+
+  bubble.appendChild(grid);
+  msgDiv.appendChild(avatar);
+  msgDiv.appendChild(bubble);
+  chatMessages.appendChild(msgDiv);
 
   // Scroll to top after adding options
   // On mobile, scrolling to the END of the options block is more reliable than scrollIntoView.
-  setScrollTarget(lastOptionEl, "end");
+  setScrollTarget(msgDiv, "end");
   forceScrollToTop();
 }
 

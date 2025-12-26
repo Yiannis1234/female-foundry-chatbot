@@ -746,6 +746,22 @@ button {
   border: 1px solid #e6e9f5;
 }
 
+/* Options grid inside ONE bubble (mobile-friendly, less scrolling) */
+.options-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.options-grid-bubble {
+  max-width: 100% !important;
+}
+
+.options-grid-bubble .bubble {
+  width: 100%;
+}
+
 .options-prompt .bubble {
   font-weight: 600;
 }
