@@ -744,6 +744,25 @@ button {
 .bubble-options {
   background: #f7f7fb;
   border: 1px solid #e6e9f5;
+  position: relative;
+}
+
+/* Visual indicator on mobile: fade on right edge shows more content to scroll */
+@media screen and (max-width: 480px) {
+  .bubble-options {
+    overflow: hidden; /* Clip the gradient overlay */
+  }
+  .bubble-options::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to left, #f7f7fb 0%, rgba(247, 247, 251, 0) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
 }
 
 /* Options grid inside ONE bubble (mobile-friendly, less scrolling) */
@@ -760,11 +779,11 @@ button {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 8px;
+    padding-right: 20px; /* Extra padding so last chip is partially visible, hinting more content */
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Hide scrollbar Firefox */
     width: auto;
     margin-right: -12px; /* Pull to edge */
-    padding-right: 12px;
   }
   .options-grid::-webkit-scrollbar {
     display: none; /* Hide scrollbar Chrome/Safari */
@@ -772,6 +791,8 @@ button {
   .options-grid .suggestion-chip {
     flex: 0 0 auto;
     white-space: nowrap;
+    position: relative;
+    z-index: 0; /* Behind the gradient overlay */
   }
 }
 
