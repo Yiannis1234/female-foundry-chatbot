@@ -434,6 +434,7 @@ function attachWelcomeListeners() {
       if (nameInput) nameInput.focus();
       if (topBar) topBar.classList.remove("hidden");
       if (appContainer) appContainer.classList.add("panel-active");
+      document.body.classList.add("show-bg");
     });
   }
 
@@ -455,6 +456,7 @@ function attachWelcomeListeners() {
         topBar.classList.add("hidden");
       }
       if (appContainer) appContainer.classList.remove("panel-active");
+      document.body.classList.remove("show-bg");
       switchView("welcome");
     });
   }

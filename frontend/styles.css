@@ -28,6 +28,11 @@ body {
   -webkit-text-size-adjust: 100% !important;
   -ms-text-size-adjust: 100% !important;
   text-size-adjust: 100% !important;
+  transition: background-color 0.3s ease;
+}
+
+body.show-bg {
+  background-color: var(--bg-soft);
 }
 
 .hidden {
@@ -174,7 +179,7 @@ button {
 .top-links a {
   text-decoration: none;
   color: var(--text-dark);
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   margin-left: 26px;
   margin-right: 52px;
   transition: color 0.2s;
