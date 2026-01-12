@@ -52,12 +52,12 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #7c63ff, #fd72c7);
+      background: linear-gradient(135deg, #e0002b, #b50021);
       color: white;
       border: none;
       cursor: pointer !important;
       pointer-events: auto !important;
-      box-shadow: 0 4px 20px rgba(124, 99, 255, 0.4);
+      box-shadow: 0 4px 20px rgba(224, 0, 43, 0.35);
       display: flex !important;
       align-items: center;
       justify-content: center;
@@ -104,8 +104,8 @@
     /* Header with controls - compact for iframe */
     .chat-window-header {
       padding: 6px 10px;
-      background: linear-gradient(135deg, #7c63ff, #fd72c7);
-      color: white;
+      background: #ffffff;
+      color: #0f0f0f;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -113,13 +113,14 @@
       min-height: 36px;
       margin: 0;
       box-sizing: border-box;
+      border-bottom: 1px solid #e6e6e6;
       position: relative;
       z-index: 1000 !important;
       pointer-events: auto !important;
     }
 
     .chat-window-header h3 {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin: 0;
       flex: 1;
@@ -137,19 +138,19 @@
     }
 
     .chat-window-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
+      background: #ffffff;
+      border: 1px solid #e0002b;
+      color: #e0002b;
       width: 20px;
       height: 20px;
-      border-radius: 50%;
+      border-radius: 6px;
       cursor: pointer !important;
       pointer-events: auto !important;
       font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
       font-weight: bold;
       flex-shrink: 0;
       margin: 0;
@@ -159,11 +160,13 @@
     }
     
     .chat-window-btn:hover {
-      background: rgba(255, 255, 255, 0.3) !important;
+      background: #ffe6ec !important;
+      border-color: #b50021 !important;
     }
     
     .chat-window-btn:active {
-      background: rgba(255, 255, 255, 0.4) !important;
+      background: #ffd1dc !important;
+      border-color: #b50021 !important;
     }
 
     .chat-window-btn:hover {
@@ -437,7 +440,7 @@
     <!-- Chat Window (Fills iframe when open) -->
     <div id="ff-chatbot-window">
       <div class="chat-window-header">
-        <h3>Female Foundry Assistant</h3>
+        <h3>Index Chat</h3>
         <div class="chat-window-actions">
           <button class="chat-window-btn" id="ff-minimize-btn" title="Minimize" onclick="window.ffMinimizeChat && window.ffMinimizeChat(event)">−</button>
           <button class="chat-window-btn" id="ff-close-btn" title="Close" onclick="window.ffCloseChat && window.ffCloseChat(event)">✕</button>
@@ -446,9 +449,9 @@
       <div class="chat-window-content">
         <iframe 
           id="ff-chatbot-iframe"
-          src="https://srv1079042.hstgr.cloud/?v=108"
+          src="https://srv1079042.hstgr.cloud/?v=110"
           allow="microphone; camera"
-          title="Female Foundry Chatbot"
+          title="Index Chat"
           scrolling="no"
           style="width: 100%; height: 100%; border: none;"
         ></iframe>

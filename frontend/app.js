@@ -1,4 +1,6 @@
 const API_BASE = "/api";
+const BOT_AVATAR = "IX";
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // State
 let sessionId = null;
@@ -53,42 +55,42 @@ const PRIMARY_LIST = [
 const DASHBOARD_CARD_META = {
   "The Era of Abundance": {
     icon: "🌌",
-    gradient: "linear-gradient(135deg, #7c63ff, #a977ff)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "Learn how AI is redefining how female founders build and solve the next generation of problems.",
     link: null,
   },
   "Key Insights": {
     icon: "💡",
-    gradient: "linear-gradient(135deg, #5bc9ff, #4f79ff)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
     link: null,
   },
   Idea: {
     icon: "✨",
-    gradient: "linear-gradient(135deg, #ffa26b, #ff5a7a)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
     link: null,
   },
   "Fundraising trends": {
     icon: "📈",
-    gradient: "linear-gradient(135deg, #7adca0, #3ab98f)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
     link: null,
   },
   "Behind the Index": {
     icon: "🤝",
-    gradient: "linear-gradient(135deg, #fbc93a, #ff8f5a)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
     link: null,
   },
   "About Female Foundry": {
     icon: "🏛️",
-    gradient: "linear-gradient(135deg, #cfd8ff, #9eaeff)",
+    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
     description:
       "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
     link: null,
@@ -689,7 +691,13 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     
     if (data.messages && data.messages.length > 0) {
       console.log('[DEBUG] Adding', data.messages.length, 'messages');
-      data.messages.forEach((msg) => addMessage(msg.role, msg.content, false));
+      for (let i = 0; i < data.messages.length; i++) {
+        const msg = data.messages[i];
+        addMessage(msg.role, msg.content, false);
+        if (i < data.messages.length - 1) {
+          await sleep(380);
+        }
+      }
     } else {
       console.log('[DEBUG] No messages in response');
     }
@@ -726,14 +734,22 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
   console.log('[DEBUG] Adding', segments.length, 'message segments');
 
   let firstMsgDiv = null;
-  
-  segments.forEach((segment, index) => {
+
+  const totalSegments = segments.length;
+  const appendSegment = (segment, index) => {
     const msgDiv = document.createElement("div");
     msgDiv.className = `chat-message ${role}`;
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
-    avatar.textContent = role === "bot" ? "FF" : "You";
+    if (role === "bot") {
+      avatar.textContent = totalSegments > 1 && index > 0 ? "" : BOT_AVATAR;
+      if (totalSegments > 1 && index > 0) {
+        avatar.classList.add("avatar-placeholder");
+      }
+    } else {
+      avatar.textContent = "You";
+    }
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
@@ -748,7 +764,22 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     if (index === 0) {
       firstMsgDiv = msgDiv;
     }
-  });
+
+    // Always scroll to keep latest bubble visible
+    requestAnimationFrame(() => {
+      if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    });
+  };
+
+  if (role === "bot" && totalSegments > 1) {
+    segments.forEach((segment, index) => {
+      setTimeout(() => appendSegment(segment, index), index * 420);
+    });
+  } else {
+    appendSegment(segments[0], 0);
+  }
   
   // If this is a user message, store it for scroll targeting
   if (role === "user" && firstMsgDiv) {
@@ -833,7 +864,7 @@ function renderChatOptions(options) {
   promptDiv.className = "chat-message bot options-prompt";
   const promptAvatar = document.createElement("div");
   promptAvatar.className = "avatar";
-  promptAvatar.textContent = "FF";
+  promptAvatar.textContent = BOT_AVATAR;
   const promptBubble = document.createElement("div");
   promptBubble.className = "bubble";
   promptBubble.innerHTML = "What would you like to explore?";
@@ -847,7 +878,7 @@ function renderChatOptions(options) {
 
   const avatar = document.createElement("div");
   avatar.className = "avatar";
-  avatar.textContent = "FF";
+  avatar.textContent = BOT_AVATAR;
 
   const bubble = document.createElement("div");
   bubble.className = "bubble bubble-options";
