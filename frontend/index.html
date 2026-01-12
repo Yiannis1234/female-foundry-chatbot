@@ -19,14 +19,14 @@
       }
     }
   </style>
-    <link rel="stylesheet" href="/styles.css?v=112" />
+    <link rel="stylesheet" href="/styles.css?v=113" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script defer src="/app.js?v=112"></script>
+    <script defer src="/app.js?v=113"></script>
   </head>
   <body>
     <div class="app-container">
@@ -34,8 +34,8 @@
       <!-- Header (Always visible except maybe on welcome screen, but good to have) -->
       <header class="top-bar">
         <div class="brand">
-          <span class="brand-icon">IX</span>
-          <span class="brand-name">Index Chat</span>
+          <span class="brand-icon spark-icon" aria-hidden="true"></span>
+          <span class="brand-name">Ask the Index</span>
         </div>
         <nav class="top-links">
           <a href="mailto:HELLO@FEMALEFOUNDRY.CO" aria-label="Email">
@@ -49,7 +49,8 @@
         <!-- VIEW 1: WELCOME / NAME INPUT -->
         <section id="view-welcome" class="view">
           <div class="welcome-content">
-            <form id="name-form" class="fade-in delay-1">
+            <button id="ask-index-btn" class="ask-index-btn">Ask the Index</button>
+            <form id="name-form" class="fade-in delay-1 hidden">
               <div class="input-wrapper">
                 <input type="text" id="name-input" placeholder="Hey, what's your name?" autocomplete="off" required />
                 <button type="submit" class="name-submit-btn">Go</button>

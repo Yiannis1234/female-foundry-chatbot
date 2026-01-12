@@ -16,6 +16,7 @@ const views = {
 
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
+const askIndexBtn = document.getElementById("ask-index-btn");
 const userNameDisplay = document.getElementById("user-name-display");
 
 const dashboardOptions = document.getElementById("dashboard-options");
@@ -419,6 +420,14 @@ function attachWelcomeListeners() {
     nameForm.addEventListener("submit", (e) => {
       e.preventDefault();
       submitName();
+    });
+  }
+
+  if (askIndexBtn) {
+    askIndexBtn.addEventListener("click", () => {
+      askIndexBtn.classList.add("hidden");
+      if (nameForm) nameForm.classList.remove("hidden");
+      if (nameInput) nameInput.focus();
     });
   }
 
