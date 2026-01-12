@@ -447,6 +447,8 @@ async function submitName() {
 
   userName = name;
   if (userNameDisplay) userNameDisplay.textContent = name;
+  if (askIndexBtn) askIndexBtn.classList.add("hidden");
+  if (nameForm) nameForm.classList.add("hidden");
 
   try {
     await startSession();

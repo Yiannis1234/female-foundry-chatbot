@@ -260,8 +260,12 @@ button {
 
 .welcome-content {
   text-align: center;
-  max-width: 500px;
+  max-width: 520px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
 }
 
 .welcome-content h1 {
@@ -270,8 +274,42 @@ button {
   color: #1a1a1a;
 }
 
+.ask-index-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brand-red);
+  background: #fff;
+  color: var(--brand-red);
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ask-index-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+  background: #fff6f6;
+}
+
+.ask-index-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.ask-index-btn .spark-icon {
+  width: 20px;
+  height: 20px;
+}
+
 #name-form {
   width: 100%;
+  display: block;
 }
 
 .input-wrapper {
