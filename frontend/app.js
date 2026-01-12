@@ -15,6 +15,7 @@ const views = {
 };
 
 const topBar = document.querySelector(".top-bar");
+const appContainer = document.querySelector(".app-container");
 
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
@@ -432,6 +433,7 @@ function attachWelcomeListeners() {
       if (nameForm) nameForm.classList.remove("hidden");
       if (nameInput) nameInput.focus();
       if (topBar) topBar.classList.remove("hidden");
+      if (appContainer) appContainer.classList.add("panel-active");
     });
   }
 
@@ -452,6 +454,7 @@ function attachWelcomeListeners() {
       if (topBar) {
         topBar.classList.add("hidden");
       }
+      if (appContainer) appContainer.classList.remove("panel-active");
       switchView("welcome");
     });
   }
