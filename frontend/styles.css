@@ -110,6 +110,9 @@ button {
   background: transparent;
   color: var(--text-dark);
 }
+.top-bar.hidden {
+  display: none !important;
+}
 
 .brand {
   display: flex;
@@ -169,8 +172,8 @@ button {
 .top-links a {
   text-decoration: none;
   color: var(--text-dark);
-  font-size: 1.1rem;
-  margin-left: 20px;
+  font-size: 1.3rem;
+  margin-left: 26px;
   transition: color 0.2s;
   white-space: nowrap;
   visibility: visible !important;

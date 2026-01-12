@@ -14,6 +14,8 @@ const views = {
   chat: document.getElementById("view-chat"),
 };
 
+const topBar = document.querySelector(".top-bar");
+
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
 const askIndexBtn = document.getElementById("ask-index-btn");
@@ -429,6 +431,7 @@ function attachWelcomeListeners() {
       askIndexBtn.classList.add("hidden");
       if (nameForm) nameForm.classList.remove("hidden");
       if (nameInput) nameInput.focus();
+      if (topBar) topBar.classList.remove("hidden");
     });
   }
 
@@ -445,6 +448,9 @@ function attachWelcomeListeners() {
       }
       if (askIndexBtn) {
         askIndexBtn.classList.remove("hidden");
+      }
+      if (topBar) {
+        topBar.classList.add("hidden");
       }
       switchView("welcome");
     });
