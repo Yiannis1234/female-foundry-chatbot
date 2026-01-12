@@ -30,6 +30,10 @@ body {
   text-size-adjust: 100% !important;
 }
 
+.hidden {
+  display: none !important;
+}
+
 a,
 a:visited,
 a:hover,
@@ -165,7 +169,7 @@ button {
 .top-links a {
   text-decoration: none;
   color: var(--text-dark);
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin-left: 20px;
   transition: color 0.2s;
   white-space: nowrap;
@@ -305,6 +309,31 @@ button {
 .ask-index-btn .spark-icon {
   width: 20px;
   height: 20px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #111;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.close-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.12);
 }
 
 #name-form {

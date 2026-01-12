@@ -17,6 +17,7 @@ const views = {
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
 const askIndexBtn = document.getElementById("ask-index-btn");
+const closeChatBtn = document.getElementById("close-chat");
 const userNameDisplay = document.getElementById("user-name-display");
 
 const dashboardOptions = document.getElementById("dashboard-options");
@@ -428,6 +429,24 @@ function attachWelcomeListeners() {
       askIndexBtn.classList.add("hidden");
       if (nameForm) nameForm.classList.remove("hidden");
       if (nameInput) nameInput.focus();
+    });
+  }
+
+  if (closeChatBtn) {
+    closeChatBtn.addEventListener("click", () => {
+      // Simple close: reset to welcome state and clear session
+      ffClearPersistedSession();
+      localHistory = [];
+      sessionId = null;
+      userName = "";
+      if (nameInput) nameInput.value = "";
+      if (nameForm) {
+        nameForm.classList.add("hidden");
+      }
+      if (askIndexBtn) {
+        askIndexBtn.classList.remove("hidden");
+      }
+      switchView("welcome");
     });
   }
 
