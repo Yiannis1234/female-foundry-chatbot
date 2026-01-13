@@ -736,7 +736,10 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     hideTyping();
 
     if (pinTop) {
-      forceScrollToTop();
+      // Scroll to absolute top immediately
+      if (chatMessages) {
+        chatMessages.scrollTop = 0;
+      }
       notifyParentPreventScroll();
     }
     
@@ -756,7 +759,12 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     renderChatOptions(data.options);
 
     if (pinTop) {
-      forceScrollToTop();
+      // Ensure we stay at top after rendering
+      requestAnimationFrame(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = 0;
+        }
+      });
     }
   } catch (err) {
     console.error('[DEBUG] API error:', err);
