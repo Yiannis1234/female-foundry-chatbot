@@ -307,6 +307,7 @@ let latestUserMessage = null;
 let latestScrollTarget = null;
 let latestScrollAlign = "start"; // "start" | "end"
 let _pendingAutoScroll = false;
+let _pinToTop = false; // When true, prevent auto-scroll to bottom
 
 function setScrollTarget(el, align = "start") {
   latestScrollTarget = el;
@@ -685,11 +686,17 @@ async function restartExperience() {
 }
 
 async function handleDashboardSelection(text) {
-  forceScrollToTop();
   switchView("chat");
+  // Scroll to absolute top immediately
+  if (chatMessages) {
+    chatMessages.scrollTop = 0;
+  }
   addMessage("user", text, false);
   await sendMessageToApi(text, { pinTop: true });
-  forceScrollToTop();
+  // Keep at top after messages render
+  if (chatMessages) {
+    chatMessages.scrollTop = 0;
+  }
 }
 
 if (dashboardSearchBtn) {
@@ -717,6 +724,9 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     addMessage("bot", "Session not started. Please refresh and try again.", false);
     return;
   }
+
+  // Set pin to top flag
+  _pinToTop = pinTop;
 
   showTyping();
   try {
@@ -764,7 +774,11 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         if (chatMessages) {
           chatMessages.scrollTop = 0;
         }
+        // Reset flag after all messages are rendered
+        _pinToTop = false;
       });
+    } else {
+      _pinToTop = false;
     }
   } catch (err) {
     console.error('[DEBUG] API error:', err);
@@ -824,12 +838,14 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
       firstMsgDiv = msgDiv;
     }
 
-    // Always scroll to keep latest bubble visible
-    requestAnimationFrame(() => {
-      if (chatMessages) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-    });
+    // Only auto-scroll if not pinning to top
+    if (!_pinToTop) {
+      requestAnimationFrame(() => {
+        if (chatMessages) {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      });
+    }
   };
 
   if (role === "bot" && totalSegments > 1) {
@@ -846,8 +862,8 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     setScrollTarget(latestUserMessage, "start");
   }
 
-  // Only scroll to bottom if explicitly requested (user typing)
-  if (shouldScroll) {
+  // Only scroll to bottom if explicitly requested (user typing) and not pinning to top
+  if (shouldScroll && !_pinToTop) {
     requestAnimationFrame(() => {
       if (chatMessages) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1188,5 +1204,13 @@ if (resetBtn) {
 }
 
 if (restartFlowBtn) {
-  restartFlowBtn.addEventListener("click", () => restartExperience());
+  restartFlowBtn.addEventListener("click", () => {
+    // Go back to name input view, don't restart everything
+    if (nameForm) nameForm.classList.remove("hidden");
+    if (askIndexBtn) askIndexBtn.classList.add("hidden");
+    switchView("welcome");
+    // Reset to initial state but keep session
+    if (nameInput) nameInput.value = "";
+    if (nameInput) nameInput.focus();
+  });
 }
