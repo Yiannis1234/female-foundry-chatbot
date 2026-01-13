@@ -1040,14 +1040,14 @@ function renderChatOptions(options) {
     if (OPTION_LINKS[opt]) {
       chip = document.createElement("a");
       chip.className = "suggestion-chip";
-      chip.textContent = `💬 ${opt}`;
+      chip.textContent = opt;
       chip.href = OPTION_LINKS[opt];
       chip.target = "_top";
       chip.rel = "noopener noreferrer";
     } else {
       chip = document.createElement("button");
       chip.className = "suggestion-chip";
-      chip.textContent = `💬 ${opt}`;
+      chip.textContent = opt;
 
       const run = () => {
         forceScrollToTop();
@@ -1113,9 +1113,9 @@ function renderPrimaryFooterOptions(options) {
   options.forEach((opt) => {
     // If it's a link, use Method 1: <a target="_top">
     if (OPTION_LINKS[opt]) {
-      const link = document.createElement("a");
+      const       link = document.createElement("a");
       link.className = "footer-chip";
-      link.textContent = `💬 ${opt}`;
+      link.textContent = opt;
       link.href = OPTION_LINKS[opt];
       link.target = "_top"; // Breaks out of iframe and navigates top window
       
@@ -1130,9 +1130,9 @@ function renderPrimaryFooterOptions(options) {
       };
       primaryFooterOptions.appendChild(link);
     } else {
-      const btn = document.createElement("button");
+      const       btn = document.createElement("button");
       btn.className = "footer-chip";
-      btn.textContent = `💬 ${opt}`;
+      btn.textContent = opt;
       
       const clickHandler = () => {
         console.log('[DEBUG] Footer button clicked:', opt);
