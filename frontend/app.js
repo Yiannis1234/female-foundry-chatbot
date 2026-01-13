@@ -405,6 +405,16 @@ function switchView(viewName) {
 
   currentView = viewName;
 
+  // Show/hide header based on view
+  const topBar = document.querySelector(".top-bar");
+  if (viewName === "welcome") {
+    if (topBar) topBar.classList.add("hidden");
+    document.body.classList.remove("show-bg");
+  } else {
+    if (topBar) topBar.classList.remove("hidden");
+    document.body.classList.add("show-bg");
+  }
+
   // Persist last view so we can restore UX after navigating between Wix pages
   try {
     ffSet("ff_last_view", viewName);
@@ -432,9 +442,9 @@ function attachWelcomeListeners() {
       askIndexBtn.classList.add("hidden");
       if (nameForm) nameForm.classList.remove("hidden");
       if (nameInput) nameInput.focus();
-      if (topBar) topBar.classList.remove("hidden");
       if (appContainer) appContainer.classList.add("panel-active");
       document.body.classList.add("show-bg");
+      // Header will be shown automatically when switching to dashboard/chat
     });
   }
 

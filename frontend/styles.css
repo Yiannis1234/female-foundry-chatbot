@@ -586,7 +586,7 @@ button {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns, 2 rows for 6 items */
+  grid-template-columns: repeat(2, 1fr); /* 2 columns, 3 rows for 6 items */
   gap: 20px;
   width: 100%;
   padding: 10px 0 30px;
