@@ -706,26 +706,29 @@ async function handleDashboardSelection(text) {
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
   
-  // Force scroll to absolute top (0) - this is what user wants to see
-  const lockToTop = () => {
-    if (chatMessages) {
-      chatMessages.scrollTop = 0;
-    }
-  };
-  
-  lockToTop();
-  
   // Add user message (pinToTop is already true, so it won't auto-scroll)
   addMessage("user", text, false);
   
-  // Aggressively lock to top - multiple attempts
-  lockToTop();
-  setTimeout(lockToTop, 10);
-  setTimeout(lockToTop, 30);
-  setTimeout(lockToTop, 60);
-  setTimeout(lockToTop, 100);
-  setTimeout(lockToTop, 150);
-  setTimeout(lockToTop, 200);
+  // Wait a moment for DOM to update
+  await sleep(50);
+  
+  // Scroll so the user message appears at the TOP of the visible area
+  const lockUserMessageToTop = () => {
+    if (latestUserMessage && chatMessages) {
+      // Direct child of chatMessages, so offsetTop is correct
+      const offset = latestUserMessage.offsetTop;
+      chatMessages.scrollTop = Math.max(0, offset - 8);
+    }
+  };
+  
+  // Aggressively lock user message to top - multiple attempts to survive layout changes
+  lockUserMessageToTop();
+  setTimeout(lockUserMessageToTop, 10);
+  setTimeout(lockUserMessageToTop, 30);
+  setTimeout(lockUserMessageToTop, 60);
+  setTimeout(lockUserMessageToTop, 100);
+  setTimeout(lockUserMessageToTop, 150);
+  setTimeout(lockUserMessageToTop, 200);
   
   await sendMessageToApi(text, { pinTop: true });
 }
@@ -776,16 +779,19 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     console.log('[DEBUG] API response:', data);
     hideTyping();
 
-    if (pinTop) {
-      // Lock scroll to absolute top (0)
-      const lockToTop = () => {
-        if (chatMessages) chatMessages.scrollTop = 0;
+    if (pinTop && latestUserMessage) {
+      // Lock user message to top of visible area
+      const lockUserToTop = () => {
+        if (latestUserMessage && chatMessages) {
+          const offset = latestUserMessage.offsetTop;
+          chatMessages.scrollTop = Math.max(0, offset - 8);
+        }
       };
-      lockToTop();
-      setTimeout(lockToTop, 10);
-      setTimeout(lockToTop, 30);
-      setTimeout(lockToTop, 60);
-      setTimeout(lockToTop, 100);
+      lockUserToTop();
+      setTimeout(lockUserToTop, 10);
+      setTimeout(lockUserToTop, 30);
+      setTimeout(lockUserToTop, 60);
+      setTimeout(lockUserToTop, 100);
       notifyParentPreventScroll();
     }
     
@@ -794,12 +800,18 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
         addMessage(msg.role, msg.content, false);
-        // Lock to absolute top after each bot message when pinTop is active
-        if (pinTop) {
-          if (chatMessages) chatMessages.scrollTop = 0;
-          setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 10);
-          setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 30);
-          setTimeout(() => { if (chatMessages) chatMessages.scrollTop = 0; }, 60);
+        // Keep user message at top after each bot message when pinTop is active
+        if (pinTop && latestUserMessage) {
+          const lockUserToTop = () => {
+            if (latestUserMessage && chatMessages) {
+              const offset = latestUserMessage.offsetTop;
+              chatMessages.scrollTop = Math.max(0, offset - 8);
+            }
+          };
+          lockUserToTop();
+          setTimeout(lockUserToTop, 10);
+          setTimeout(lockUserToTop, 30);
+          setTimeout(lockUserToTop, 60);
         }
         if (i < data.messages.length - 1) {
           await sleep(380);
@@ -811,23 +823,26 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
 
     renderChatOptions(data.options);
 
-    if (pinTop) {
-      // Lock to absolute top after all messages render - multiple attempts
-      const lockToTop = () => {
-        if (chatMessages) chatMessages.scrollTop = 0;
+    if (pinTop && latestUserMessage) {
+      // Keep user message at top after all messages render - multiple attempts
+      const lockUserToTop = () => {
+        if (latestUserMessage && chatMessages) {
+          const offset = latestUserMessage.offsetTop;
+          chatMessages.scrollTop = Math.max(0, offset - 8);
+        }
       };
       setTimeout(() => {
-        lockToTop();
-        setTimeout(lockToTop, 10);
-        setTimeout(lockToTop, 30);
-        setTimeout(lockToTop, 60);
-        setTimeout(lockToTop, 100);
+        lockUserToTop();
+        setTimeout(lockUserToTop, 10);
+        setTimeout(lockUserToTop, 30);
+        setTimeout(lockUserToTop, 60);
+        setTimeout(lockUserToTop, 100);
         requestAnimationFrame(() => {
-          lockToTop();
+          lockUserToTop();
           requestAnimationFrame(() => {
-            lockToTop();
+            lockUserToTop();
             setTimeout(() => {
-              lockToTop();
+              lockUserToTop();
               // Reset flag after all messages are rendered
               _pinToTop = false;
             }, 40);
