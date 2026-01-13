@@ -19,14 +19,14 @@
       }
     }
   </style>
-    <link rel="stylesheet" href="/styles.css?v=117" />
+    <link rel="stylesheet" href="/styles.css?v=118" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <script defer src="/app.js?v=117"></script>
+    <script defer src="/app.js?v=118"></script>
   </head>
   <body>
     <div class="app-container">
@@ -50,7 +50,10 @@
         <!-- VIEW 1: WELCOME / NAME INPUT -->
         <section id="view-welcome" class="view">
           <div class="welcome-content">
-            <button id="ask-index-btn" class="ask-index-btn">Ask the Index</button>
+            <button id="ask-index-btn" class="ask-index-btn">
+              <span class="spark-icon-btn"></span>
+              Ask the Index
+            </button>
             <form id="name-form" class="fade-in delay-1 hidden">
               <div class="input-wrapper">
                 <input type="text" id="name-input" placeholder="Hey, what's your name?" autocomplete="off" required />
@@ -64,8 +67,8 @@
         <section id="view-dashboard" class="view hidden">
             <div class="dashboard-container-inner">
               <div class="dashboard-top-row">
-                <!-- Back button hidden on dashboard -->
-                <button id="restartFlow" class="ghost-back-btn" type="button" style="display:none;">← Back</button>
+                <!-- Back button visible on dashboard -->
+                <button id="restartFlow" class="ghost-back-btn" type="button">← Back</button>
                 <div class="dashboard-header">
                   <h1>Hi, <span id="user-name-display">there</span>!</h1>
                   <p class="subtitle">
