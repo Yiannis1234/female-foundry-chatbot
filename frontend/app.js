@@ -337,15 +337,17 @@ function scrollMessageToTop(messageElement) {
   if (!messageElement || !chatMessages) return;
   if (!chatMessages.contains(messageElement)) return;
   
-  // Calculate offset from top of container
-  let offset = 0;
-  let element = messageElement;
-  while (element && element !== chatMessages && element !== document.body) {
-    offset += element.offsetTop;
-    element = element.offsetParent;
-  }
-  // Scroll so message is at top (with small padding)
-  chatMessages.scrollTop = Math.max(0, offset - 8);
+  // Use getBoundingClientRect for accurate position calculation
+  const containerRect = chatMessages.getBoundingClientRect();
+  const messageRect = messageElement.getBoundingClientRect();
+  
+  // Calculate current scroll position needed to put message at top
+  const currentScroll = chatMessages.scrollTop;
+  const messageTopRelativeToContainer = messageRect.top - containerRect.top;
+  const newScrollTop = currentScroll + messageTopRelativeToContainer - 8; // 8px padding
+  
+  // Set scroll position
+  chatMessages.scrollTop = Math.max(0, newScrollTop);
 }
 
 function forceScrollToTop() {
@@ -704,26 +706,35 @@ async function restartExperience() {
 async function handleDashboardSelection(text) {
   switchView("chat");
   
-  // FIRST: Reset scroll to top before adding message
+  // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
+  _pinToTop = true;
+  
+  // Reset scroll to top before adding message
   if (chatMessages) {
     chatMessages.scrollTop = 0;
   }
   
-  // Add user message
+  // Add user message (pinToTop is already true, so it won't auto-scroll)
   addMessage("user", text, false);
   
-  // Wait for DOM to update, then scroll user message to absolute top
-  await sleep(150);
-  
-  // Scroll user message to top using helper function
+  // Immediately scroll user message to top - don't wait
   if (latestUserMessage) {
     scrollMessageToTop(latestUserMessage);
-    // Also try scrollIntoView as backup
-    latestUserMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
-    // Force scroll again after a moment
-    setTimeout(() => scrollMessageToTop(latestUserMessage), 50);
-    setTimeout(() => scrollMessageToTop(latestUserMessage), 150);
   }
+  
+  // Keep scrolling to top multiple times to ensure it works
+  setTimeout(() => {
+    if (latestUserMessage) scrollMessageToTop(latestUserMessage);
+  }, 10);
+  setTimeout(() => {
+    if (latestUserMessage) scrollMessageToTop(latestUserMessage);
+  }, 50);
+  setTimeout(() => {
+    if (latestUserMessage) {
+      scrollMessageToTop(latestUserMessage);
+      latestUserMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, 100);
   
   await sendMessageToApi(text, { pinTop: true });
 }
@@ -791,9 +802,12 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
         addMessage(msg.role, msg.content, false);
-        // Keep user message at top after each bot message when pinTop is active
+        // Aggressively keep user message at top after each bot message when pinTop is active
         if (pinTop && latestUserMessage) {
+          scrollMessageToTop(latestUserMessage);
+          setTimeout(() => scrollMessageToTop(latestUserMessage), 10);
           setTimeout(() => scrollMessageToTop(latestUserMessage), 50);
+          setTimeout(() => scrollMessageToTop(latestUserMessage), 100);
         }
         if (i < data.messages.length - 1) {
           await sleep(380);
