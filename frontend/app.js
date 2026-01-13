@@ -690,23 +690,29 @@ async function handleDashboardSelection(text) {
   // Add user message first
   addMessage("user", text, false);
   
-  // Force scroll user message to absolute top - use multiple attempts to ensure it works
+  // Force scroll user message to absolute top - use getBoundingClientRect for accuracy
   const scrollToUserMessage = () => {
     if (latestUserMessage && chatMessages) {
-      // Get the offset of the user message relative to chatMessages
-      const userMsgOffset = latestUserMessage.offsetTop;
-      // Scroll so user message is at the very top
-      chatMessages.scrollTop = userMsgOffset - 8; // Small padding
+      const containerRect = chatMessages.getBoundingClientRect();
+      const messageRect = latestUserMessage.getBoundingClientRect();
+      // Calculate how much we need to scroll
+      const scrollAmount = messageRect.top - containerRect.top + chatMessages.scrollTop - 8;
+      chatMessages.scrollTop = Math.max(0, scrollAmount);
     }
   };
   
-  // Try immediately
+  // Try multiple times to ensure it works
   scrollToUserMessage();
-  // Try after a short delay
+  setTimeout(scrollToUserMessage, 10);
   setTimeout(scrollToUserMessage, 50);
-  // Try after DOM settles
+  setTimeout(scrollToUserMessage, 100);
+  setTimeout(scrollToUserMessage, 200);
   requestAnimationFrame(() => {
-    requestAnimationFrame(scrollToUserMessage);
+    scrollToUserMessage();
+    requestAnimationFrame(() => {
+      scrollToUserMessage();
+      setTimeout(scrollToUserMessage, 50);
+    });
   });
   
   await sendMessageToApi(text, { pinTop: true });
@@ -759,16 +765,23 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     hideTyping();
 
     if (pinTop && latestUserMessage) {
-      // Scroll to user message (so it appears at top) - use offsetTop for reliability
+      // Scroll to user message (so it appears at top) - use getBoundingClientRect for accuracy
       const scrollToUser = () => {
         if (chatMessages && latestUserMessage) {
-          const userMsgOffset = latestUserMessage.offsetTop;
-          chatMessages.scrollTop = userMsgOffset - 8;
+          const containerRect = chatMessages.getBoundingClientRect();
+          const messageRect = latestUserMessage.getBoundingClientRect();
+          const scrollAmount = messageRect.top - containerRect.top + chatMessages.scrollTop - 8;
+          chatMessages.scrollTop = Math.max(0, scrollAmount);
         }
       };
       scrollToUser();
+      setTimeout(scrollToUser, 10);
       setTimeout(scrollToUser, 50);
-      requestAnimationFrame(() => requestAnimationFrame(scrollToUser));
+      setTimeout(scrollToUser, 100);
+      requestAnimationFrame(() => {
+        scrollToUser();
+        requestAnimationFrame(scrollToUser);
+      });
       notifyParentPreventScroll();
     }
     
@@ -781,8 +794,10 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         if (pinTop && latestUserMessage && chatMessages) {
           setTimeout(() => {
             if (latestUserMessage && chatMessages) {
-              const userMsgOffset = latestUserMessage.offsetTop;
-              chatMessages.scrollTop = userMsgOffset - 8;
+              const containerRect = chatMessages.getBoundingClientRect();
+              const messageRect = latestUserMessage.getBoundingClientRect();
+              const scrollAmount = messageRect.top - containerRect.top + chatMessages.scrollTop - 8;
+              chatMessages.scrollTop = Math.max(0, scrollAmount);
             }
           }, 50);
         }
@@ -800,16 +815,26 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       // Ensure user message stays at top after all messages render - multiple attempts
       const scrollToUser = () => {
         if (chatMessages && latestUserMessage) {
-          const userMsgOffset = latestUserMessage.offsetTop;
-          chatMessages.scrollTop = userMsgOffset - 8;
+          const containerRect = chatMessages.getBoundingClientRect();
+          const messageRect = latestUserMessage.getBoundingClientRect();
+          const scrollAmount = messageRect.top - containerRect.top + chatMessages.scrollTop - 8;
+          chatMessages.scrollTop = Math.max(0, scrollAmount);
         }
       };
       setTimeout(() => {
         scrollToUser();
+        setTimeout(scrollToUser, 10);
         setTimeout(scrollToUser, 50);
-        requestAnimationFrame(() => requestAnimationFrame(scrollToUser));
-        // Reset flag after all messages are rendered
-        _pinToTop = false;
+        setTimeout(scrollToUser, 100);
+        requestAnimationFrame(() => {
+          scrollToUser();
+          requestAnimationFrame(() => {
+            scrollToUser();
+            setTimeout(scrollToUser, 50);
+            // Reset flag after all messages are rendered
+            _pinToTop = false;
+          });
+        });
       }, 150);
     } else {
       _pinToTop = false;
