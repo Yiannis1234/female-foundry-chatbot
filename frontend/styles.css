@@ -179,7 +179,7 @@ button {
 .top-links a {
   text-decoration: none;
   color: var(--text-dark);
-  font-size: 3rem;
+  font-size: 4.5rem;
   margin-left: 30px;
   margin-right: 60px;
   transition: color 0.2s;
@@ -203,7 +203,7 @@ button {
   }
   
   .top-links a {
-    font-size: 0.85rem !important;
+    font-size: 3.5rem !important;
     margin-left: 12px !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -219,7 +219,7 @@ button {
   }
   
   .top-links a {
-    font-size: 0.8rem !important;
+    font-size: 3rem !important;
     margin-left: 10px !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -1135,8 +1135,9 @@ button {
     font-size: 1.3rem;
   }
 
+  /* Keep 2 columns on tablets, only stack on very small mobile */
   .cards-grid {
-    grid-template-columns: 1fr; /* Stack on mobile */
+    grid-template-columns: repeat(2, 1fr) !important;
   }
   
   .chat-container {
@@ -1207,6 +1208,11 @@ button {
   /* Normal size on small phones */
   body {
     font-size: 16px !important;
+  }
+  
+  /* Stack cards on very small phones only */
+  .cards-grid {
+    grid-template-columns: 1fr !important;
   }
   
   /* Mobile scroll fixes for small phones */
