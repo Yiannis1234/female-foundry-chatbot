@@ -687,16 +687,20 @@ async function restartExperience() {
 
 async function handleDashboardSelection(text) {
   switchView("chat");
-  // Scroll to absolute top immediately
-  if (chatMessages) {
-    chatMessages.scrollTop = 0;
-  }
+  // Add user message first
   addMessage("user", text, false);
-  await sendMessageToApi(text, { pinTop: true });
-  // Keep at top after messages render
-  if (chatMessages) {
-    chatMessages.scrollTop = 0;
+  
+  // Wait for DOM to update, then scroll user message to top
+  await sleep(100);
+  if (latestUserMessage && chatMessages) {
+    const cRect = chatMessages.getBoundingClientRect();
+    const eRect = latestUserMessage.getBoundingClientRect();
+    const current = chatMessages.scrollTop;
+    const delta = eRect.top - cRect.top;
+    chatMessages.scrollTop = Math.max(0, current + delta - 8);
   }
+  
+  await sendMessageToApi(text, { pinTop: true });
 }
 
 if (dashboardSearchBtn) {
@@ -745,11 +749,17 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     console.log('[DEBUG] API response:', data);
     hideTyping();
 
-    if (pinTop) {
-      // Scroll to absolute top immediately
-      if (chatMessages) {
-        chatMessages.scrollTop = 0;
-      }
+    if (pinTop && latestUserMessage) {
+      // Scroll to user message (so it appears at top) after a brief delay
+      setTimeout(() => {
+        if (chatMessages && latestUserMessage) {
+          const cRect = chatMessages.getBoundingClientRect();
+          const eRect = latestUserMessage.getBoundingClientRect();
+          const current = chatMessages.scrollTop;
+          const delta = eRect.top - cRect.top;
+          chatMessages.scrollTop = Math.max(0, current + delta - 8);
+        }
+      }, 50);
       notifyParentPreventScroll();
     }
     
@@ -768,15 +778,19 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
 
     renderChatOptions(data.options);
 
-    if (pinTop) {
-      // Ensure we stay at top after rendering
-      requestAnimationFrame(() => {
-        if (chatMessages) {
-          chatMessages.scrollTop = 0;
+    if (pinTop && latestUserMessage) {
+      // Ensure user message stays at top after all messages render
+      setTimeout(() => {
+        if (chatMessages && latestUserMessage) {
+          const cRect = chatMessages.getBoundingClientRect();
+          const eRect = latestUserMessage.getBoundingClientRect();
+          const current = chatMessages.scrollTop;
+          const delta = eRect.top - cRect.top;
+          chatMessages.scrollTop = Math.max(0, current + delta - 8);
         }
         // Reset flag after all messages are rendered
         _pinToTop = false;
-      });
+      }, 100);
     } else {
       _pinToTop = false;
     }
