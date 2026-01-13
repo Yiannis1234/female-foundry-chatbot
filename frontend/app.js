@@ -336,18 +336,10 @@ function scrollChatToTarget() {
 function scrollMessageToTop(messageElement) {
   if (!messageElement || !chatMessages) return;
   if (!chatMessages.contains(messageElement)) return;
-  
-  // Use getBoundingClientRect for accurate position calculation
-  const containerRect = chatMessages.getBoundingClientRect();
-  const messageRect = messageElement.getBoundingClientRect();
-  
-  // Calculate current scroll position needed to put message at top
-  const currentScroll = chatMessages.scrollTop;
-  const messageTopRelativeToContainer = messageRect.top - containerRect.top;
-  const newScrollTop = currentScroll + messageTopRelativeToContainer - 8; // 8px padding
-  
-  // Set scroll position
-  chatMessages.scrollTop = Math.max(0, newScrollTop);
+
+  // messageElement is a direct child of chatMessages, so offsetTop is relative to the scroll container
+  const offset = messageElement.offsetTop;
+  chatMessages.scrollTop = Math.max(0, offset - 8); // small padding
 }
 
 function forceScrollToTop() {
@@ -720,21 +712,11 @@ async function handleDashboardSelection(text) {
   // Immediately scroll user message to top - don't wait
   if (latestUserMessage) {
     scrollMessageToTop(latestUserMessage);
+    // Repeat a few times to survive DOM/layout changes
+    setTimeout(() => scrollMessageToTop(latestUserMessage), 20);
+    setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
+    setTimeout(() => scrollMessageToTop(latestUserMessage), 160);
   }
-  
-  // Keep scrolling to top multiple times to ensure it works
-  setTimeout(() => {
-    if (latestUserMessage) scrollMessageToTop(latestUserMessage);
-  }, 10);
-  setTimeout(() => {
-    if (latestUserMessage) scrollMessageToTop(latestUserMessage);
-  }, 50);
-  setTimeout(() => {
-    if (latestUserMessage) {
-      scrollMessageToTop(latestUserMessage);
-      latestUserMessage.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
-  }, 100);
   
   await sendMessageToApi(text, { pinTop: true });
 }
@@ -788,8 +770,9 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     if (pinTop && latestUserMessage) {
       // Scroll to user message (so it appears at top)
       scrollMessageToTop(latestUserMessage);
-      setTimeout(() => scrollMessageToTop(latestUserMessage), 50);
-      setTimeout(() => scrollMessageToTop(latestUserMessage), 150);
+      setTimeout(() => scrollMessageToTop(latestUserMessage), 20);
+      setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
+      setTimeout(() => scrollMessageToTop(latestUserMessage), 160);
       requestAnimationFrame(() => {
         scrollMessageToTop(latestUserMessage);
         requestAnimationFrame(() => scrollMessageToTop(latestUserMessage));
@@ -805,9 +788,8 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         // Aggressively keep user message at top after each bot message when pinTop is active
         if (pinTop && latestUserMessage) {
           scrollMessageToTop(latestUserMessage);
-          setTimeout(() => scrollMessageToTop(latestUserMessage), 10);
-          setTimeout(() => scrollMessageToTop(latestUserMessage), 50);
-          setTimeout(() => scrollMessageToTop(latestUserMessage), 100);
+          setTimeout(() => scrollMessageToTop(latestUserMessage), 20);
+          setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
         }
         if (i < data.messages.length - 1) {
           await sleep(380);
@@ -823,8 +805,8 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       // Ensure user message stays at top after all messages render - multiple attempts
       setTimeout(() => {
         scrollMessageToTop(latestUserMessage);
-        setTimeout(() => scrollMessageToTop(latestUserMessage), 50);
-        setTimeout(() => scrollMessageToTop(latestUserMessage), 100);
+        setTimeout(() => scrollMessageToTop(latestUserMessage), 20);
+        setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
         requestAnimationFrame(() => {
           scrollMessageToTop(latestUserMessage);
           requestAnimationFrame(() => {
@@ -833,10 +815,10 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
               scrollMessageToTop(latestUserMessage);
               // Reset flag after all messages are rendered
               _pinToTop = false;
-            }, 50);
+            }, 40);
           });
         });
-      }, 150);
+      }, 120);
     } else {
       _pinToTop = false;
     }
