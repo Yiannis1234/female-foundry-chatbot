@@ -342,6 +342,11 @@ function scrollMessageToTop(messageElement) {
   chatMessages.scrollTop = Math.max(0, offset - 8); // small padding
 }
 
+// Simple top lock helper
+function forceTop() {
+  if (chatMessages) chatMessages.scrollTop = 0;
+}
+
 function forceScrollToTop() {
   // Keep name for legacy calls: this now scrolls to the latest target (user selection or options)
   if (_pendingAutoScroll) return;
@@ -708,6 +713,7 @@ async function handleDashboardSelection(text) {
   
   // Add user message (pinToTop is already true, so it won't auto-scroll)
   addMessage("user", text, false);
+  forceTop();
   
   // Immediately scroll user message to top - don't wait
   if (latestUserMessage) {
@@ -717,6 +723,8 @@ async function handleDashboardSelection(text) {
     setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
     setTimeout(() => scrollMessageToTop(latestUserMessage), 160);
   }
+  // Extra top lock
+  forceTop();
   
   await sendMessageToApi(text, { pinTop: true });
 }
@@ -777,6 +785,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         scrollMessageToTop(latestUserMessage);
         requestAnimationFrame(() => scrollMessageToTop(latestUserMessage));
       });
+      forceTop();
       notifyParentPreventScroll();
     }
     
@@ -790,6 +799,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
           scrollMessageToTop(latestUserMessage);
           setTimeout(() => scrollMessageToTop(latestUserMessage), 20);
           setTimeout(() => scrollMessageToTop(latestUserMessage), 80);
+          forceTop();
         }
         if (i < data.messages.length - 1) {
           await sleep(380);
@@ -813,6 +823,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
             scrollMessageToTop(latestUserMessage);
             setTimeout(() => {
               scrollMessageToTop(latestUserMessage);
+              forceTop();
               // Reset flag after all messages are rendered
               _pinToTop = false;
             }, 40);
@@ -880,13 +891,15 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
       firstMsgDiv = msgDiv;
     }
 
-    // Only auto-scroll if not pinning to top
+    // Only auto-scroll if not pinning to top; otherwise force stay at top
     if (!_pinToTop) {
       requestAnimationFrame(() => {
         if (chatMessages) {
           chatMessages.scrollTop = chatMessages.scrollHeight;
         }
       });
+    } else {
+      forceTop();
     }
   };
 
