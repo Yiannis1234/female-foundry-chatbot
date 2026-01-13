@@ -690,15 +690,24 @@ async function handleDashboardSelection(text) {
   // Add user message first
   addMessage("user", text, false);
   
-  // Wait for DOM to update, then scroll user message to top
-  await sleep(100);
-  if (latestUserMessage && chatMessages) {
-    const cRect = chatMessages.getBoundingClientRect();
-    const eRect = latestUserMessage.getBoundingClientRect();
-    const current = chatMessages.scrollTop;
-    const delta = eRect.top - cRect.top;
-    chatMessages.scrollTop = Math.max(0, current + delta - 8);
-  }
+  // Force scroll user message to absolute top - use multiple attempts to ensure it works
+  const scrollToUserMessage = () => {
+    if (latestUserMessage && chatMessages) {
+      // Get the offset of the user message relative to chatMessages
+      const userMsgOffset = latestUserMessage.offsetTop;
+      // Scroll so user message is at the very top
+      chatMessages.scrollTop = userMsgOffset - 8; // Small padding
+    }
+  };
+  
+  // Try immediately
+  scrollToUserMessage();
+  // Try after a short delay
+  setTimeout(scrollToUserMessage, 50);
+  // Try after DOM settles
+  requestAnimationFrame(() => {
+    requestAnimationFrame(scrollToUserMessage);
+  });
   
   await sendMessageToApi(text, { pinTop: true });
 }
@@ -750,16 +759,16 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     hideTyping();
 
     if (pinTop && latestUserMessage) {
-      // Scroll to user message (so it appears at top) after a brief delay
-      setTimeout(() => {
+      // Scroll to user message (so it appears at top) - use offsetTop for reliability
+      const scrollToUser = () => {
         if (chatMessages && latestUserMessage) {
-          const cRect = chatMessages.getBoundingClientRect();
-          const eRect = latestUserMessage.getBoundingClientRect();
-          const current = chatMessages.scrollTop;
-          const delta = eRect.top - cRect.top;
-          chatMessages.scrollTop = Math.max(0, current + delta - 8);
+          const userMsgOffset = latestUserMessage.offsetTop;
+          chatMessages.scrollTop = userMsgOffset - 8;
         }
-      }, 50);
+      };
+      scrollToUser();
+      setTimeout(scrollToUser, 50);
+      requestAnimationFrame(() => requestAnimationFrame(scrollToUser));
       notifyParentPreventScroll();
     }
     
@@ -768,6 +777,15 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
         addMessage(msg.role, msg.content, false);
+        // Keep user message at top after each bot message when pinTop is active
+        if (pinTop && latestUserMessage && chatMessages) {
+          setTimeout(() => {
+            if (latestUserMessage && chatMessages) {
+              const userMsgOffset = latestUserMessage.offsetTop;
+              chatMessages.scrollTop = userMsgOffset - 8;
+            }
+          }, 50);
+        }
         if (i < data.messages.length - 1) {
           await sleep(380);
         }
@@ -779,18 +797,20 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     renderChatOptions(data.options);
 
     if (pinTop && latestUserMessage) {
-      // Ensure user message stays at top after all messages render
-      setTimeout(() => {
+      // Ensure user message stays at top after all messages render - multiple attempts
+      const scrollToUser = () => {
         if (chatMessages && latestUserMessage) {
-          const cRect = chatMessages.getBoundingClientRect();
-          const eRect = latestUserMessage.getBoundingClientRect();
-          const current = chatMessages.scrollTop;
-          const delta = eRect.top - cRect.top;
-          chatMessages.scrollTop = Math.max(0, current + delta - 8);
+          const userMsgOffset = latestUserMessage.offsetTop;
+          chatMessages.scrollTop = userMsgOffset - 8;
         }
+      };
+      setTimeout(() => {
+        scrollToUser();
+        setTimeout(scrollToUser, 50);
+        requestAnimationFrame(() => requestAnimationFrame(scrollToUser));
         // Reset flag after all messages are rendered
         _pinToTop = false;
-      }, 100);
+      }, 150);
     } else {
       _pinToTop = false;
     }
