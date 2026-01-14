@@ -459,7 +459,6 @@ function attachWelcomeListeners() {
       if (nameForm) nameForm.classList.remove("hidden");
       if (nameInput) nameInput.focus();
       if (appContainer) appContainer.classList.add("panel-active");
-      document.body.classList.add("show-bg");
       // Header will be shown automatically when switching to dashboard/chat
     });
   }
