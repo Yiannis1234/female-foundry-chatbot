@@ -725,47 +725,45 @@ async function handleDashboardSelection(text) {
   
   // Scroll so the user message appears at the TOP of the visible area
   const lockUserMessageToTop = () => {
-    if (latestUserMessage && chatMessages) {
+    if (latestUserMessage && chatMessages && _pinToTop) {
       scrollMessageToTop(latestUserMessage);
     }
   };
   
-  // AGGRESSIVE LOCK - but stop if user manually scrolls
-  const lockInterval = setInterval(lockUserMessageToTop, 50);
+  // Less aggressive lock - 150ms interval instead of 50ms
+  let lockInterval = setInterval(lockUserMessageToTop, 150);
+  let isManualScrolling = false;
   
-  // Detect manual scroll and stop locking
-  let userScrollTimeout;
+  // Detect manual scroll and IMMEDIATELY stop locking
   const detectManualScroll = () => {
-    clearTimeout(userScrollTimeout);
-    userScrollTimeout = setTimeout(() => {
-      // User stopped scrolling for 100ms - they're trying to scroll manually
+    if (!isManualScrolling) {
+      isManualScrolling = true;
       clearInterval(lockInterval);
       _pinToTop = false;
       if (chatMessages) {
         chatMessages.removeEventListener('scroll', detectManualScroll);
       }
-    }, 100);
+    }
   };
   
   if (chatMessages) {
-    chatMessages.addEventListener('scroll', detectManualScroll, { passive: true });
+    chatMessages.addEventListener('scroll', detectManualScroll, { passive: true, once: true });
   }
   
-  // Also auto-stop after 2 seconds (enough time for bot messages to render)
+  // Auto-stop after 1.5 seconds (enough for initial bot message rendering)
   setTimeout(() => {
     clearInterval(lockInterval);
+    _pinToTop = false;
     if (chatMessages) {
       chatMessages.removeEventListener('scroll', detectManualScroll);
     }
-  }, 2000);
+  }, 1500);
   
-  // Lock immediately with multiple attempts
+  // Initial locks with fewer attempts
   lockUserMessageToTop();
-  setTimeout(lockUserMessageToTop, 10);
-  setTimeout(lockUserMessageToTop, 30);
-  setTimeout(lockUserMessageToTop, 60);
+  setTimeout(lockUserMessageToTop, 20);
+  setTimeout(lockUserMessageToTop, 50);
   setTimeout(lockUserMessageToTop, 100);
-  setTimeout(lockUserMessageToTop, 150);
   setTimeout(lockUserMessageToTop, 200);
   
   await sendMessageToApi(text, { pinTop: true });
@@ -864,27 +862,24 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     if (pinTop && latestUserMessage) {
       // Keep user message at top after all messages render
       const lockUserToTop = () => {
-        if (latestUserMessage && chatMessages) {
+        if (latestUserMessage && chatMessages && _pinToTop) {
           const offset = latestUserMessage.offsetTop;
           chatMessages.scrollTop = Math.max(0, offset - 8);
         }
       };
       
-      // Lock for 1.5 more seconds after API response (messages rendering)
-      const lockInterval = setInterval(lockUserToTop, 50);
+      // Less aggressive lock - 150ms interval, shorter duration
+      const lockInterval = setInterval(lockUserToTop, 150);
       setTimeout(() => {
         clearInterval(lockInterval);
-        // Reset flag after rendering complete
         _pinToTop = false;
-      }, 1500);
+      }, 1000);
       
-      // Lock immediately
+      // Initial locks
       lockUserToTop();
-      setTimeout(lockUserToTop, 10);
-      setTimeout(lockUserToTop, 50);
+      setTimeout(lockUserToTop, 20);
       setTimeout(lockUserToTop, 100);
-      setTimeout(lockUserToTop, 200);
-      setTimeout(lockUserToTop, 500);
+      setTimeout(lockUserToTop, 300);
     } else {
       _pinToTop = false;
     }
