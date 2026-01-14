@@ -300,8 +300,8 @@ button {
   justify-content: center;
   gap: 10px;
   padding: 14px 22px;
-  border-radius: 999px;
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border-radius: 50px; /* Match website button radius */
+  border: 2px solid #2a2a2a; /* ADD BORDER like website buttons - Agata's feedback */
   background: #fff;
   color: var(--brand-red);
   font-weight: 700;
@@ -346,8 +346,8 @@ button {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  border: none; /* NO BORDER - Agata's feedback */
-  background: #fff;
+  border: none;
+  background: transparent; /* NO BACKGROUND - Agata's feedback */
   color: #111;
   font-weight: 700;
   font-size: 20px;
@@ -355,8 +355,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none; /* NO SHADOW - Agata's feedback */
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  box-shadow: none;
+  transition: none;
 }
 
 .close-btn:hover {
@@ -384,7 +384,7 @@ button {
   padding: 16px 20px;
   font-size: 1.1rem;
   border: 1px solid #d8d8d8;
-  border-radius: 12px;
+  border-radius: 50px; /* Match website input radius */
   background: white;
   transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
@@ -396,15 +396,15 @@ button {
 
 .name-submit-btn {
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: 50px; /* Match website button radius */
   border: none;
-  background-color: var(--brand-red); /* FLAT RED - no gradient */
+  background-color: var(--brand-red);
   color: white;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
-  box-shadow: none; /* NO SHADOW - Agata's feedback */
+  transition: none;
+  box-shadow: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -446,18 +446,18 @@ button {
   width: 40px;
   height: 40px;
   border: none;
-  background-color: var(--brand-red); /* FLAT RED - no gradient */
-  color: white;
+  background: transparent; /* NO BACKGROUND - Agata's feedback */
+  color: var(--brand-red);
   border-radius: 12px;
   font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  transition: none;
 }
 
 .arrow-btn:hover {
-  transform: translateY(-50%); /* Keep centered, no scale */
+  transform: translateY(-50%);
 }
 
 /* VIEW 2: Dashboard */
@@ -492,10 +492,10 @@ button {
 
 .ghost-back-btn {
   align-self: flex-start;
-  border: none; /* NO BORDER - Agata's feedback */
+  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
   background: #fff;
   color: #4a4f73;
-  border-radius: 999px;
+  border-radius: 50px; /* Match website button radius */
   padding: 10px 18px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -594,11 +594,11 @@ button {
 .card {
   background: #fff;
   padding: 14px;
-  border-radius: var(--card-radius);
-  border: none; /* NO OUTLINES - Agata's feedback */
-  box-shadow: none; /* NO SHADOWS - Agata's feedback */
+  border-radius: 50px; /* Match website button radius - pill shape */
+  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  box-shadow: none;
   cursor: pointer;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  transition: none;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -717,16 +717,16 @@ button {
 
 .secondary-btn {
   background: transparent;
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 50px; /* Match website button radius */
   font-size: 0.9rem;
   color: #555;
-  transition: background 0.2s;
+  transition: none; /* NO ANIMATIONS - Agata's feedback */
 }
 
 .secondary-btn:hover {
-  background: #f5f5f5;
+  /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
 .ghost-btn {
@@ -902,8 +902,8 @@ button {
 
 .suggestion-chip {
   padding: 6px 12px;
-  border-radius: 14px;
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border-radius: 50px; /* Match website button radius */
+  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
   background: #ffffff;
   color: var(--text-dark);
   font-size: 0.78rem;
@@ -1047,8 +1047,8 @@ button {
 
 .footer-chip {
   padding: 4px 8px;
-  border-radius: 12px;
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border-radius: 50px; /* Match website button radius */
+  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
   background: #fff;
   color: var(--text-dark);
   font-size: 0.68rem;

@@ -672,7 +672,6 @@ function renderDashboard(options) {
       if (url) {
         html += `
           <a class="card" href="${url}" target="_top" rel="noopener noreferrer">
-            <div class="card-icon" style="background-color:${meta.background};">${meta.icon}</div>
             <div class="card-title">${opt}</div>
             <p class="card-desc">${meta.description}</p>
           </a>
@@ -680,7 +679,6 @@ function renderDashboard(options) {
       } else {
         html += `
           <div class="card" data-opt="${opt}">
-            <div class="card-icon" style="background-color:${meta.background};">${meta.icon}</div>
             <div class="card-title">${opt}</div>
             <p class="card-desc">${meta.description}</p>
           </div>
