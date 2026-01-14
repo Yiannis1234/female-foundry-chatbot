@@ -400,16 +400,18 @@ button {
   flex: 1;
   padding: 16px 20px;
   font-size: 1.1rem;
-  border: 1px solid transparent; /* NO BORDER initially - appears on focus */
-  border-radius: 50px; /* Match website input radius */
-  background: transparent; /* NO WHITE BACKGROUND initially */
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  border: none; /* NO BORDER AT ALL initially */
+  border-radius: 50px;
+  background: none !important; /* ABSOLUTELY NO BACKGROUND */
+  background-color: transparent !important; /* FORCE TRANSPARENT */
+  transition: background 0.3s, border 0.3s, box-shadow 0.3s;
   outline: none;
   text-align: center;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  color: #666; /* Subtle text color initially */
+  color: #333; /* Text color */
+  box-shadow: none !important; /* NO SHADOW */
 }
 
 .name-submit-btn {
@@ -456,10 +458,11 @@ button {
 }
 
 #name-input:focus {
-  background: white; /* WHITE BACKGROUND appears after focus */
-  border-color: #808080; /* BORDER appears on focus */
-  box-shadow: none; /* NO SHADOW - Agata's feedback */
-  color: #333; /* Darker text on white background */
+  background: white !important; /* WHITE BACKGROUND appears after focus */
+  background-color: white !important;
+  border: 1px solid #808080; /* BORDER appears on focus */
+  box-shadow: none !important;
+  color: #333;
 }
 
 /* When input is focused, button becomes red circle with white text */
