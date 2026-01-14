@@ -402,8 +402,8 @@ button {
   font-size: 1.1rem;
   border: 1px solid #808080; /* DARK GREY BORDER like Join Launch Event */
   border-radius: 50px; /* Match website input radius */
-  background: var(--bg-soft); /* GREY BACKGROUND */
-  transition: border-color 0.3s, box-shadow 0.3s;
+  background: transparent; /* NO WHITE BACKGROUND initially */
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
   outline: none;
   text-align: center;
   -webkit-appearance: none;
@@ -417,12 +417,12 @@ button {
   padding: 0;
   border-radius: 50%; /* Perfect circle */
   border: none;
-  background-color: var(--brand-red);
-  color: white;
+  background-color: transparent; /* NO BACKGROUND initially */
+  color: var(--brand-red); /* RED TEXT initially */
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: none;
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
   box-shadow: none;
   white-space: nowrap;
   flex-shrink: 0;
@@ -431,12 +431,11 @@ button {
   justify-content: center;
 }
 
-.name-submit-btn:hover {
-  /* NO HOVER ANIMATIONS - Agata's feedback */
-}
-
+.name-submit-btn:hover,
+.name-submit-btn:focus,
 .name-submit-btn:active {
-  /* NO ACTIVE ANIMATIONS - Agata's feedback */
+  background-color: white; /* WHITE BACKGROUND appears after interaction */
+  color: var(--brand-red); /* Keep red text */
 }
 
 @media screen and (max-width: 768px) {
@@ -456,8 +455,14 @@ button {
 }
 
 #name-input:focus {
+  background: white; /* WHITE BACKGROUND appears after focus */
   border-color: var(--brand-red);
   box-shadow: none; /* NO SHADOW - Agata's feedback */
+}
+
+/* When input is focused, button also gets white background */
+#name-input:focus + .name-submit-btn {
+  background-color: white; /* WHITE BACKGROUND appears when input is focused */
 }
 
 .arrow-btn {
