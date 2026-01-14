@@ -306,7 +306,7 @@ button {
 }
 
 .ask-index-btn {
-  /* POSITION TOP-RIGHT - Agata's feedback */
+  /* RED CIRCLE with WHITE SPARKLE */
   position: fixed;
   top: 20px;
   right: 20px;
@@ -314,24 +314,25 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 22px;
-  border-radius: 50px;
-  border: none; /* NO BORDERS - user confirmed */
-  background: var(--bg-soft); /* GREY BACKGROUND */
-  color: var(--brand-red);
+  width: 60px; /* CIRCLE SIZE */
+  height: 60px; /* CIRCLE SIZE */
+  padding: 0;
+  border-radius: 50%; /* PERFECT CIRCLE */
+  border: none;
+  background: var(--brand-red); /* RED BACKGROUND */
+  color: white;
   font-weight: 700;
-  font-size: 1rem;
-  box-shadow: none; /* NO SHADOW - Agata's feedback */
+  font-size: 0; /* HIDE TEXT */
+  box-shadow: none;
   cursor: pointer;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  transition: none;
 }
 
 .spark-icon-btn {
   display: inline-block;
-  width: 28px; /* BIGGER - was 20px */
-  height: 28px; /* BIGGER - was 20px */
-  background-color: var(--brand-red);
+  width: 32px; /* BIGGER for visibility in circle */
+  height: 32px; /* BIGGER for visibility in circle */
+  background-color: white; /* WHITE SPARKLE on red circle */
   mask-image: url("/icons/sparkles.svg");
   -webkit-mask-image: url("/icons/sparkles.svg");
   mask-size: contain;
@@ -922,7 +923,7 @@ button {
 .suggestion-chip {
   padding: 6px 12px;
   border-radius: 50px;
-  border: none; /* NO BORDERS for bottom chips */
+  border: 1px solid #c0c0c0; /* BORDER for chat suggestions */
   background: var(--bg-soft); /* GREY BACKGROUND - same as page */
   color: var(--text-dark);
   font-size: 0.78rem;
@@ -1067,7 +1068,7 @@ button {
 .footer-chip {
   padding: 4px 8px;
   border-radius: 50px;
-  border: none; /* NO BORDERS for bottom chips */
+  border: 1px solid #c0c0c0; /* BORDER for footer suggestions */
   background: var(--bg-soft); /* GREY BACKGROUND - same as page */
   color: var(--text-dark);
   font-size: 0.68rem;
