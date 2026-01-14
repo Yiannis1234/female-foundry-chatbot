@@ -613,10 +613,10 @@ button {
 }
 
 .card {
-  background: #fff;
+  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
   padding: 14px;
   border-radius: 50px;
-  border: none; /* NO BORDERS - user confirmed */
+  border: 1px solid #d0d0d0; /* VERY LIGHT GREY BORDER */
   box-shadow: none;
   cursor: pointer;
   transition: none;
@@ -851,13 +851,13 @@ button {
 .chat-message.bot .bubble {
   background: transparent; /* NO WHITE BOX - blend with grey background */
   color: var(--text-dark);
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border: 1px solid #d0d0d0; /* VERY LIGHT GREY BORDER */
 }
 
 .chat-message.user .bubble {
   background: transparent; /* NO WHITE BOX - blend with grey background */
   color: var(--text-dark);
-  border: none; /* NO OUTLINE - Agata's feedback */
+  border: 1px solid #d0d0d0; /* VERY LIGHT GREY BORDER */
 }
 
 .bubble a,
@@ -923,8 +923,8 @@ button {
 .suggestion-chip {
   padding: 6px 12px;
   border-radius: 50px;
-  border: none; /* NO BORDERS - user confirmed */
-  background: #ffffff;
+  border: none; /* NO BORDERS for bottom chips */
+  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
   color: var(--text-dark);
   font-size: 0.78rem;
   font-weight: 600;
@@ -1068,8 +1068,8 @@ button {
 .footer-chip {
   padding: 4px 8px;
   border-radius: 50px;
-  border: none; /* NO BORDERS - user confirmed */
-  background: #fff;
+  border: none; /* NO BORDERS for bottom chips */
+  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
   color: var(--text-dark);
   font-size: 0.68rem;
   font-weight: 600;
