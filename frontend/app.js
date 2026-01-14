@@ -644,16 +644,12 @@ function renderDashboard(options) {
   const optsToRender = (options && options.length > 0) ? options : PRIMARY_LIST;
   console.log("[FF-CHATBOT] Rendering dashboard with:", optsToRender);
 
-  // Force styles to ensure visibility (Wix iframe edge cases)
-  // Check width: if narrow (like Wix 387px iframe), use 1 column; otherwise 2 columns
-  const containerWidth = container.offsetWidth || window.innerWidth;
-  const columns = containerWidth < 500 ? "1fr" : "repeat(2, minmax(0, 1fr))";
-  
+  // FORCE 2 COLUMNS ALWAYS - user wants 2 per row even in narrow iframes
   container.style.display = "grid";
-  container.style.gridTemplateColumns = columns;
+  container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
   container.style.gridAutoRows = "auto";
-  container.style.columnGap = "20px";
-  container.style.rowGap = "20px";
+  container.style.columnGap = "12px";
+  container.style.rowGap = "12px";
   container.style.alignItems = "stretch";
   container.style.justifyItems = "stretch";
   container.style.opacity = "1";
@@ -712,13 +708,14 @@ async function restartExperience() {
 
 async function handleDashboardSelection(text) {
   switchView("chat");
-  if (chatMessages) {
-    // Reset scroll position to the top before inserting the user message
-    chatMessages.scrollTop = 0;
-  }
   
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
+  
+  // Clear chat and reset scroll
+  if (chatMessages) {
+    chatMessages.scrollTop = 0;
+  }
   
   // Add user message (pinToTop is already true, so it won't auto-scroll)
   addMessage("user", text, false);
@@ -733,7 +730,11 @@ async function handleDashboardSelection(text) {
     }
   };
   
-  // Aggressively lock user message to top - multiple attempts to survive layout changes
+  // SUPER AGGRESSIVE LOCK - lock every 50ms for 5 seconds to survive ALL bot message rendering
+  const lockInterval = setInterval(lockUserMessageToTop, 50);
+  setTimeout(() => clearInterval(lockInterval), 5000);
+  
+  // Also lock immediately with multiple attempts
   lockUserMessageToTop();
   setTimeout(lockUserMessageToTop, 10);
   setTimeout(lockUserMessageToTop, 30);
@@ -836,31 +837,30 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     renderChatOptions(data.options);
 
     if (pinTop && latestUserMessage) {
-      // Keep user message at top after all messages render - multiple attempts
+      // Keep user message at top after all messages render - SUPER AGGRESSIVE
       const lockUserToTop = () => {
         if (latestUserMessage && chatMessages) {
           const offset = latestUserMessage.offsetTop;
           chatMessages.scrollTop = Math.max(0, offset - 8);
         }
       };
+      
+      // Lock continuously for 3 more seconds after API response
+      const lockInterval = setInterval(lockUserToTop, 50);
       setTimeout(() => {
-        lockUserToTop();
-        setTimeout(lockUserToTop, 10);
-        setTimeout(lockUserToTop, 30);
-        setTimeout(lockUserToTop, 60);
-        setTimeout(lockUserToTop, 100);
-        requestAnimationFrame(() => {
-          lockUserToTop();
-          requestAnimationFrame(() => {
-            lockUserToTop();
-            setTimeout(() => {
-              lockUserToTop();
-              // Reset flag after all messages are rendered
-              _pinToTop = false;
-            }, 40);
-          });
-        });
-      }, 120);
+        clearInterval(lockInterval);
+        // Reset flag ONLY after all rendering is complete
+        _pinToTop = false;
+      }, 3000);
+      
+      // Also lock immediately
+      lockUserToTop();
+      setTimeout(lockUserToTop, 10);
+      setTimeout(lockUserToTop, 50);
+      setTimeout(lockUserToTop, 100);
+      setTimeout(lockUserToTop, 200);
+      setTimeout(lockUserToTop, 500);
+      setTimeout(lockUserToTop, 1000);
     } else {
       _pinToTop = false;
     }
