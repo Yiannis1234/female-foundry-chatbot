@@ -701,7 +701,13 @@ async function restartExperience() {
   if (nameInput) nameInput.value = "";
   if (userNameDisplay) userNameDisplay.textContent = "there";
   switchView("welcome");
+  
+  // Show the name form so user can start again
+  if (nameForm) nameForm.classList.remove("hidden");
   if (nameInput) nameInput.focus();
+  
+  // Hide the "Ask the Index" button since we're showing the form
+  if (askIndexBtn) askIndexBtn.classList.add("hidden");
 }
 
 async function handleDashboardSelection(text) {
