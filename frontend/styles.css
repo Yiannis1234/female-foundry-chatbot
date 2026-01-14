@@ -128,7 +128,7 @@ button {
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
+  text-transform: none; /* NO CAPITALS - Agata's feedback */
   color: var(--text-dark);
 }
 
@@ -395,8 +395,10 @@ button {
 }
 
 .name-submit-btn {
-  padding: 16px 24px;
-  border-radius: 50px; /* Match website button radius */
+  width: 48px; /* CIRCLE - Agata's feedback */
+  height: 48px;
+  padding: 0;
+  border-radius: 50%; /* Perfect circle */
   border: none;
   background-color: var(--brand-red);
   color: white;
@@ -407,6 +409,9 @@ button {
   box-shadow: none;
   white-space: nowrap;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .name-submit-btn:hover {
@@ -793,8 +798,7 @@ button {
 }
 
 .chat-message.bot .avatar {
-  background-color: var(--brand-red); /* FLAT RED - no gradient */
-  color: white;
+  display: none; /* REMOVE IX from chat - Agata's feedback */
 }
 
 .avatar-placeholder {
