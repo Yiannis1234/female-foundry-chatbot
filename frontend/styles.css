@@ -849,14 +849,14 @@ button {
 }
 
 .chat-message.bot .bubble {
-  background: #f3f3f3;
+  background: transparent; /* NO WHITE BOX - blend with grey background */
   color: var(--text-dark);
   border: none; /* NO OUTLINE - Agata's feedback */
 }
 
 .chat-message.user .bubble {
-  background: #1a1a1a;
-  color: white;
+  background: transparent; /* NO WHITE BOX - blend with grey background */
+  color: var(--text-dark);
   border: none; /* NO OUTLINE - Agata's feedback */
 }
 
