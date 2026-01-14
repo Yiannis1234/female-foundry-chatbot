@@ -434,8 +434,8 @@ button {
 .name-submit-btn:hover,
 .name-submit-btn:focus,
 .name-submit-btn:active {
-  background-color: white; /* WHITE BACKGROUND appears after interaction */
-  color: var(--brand-red); /* Keep red text */
+  background-color: var(--brand-red); /* RED CIRCLE appears after interaction */
+  color: white; /* WHITE TEXT on red background */
 }
 
 @media screen and (max-width: 768px) {
@@ -460,9 +460,10 @@ button {
   box-shadow: none; /* NO SHADOW - Agata's feedback */
 }
 
-/* When input is focused, button also gets white background */
+/* When input is focused, button becomes red circle with white text */
 #name-input:focus + .name-submit-btn {
-  background-color: white; /* WHITE BACKGROUND appears when input is focused */
+  background-color: var(--brand-red); /* RED CIRCLE */
+  color: white; /* WHITE TEXT */
 }
 
 .arrow-btn {
