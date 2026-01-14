@@ -60,42 +60,42 @@ const PRIMARY_LIST = [
 const DASHBOARD_CARD_META = {
   "The Era of Abundance": {
     icon: "🌌",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "Learn how AI is redefining how female founders build and solve the next generation of problems.",
     link: null,
   },
   "Key Insights": {
     icon: "💡",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
     link: null,
   },
   Idea: {
     icon: "✨",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
     link: null,
   },
   "Fundraising trends": {
     icon: "📈",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
     link: null,
   },
   "Behind the Index": {
     icon: "🤝",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
     link: null,
   },
   "About Female Foundry": {
     icon: "🏛️",
-    background: "#e0002b", // FLAT RED - no gradient, no shadow
+    background: "#FF0000", // EXACT RED from website - Agata's feedback
     description:
       "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
     link: null,
@@ -663,7 +663,7 @@ function renderDashboard(options) {
       const meta =
         DASHBOARD_CARD_META[opt] || {
           icon: "💡",
-          background: "#e0002b", // FLAT RED
+          background: "#FF0000", // EXACT RED from website
           description: "Tap to explore this topic.",
           link: null,
         };

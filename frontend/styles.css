@@ -4,8 +4,8 @@
 }
 
 :root {
-  --brand-red: #e0002b;
-  --brand-red-dark: #b50021;
+  --brand-red: #FF0000; /* EXACT RED from website - Agata's feedback */
+  --brand-red-dark: #FF0000; /* Same red, no dark variant - flat design */
   --text-dark: #0f0f0f;
   --text-muted: #4a4a4a;
   --bg-soft: #f5f5f5;
