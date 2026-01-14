@@ -646,6 +646,12 @@ function renderDashboard(options) {
 
   // Force styles to ensure visibility (Wix iframe edge cases)
   container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+  container.style.gridAutoRows = "auto";
+  container.style.columnGap = "20px";
+  container.style.rowGap = "20px";
+  container.style.alignItems = "stretch";
+  container.style.justifyItems = "stretch";
   container.style.opacity = "1";
   container.style.visibility = "visible";
   container.style.border = "";
@@ -702,6 +708,10 @@ async function restartExperience() {
 
 async function handleDashboardSelection(text) {
   switchView("chat");
+  if (chatMessages) {
+    // Reset scroll position to the top before inserting the user message
+    chatMessages.scrollTop = 0;
+  }
   
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
@@ -715,9 +725,7 @@ async function handleDashboardSelection(text) {
   // Scroll so the user message appears at the TOP of the visible area
   const lockUserMessageToTop = () => {
     if (latestUserMessage && chatMessages) {
-      // Direct child of chatMessages, so offsetTop is correct
-      const offset = latestUserMessage.offsetTop;
-      chatMessages.scrollTop = Math.max(0, offset - 8);
+      scrollMessageToTop(latestUserMessage);
     }
   };
   
@@ -917,8 +925,11 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
           chatMessages.scrollTop = chatMessages.scrollHeight;
         }
       });
-    } else {
-      forceTop();
+    } else if (latestUserMessage) {
+      const lockUserToTop = () => scrollMessageToTop(latestUserMessage);
+      lockUserToTop();
+      requestAnimationFrame(lockUserToTop);
+      setTimeout(lockUserToTop, 20);
     }
   };
 
@@ -934,6 +945,12 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
   if (role === "user" && firstMsgDiv) {
     latestUserMessage = firstMsgDiv;
     setScrollTarget(latestUserMessage, "start");
+    if (_pinToTop) {
+      const lockUserToTop = () => scrollMessageToTop(firstMsgDiv);
+      lockUserToTop();
+      requestAnimationFrame(lockUserToTop);
+      setTimeout(lockUserToTop, 20);
+    }
   }
 
   // Only scroll to bottom if explicitly requested (user typing) and not pinning to top
