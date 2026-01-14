@@ -26,7 +26,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
-  <script defer src="/app.js?v=142"></script>
+  <script defer src="/app.js?v=143"></script>
   </head>
   <body>
     <div class="app-container">
@@ -45,15 +45,17 @@
         <button id="close-chat" class="close-btn" aria-label="Close">×</button>
       </header>
 
+      <!-- Ask the Index button - OUTSIDE views so it's fixed top-right -->
+      <button id="ask-index-btn" class="ask-index-btn">
+        <span class="spark-icon-btn"></span>
+        Ask the Index
+      </button>
+
       <main id="main-content">
         
         <!-- VIEW 1: WELCOME / NAME INPUT -->
         <section id="view-welcome" class="view">
           <div class="welcome-content">
-            <button id="ask-index-btn" class="ask-index-btn">
-              <span class="spark-icon-btn"></span>
-              Ask the Index
-            </button>
             <form id="name-form" class="fade-in delay-1 hidden">
               <div class="input-wrapper">
                 <input type="text" id="name-input" placeholder="Hey, what's your name?" autocomplete="off" required />
