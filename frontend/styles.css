@@ -300,8 +300,8 @@ button {
   justify-content: center;
   gap: 10px;
   padding: 14px 22px;
-  border-radius: 50px; /* Match website button radius */
-  border: 2px solid #2a2a2a; /* ADD BORDER like website buttons - Agata's feedback */
+  border-radius: 50px;
+  border: none; /* NO BORDERS - user confirmed */
   background: #fff;
   color: var(--brand-red);
   font-weight: 700;
@@ -383,7 +383,7 @@ button {
   flex: 1;
   padding: 16px 20px;
   font-size: 1.1rem;
-  border: 1px solid #d8d8d8;
+  border: none; /* NO BORDERS - user confirmed */
   border-radius: 50px; /* Match website input radius */
   background: white;
   transition: border-color 0.3s, box-shadow 0.3s;
@@ -492,7 +492,7 @@ button {
 
 .ghost-back-btn {
   align-self: flex-start;
-  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  border: none; /* NO BORDERS - user confirmed */
   background: #fff;
   color: #4a4f73;
   border-radius: 50px; /* Match website button radius */
@@ -564,7 +564,7 @@ button {
   flex: 1;
   padding: 16px 20px;
   border-radius: 14px;
-  border: 1px solid #ddd;
+  border: none; /* NO BORDERS - user confirmed */
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
@@ -594,8 +594,8 @@ button {
 .card {
   background: #fff;
   padding: 14px;
-  border-radius: 50px; /* Match website button radius - pill shape */
-  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  border-radius: 50px;
+  border: none; /* NO BORDERS - user confirmed */
   box-shadow: none;
   cursor: pointer;
   transition: none;
@@ -717,7 +717,7 @@ button {
 
 .secondary-btn {
   background: transparent;
-  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  border: none; /* NO BORDERS - user confirmed */
   padding: 8px 16px;
   border-radius: 50px; /* Match website button radius */
   font-size: 0.9rem;
@@ -902,8 +902,8 @@ button {
 
 .suggestion-chip {
   padding: 6px 12px;
-  border-radius: 50px; /* Match website button radius */
-  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  border-radius: 50px;
+  border: none; /* NO BORDERS - user confirmed */
   background: #ffffff;
   color: var(--text-dark);
   font-size: 0.78rem;
@@ -1047,8 +1047,8 @@ button {
 
 .footer-chip {
   padding: 4px 8px;
-  border-radius: 50px; /* Match website button radius */
-  border: 1px solid #2a2a2a; /* ADD BORDER - buttons need borders per Agata */
+  border-radius: 50px;
+  border: none; /* NO BORDERS - user confirmed */
   background: #fff;
   color: var(--text-dark);
   font-size: 0.68rem;
@@ -1079,7 +1079,7 @@ button {
   flex: 1;
   padding: 12px 16px;
   border-radius: 12px;
-  border: 1px solid #ddd;
+  border: none; /* NO BORDERS - user confirmed */
   font-size: 0.95rem;
   outline: none;
   /* Ensure it looks good without the button */
