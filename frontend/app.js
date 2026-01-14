@@ -712,8 +712,8 @@ async function restartExperience() {
 async function handleDashboardSelection(text) {
   switchView("chat");
   
-  // Allow the chat view to finish its first paint before locking scroll
-  await sleep(60);
+  // CRITICAL: Wait for chat view to fully render and layout (FIRST TIME needs more time!)
+  await sleep(150);
   
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
@@ -726,8 +726,8 @@ async function handleDashboardSelection(text) {
   // Add user message (pinToTop is already true, so it won't auto-scroll)
   addMessage("user", text, false);
   
-  // Wait a moment for DOM to update
-  await sleep(50);
+  // Wait for DOM to fully update and layout to be calculated
+  await sleep(100);
   
   // Scroll so the user message appears at the TOP of the visible area
   const lockUserMessageToTop = () => {
@@ -735,6 +735,17 @@ async function handleDashboardSelection(text) {
       scrollMessageToTop(latestUserMessage);
     }
   };
+  
+  // AGGRESSIVE initial locks to ensure first time works
+  lockUserMessageToTop();
+  await sleep(10);
+  lockUserMessageToTop();
+  await sleep(20);
+  lockUserMessageToTop();
+  await sleep(30);
+  lockUserMessageToTop();
+  await sleep(50);
+  lockUserMessageToTop();
   
   // Less aggressive lock - 150ms interval instead of 50ms
   let lockInterval = setInterval(lockUserMessageToTop, 150);
@@ -764,13 +775,6 @@ async function handleDashboardSelection(text) {
       chatMessages.removeEventListener('scroll', detectManualScroll);
     }
   }, 1500);
-  
-  // Initial locks with fewer attempts
-  lockUserMessageToTop();
-  setTimeout(lockUserMessageToTop, 20);
-  setTimeout(lockUserMessageToTop, 50);
-  setTimeout(lockUserMessageToTop, 100);
-  setTimeout(lockUserMessageToTop, 200);
   
   await sendMessageToApi(text, { pinTop: true });
 }
