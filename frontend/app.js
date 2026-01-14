@@ -60,42 +60,42 @@ const PRIMARY_LIST = [
 const DASHBOARD_CARD_META = {
   "The Era of Abundance": {
     icon: "🌌",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "Learn how AI is redefining how female founders build and solve the next generation of problems.",
     link: null,
   },
   "Key Insights": {
     icon: "💡",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "Explore the key insights captured in the 2026 Edition of the Index and the methodology behind the data.",
     link: null,
   },
   Idea: {
     icon: "✨",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "Explore where newly-minted female founders are emerging today—and what motivates them to start their companies.",
     link: null,
   },
   "Fundraising trends": {
     icon: "📈",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "Dive into the fundraising data and see where capital is flowing for female-founded companies across Europe.",
     link: null,
   },
   "Behind the Index": {
     icon: "🤝",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
     link: null,
   },
   "About Female Foundry": {
     icon: "🏛️",
-    gradient: "linear-gradient(135deg, #e0002b, #b50021)",
+    background: "#e0002b", // FLAT RED - no gradient, no shadow
     description:
       "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
     link: null,
@@ -663,7 +663,7 @@ function renderDashboard(options) {
       const meta =
         DASHBOARD_CARD_META[opt] || {
           icon: "💡",
-          gradient: "linear-gradient(135deg, #cfd8ff, #f7f6ff)",
+          background: "#e0002b", // FLAT RED
           description: "Tap to explore this topic.",
           link: null,
         };
@@ -672,7 +672,7 @@ function renderDashboard(options) {
       if (url) {
         html += `
           <a class="card" href="${url}" target="_top" rel="noopener noreferrer">
-            <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+            <div class="card-icon" style="background-color:${meta.background};">${meta.icon}</div>
             <div class="card-title">${opt}</div>
             <p class="card-desc">${meta.description}</p>
           </a>
@@ -680,7 +680,7 @@ function renderDashboard(options) {
       } else {
         html += `
           <div class="card" data-opt="${opt}">
-            <div class="card-icon" style="background:${meta.gradient};">${meta.icon}</div>
+            <div class="card-icon" style="background-color:${meta.background};">${meta.icon}</div>
             <div class="card-title">${opt}</div>
             <p class="card-desc">${meta.description}</p>
           </div>

@@ -301,9 +301,9 @@ button {
   color: var(--brand-red);
   font-weight: 700;
   font-size: 1rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: none; /* NO SHADOW - Agata's feedback */
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: none; /* NO ANIMATIONS - Agata's feedback */
 }
 
 .spark-icon-btn {
@@ -322,14 +322,11 @@ button {
 }
 
 .ask-index-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 34px rgba(0,0,0,0.12);
-  background: #fff6f6;
+  /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
 .ask-index-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  /* NO ACTIVE ANIMATIONS - Agata's feedback */
 }
 
 .ask-index-btn .spark-icon {
@@ -397,24 +394,23 @@ button {
   padding: 16px 24px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
+  background-color: var(--brand-red); /* FLAT RED - no gradient */
   color: white;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 6px 20px rgba(224, 0, 43, 0.25);
+  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  box-shadow: none; /* NO SHADOW - Agata's feedback */
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .name-submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(224, 0, 43, 0.28);
+  /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
 .name-submit-btn:active {
-  transform: translateY(0);
+  /* NO ACTIVE ANIMATIONS - Agata's feedback */
 }
 
 @media screen and (max-width: 768px) {
@@ -594,20 +590,20 @@ button {
 
 .card {
   background: #fff;
-  padding: 14px; /* MUCH smaller for narrow iframes */
+  padding: 14px;
   border-radius: var(--card-radius);
-  border: 1px solid #eceef7;
-  box-shadow: 0 8px 20px rgba(10, 22, 70, 0.08);
+  border: none; /* NO OUTLINES - Agata's feedback */
+  box-shadow: none; /* NO SHADOWS - Agata's feedback */
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: none; /* NO ANIMATIONS - Agata's feedback */
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Smaller gap */
+  gap: 8px;
   text-align: left;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  min-width: 0; /* Allow cards to shrink in grid */
+  min-width: 0;
   width: 100%;
 }
 
@@ -620,20 +616,19 @@ button {
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 24px 46px rgba(15, 18, 70, 0.12);
+  /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
 .card-icon {
-  width: 38px; /* Smaller for narrow iframes */
+  width: 38px;
   height: 38px;
   border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem; /* Smaller icon */
+  font-size: 0.95rem;
   color: #fff;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none; /* NO SHADOWS - Agata's feedback */
 }
 
 .card-title {
@@ -795,7 +790,7 @@ button {
 }
 
 .chat-message.bot .avatar {
-  background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
+  background-color: var(--brand-red); /* FLAT RED - no gradient */
   color: white;
 }
 
