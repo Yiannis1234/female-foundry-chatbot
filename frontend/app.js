@@ -337,9 +337,14 @@ function scrollMessageToTop(messageElement) {
   if (!messageElement || !chatMessages) return;
   if (!chatMessages.contains(messageElement)) return;
 
-  // messageElement is a direct child of chatMessages, so offsetTop is relative to the scroll container
-  const offset = messageElement.offsetTop;
-  chatMessages.scrollTop = Math.max(0, offset - 8); // small padding
+  // Use scrollIntoView for more reliable scrolling, especially on first load
+  try {
+    messageElement.scrollIntoView({ behavior: 'instant', block: 'start', inline: 'nearest' });
+  } catch (e) {
+    // Fallback to manual scroll if scrollIntoView fails
+    const offset = messageElement.offsetTop;
+    chatMessages.scrollTop = Math.max(0, offset - 8);
+  }
 }
 
 // Simple top lock helper
@@ -713,7 +718,7 @@ async function handleDashboardSelection(text) {
   switchView("chat");
   
   // CRITICAL: Wait for chat view to fully render and layout (FIRST TIME needs more time!)
-  await sleep(150);
+  await sleep(200);
   
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
@@ -727,7 +732,7 @@ async function handleDashboardSelection(text) {
   addMessage("user", text, false);
   
   // Wait for DOM to fully update and layout to be calculated
-  await sleep(100);
+  await sleep(150);
   
   // Scroll so the user message appears at the TOP of the visible area
   const lockUserMessageToTop = () => {
@@ -736,16 +741,11 @@ async function handleDashboardSelection(text) {
     }
   };
   
-  // AGGRESSIVE initial locks to ensure first time works
-  lockUserMessageToTop();
-  await sleep(10);
-  lockUserMessageToTop();
-  await sleep(20);
-  lockUserMessageToTop();
-  await sleep(30);
-  lockUserMessageToTop();
-  await sleep(50);
-  lockUserMessageToTop();
+  // SUPER AGGRESSIVE initial locks - MORE attempts with LONGER delays
+  for (let i = 0; i < 8; i++) {
+    lockUserMessageToTop();
+    await sleep(30);
+  }
   
   // Less aggressive lock - 150ms interval instead of 50ms
   let lockInterval = setInterval(lockUserMessageToTop, 150);
@@ -767,14 +767,14 @@ async function handleDashboardSelection(text) {
     chatMessages.addEventListener('scroll', detectManualScroll, { passive: true, once: true });
   }
   
-  // Auto-stop after 1.5 seconds (enough for initial bot message rendering)
+  // Auto-stop after 2 seconds (more time for first load)
   setTimeout(() => {
     clearInterval(lockInterval);
     _pinToTop = false;
     if (chatMessages) {
       chatMessages.removeEventListener('scroll', detectManualScroll);
     }
-  }, 1500);
+  }, 2000);
   
   await sendMessageToApi(text, { pinTop: true });
 }
