@@ -730,11 +730,36 @@ async function handleDashboardSelection(text) {
     }
   };
   
-  // SUPER AGGRESSIVE LOCK - lock every 50ms for 5 seconds to survive ALL bot message rendering
+  // AGGRESSIVE LOCK - but stop if user manually scrolls
   const lockInterval = setInterval(lockUserMessageToTop, 50);
-  setTimeout(() => clearInterval(lockInterval), 5000);
   
-  // Also lock immediately with multiple attempts
+  // Detect manual scroll and stop locking
+  let userScrollTimeout;
+  const detectManualScroll = () => {
+    clearTimeout(userScrollTimeout);
+    userScrollTimeout = setTimeout(() => {
+      // User stopped scrolling for 100ms - they're trying to scroll manually
+      clearInterval(lockInterval);
+      _pinToTop = false;
+      if (chatMessages) {
+        chatMessages.removeEventListener('scroll', detectManualScroll);
+      }
+    }, 100);
+  };
+  
+  if (chatMessages) {
+    chatMessages.addEventListener('scroll', detectManualScroll, { passive: true });
+  }
+  
+  // Also auto-stop after 2 seconds (enough time for bot messages to render)
+  setTimeout(() => {
+    clearInterval(lockInterval);
+    if (chatMessages) {
+      chatMessages.removeEventListener('scroll', detectManualScroll);
+    }
+  }, 2000);
+  
+  // Lock immediately with multiple attempts
   lockUserMessageToTop();
   setTimeout(lockUserMessageToTop, 10);
   setTimeout(lockUserMessageToTop, 30);
@@ -837,7 +862,7 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     renderChatOptions(data.options);
 
     if (pinTop && latestUserMessage) {
-      // Keep user message at top after all messages render - SUPER AGGRESSIVE
+      // Keep user message at top after all messages render
       const lockUserToTop = () => {
         if (latestUserMessage && chatMessages) {
           const offset = latestUserMessage.offsetTop;
@@ -845,22 +870,21 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         }
       };
       
-      // Lock continuously for 3 more seconds after API response
+      // Lock for 1.5 more seconds after API response (messages rendering)
       const lockInterval = setInterval(lockUserToTop, 50);
       setTimeout(() => {
         clearInterval(lockInterval);
-        // Reset flag ONLY after all rendering is complete
+        // Reset flag after rendering complete
         _pinToTop = false;
-      }, 3000);
+      }, 1500);
       
-      // Also lock immediately
+      // Lock immediately
       lockUserToTop();
       setTimeout(lockUserToTop, 10);
       setTimeout(lockUserToTop, 50);
       setTimeout(lockUserToTop, 100);
       setTimeout(lockUserToTop, 200);
       setTimeout(lockUserToTop, 500);
-      setTimeout(lockUserToTop, 1000);
     } else {
       _pinToTop = false;
     }
