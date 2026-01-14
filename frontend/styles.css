@@ -4,9 +4,9 @@
 }
 
 :root {
-  --brand-red: #FF0000; /* EXACT RED from website - Agata's feedback */
-  --brand-red-dark: #FF0000; /* Same red, no dark variant - flat design */
-  --text-dark: #0f0f0f;
+  --brand-red: #FF0000; /* EXACT RED from website */
+  --brand-red-dark: #FF0000; /* Same red, no dark variant */
+  --text-dark: #000000; /* Pure black for text */
   --text-muted: #4a4a4a;
   --bg-soft: #f5f5f5;
   --card-radius: 16px;
@@ -153,7 +153,7 @@ button {
   justify-content: center;
   font-weight: 700;
   font-size: 0.8rem;
-  background: #d90000;
+  background-color: #FF0000; /* EXACT RED from website */
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
@@ -163,7 +163,7 @@ button {
 }
 
 .spark-icon {
-  background-color: #d90000;
+  background-color: #FF0000; /* EXACT RED from website */
   mask-image: url("data:image/svg+xml,%3Csvg width='128' height='128' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M64 7c3.9 13.9 9.5 26.1 18.2 34.8C91 51.5 103.1 57.1 117 61c-13.9 3.9-26.1 9.5-34.8 18.2C73.5 88.9 67.9 101 64 115c-3.9-14-9.5-26.1-18.2-34.8C37 70.5 24.9 64.9 11 61c13.9-3.9 26.1-9.5 34.8-18.2C54.5 33.1 60.1 21 64 7Zm-40 36c1.4 5.2 3.6 9.7 6.9 13C35.2 59.3 39.8 61.5 45 63c-5.2 1.4-9.7 3.6-13.1 6.9C28.6 73.2 26.4 77.8 25 83c-1.4-5.2-3.6-9.7-6.9-13.1C14.8 66.6 10.2 64.4 5 63c5.2-1.4 9.7-3.6 13.1-6.9C21.4 52.7 23.6 48.2 25 43Zm80 0c1.4 5.2 3.6 9.7 6.9 13C115.2 59.3 119.8 61.5 125 63c-5.2 1.4-9.7 3.6-13.1 6.9C109.4 73.2 107.2 77.8 105.8 83c-1.4-5.2-3.6-9.7-6.9-13.1C95.5 66.6 91 64.4 85.8 63c5.2-1.4 9.7-3.6 13.1-6.9C102.2 52.7 104.4 48.2 105.8 43Z' fill='%23ffffff'/%3E%3C/svg%3E");
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='128' height='128' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M64 7c3.9 13.9 9.5 26.1 18.2 34.8C91 51.5 103.1 57.1 117 61c-13.9 3.9-26.1 9.5-34.8 18.2C73.5 88.9 67.9 101 64 115c-3.9-14-9.5-26.1-18.2-34.8C37 70.5 24.9 64.9 11 61c13.9-3.9 26.1-9.5 34.8-18.2C54.5 33.1 60.1 21 64 7Zm-40 36c1.4 5.2 3.6 9.7 6.9 13C35.2 59.3 39.8 61.5 45 63c-5.2 1.4-9.7 3.6-13.1 6.9C28.6 73.2 26.4 77.8 25 83c-1.4-5.2-3.6-9.7-6.9-13.1C14.8 66.6 10.2 64.4 5 63c5.2-1.4 9.7-3.6 13.1-6.9C21.4 52.7 23.6 48.2 25 43Zm80 0c1.4 5.2 3.6 9.7 6.9 13C115.2 59.3 119.8 61.5 125 63c-5.2 1.4-9.7 3.6-13.1 6.9C109.4 73.2 107.2 77.8 105.8 83c-1.4-5.2-3.6-9.7-6.9-13.1C95.5 66.6 91 64.4 85.8 63c5.2-1.4 9.7-3.6 13.1-6.9C102.2 52.7 104.4 48.2 105.8 43Z' fill='%23ffffff'/%3E%3C/svg%3E");
 }
