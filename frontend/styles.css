@@ -754,13 +754,14 @@ button {
 .ghost-btn {
   background: transparent;
   border: none;
-  font-size: 1.2rem;
-  color: #999;
-  padding: 5px;
+  font-size: 2rem; /* BIGGER - was 1.2rem */
+  color: #333; /* DARKER - was #999 */
+  padding: 8px; /* MORE VISIBLE - was 5px */
+  font-weight: 600; /* BOLDER for visibility */
 }
 
 .ghost-btn:hover {
-  color: #333;
+  color: #111; /* EVEN DARKER on hover */
 }
 
 .chat-scroll {
