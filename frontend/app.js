@@ -645,8 +645,12 @@ function renderDashboard(options) {
   console.log("[FF-CHATBOT] Rendering dashboard with:", optsToRender);
 
   // Force styles to ensure visibility (Wix iframe edge cases)
+  // Check width: if narrow (like Wix 387px iframe), use 1 column; otherwise 2 columns
+  const containerWidth = container.offsetWidth || window.innerWidth;
+  const columns = containerWidth < 500 ? "1fr" : "repeat(2, minmax(0, 1fr))";
+  
   container.style.display = "grid";
-  container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+  container.style.gridTemplateColumns = columns;
   container.style.gridAutoRows = "auto";
   container.style.columnGap = "20px";
   container.style.rowGap = "20px";
