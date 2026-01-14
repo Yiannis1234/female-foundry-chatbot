@@ -712,6 +712,9 @@ async function restartExperience() {
 async function handleDashboardSelection(text) {
   switchView("chat");
   
+  // Allow the chat view to finish its first paint before locking scroll
+  await sleep(60);
+  
   // CRITICAL: Set pinToTop flag FIRST to prevent any auto-scrolling
   _pinToTop = true;
   
