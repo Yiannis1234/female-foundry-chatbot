@@ -297,6 +297,7 @@ button {
   flex-direction: column;
   gap: 24px;
   align-items: center;
+  background: none !important; /* NO BACKGROUND */
 }
 
 .welcome-content h1 {
@@ -383,6 +384,7 @@ button {
 #name-form {
   width: 100%;
   display: block;
+  background: none !important; /* NO BACKGROUND */
 }
 
 .input-wrapper {
@@ -393,6 +395,8 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
+  background: none !important; /* NO BACKGROUND */
+  padding: 0 !important; /* NO PADDING that could create visible box */
 }
 
 #name-input {
