@@ -337,14 +337,14 @@ function scrollMessageToTop(messageElement) {
   if (!messageElement || !chatMessages) return;
   if (!chatMessages.contains(messageElement)) return;
 
-  // Use scrollIntoView for more reliable scrolling, especially on first load
-  try {
-    messageElement.scrollIntoView({ behavior: 'instant', block: 'start', inline: 'nearest' });
-  } catch (e) {
-    // Fallback to manual scroll if scrollIntoView fails
-    const offset = messageElement.offsetTop;
-    chatMessages.scrollTop = Math.max(0, offset - 8);
-  }
+  // Force layout reflow by reading offsetHeight BEFORE calculating offsetTop
+  // This ensures layout is complete before we scroll
+  void messageElement.offsetHeight;
+  void chatMessages.offsetHeight;
+  
+  // Now calculate and set scroll position
+  const offset = messageElement.offsetTop;
+  chatMessages.scrollTop = Math.max(0, offset - 8);
 }
 
 // Simple top lock helper
