@@ -404,18 +404,21 @@ button {
   flex: 1;
   padding: 16px 20px;
   font-size: 1.1rem;
-  border: none; /* NO BORDER AT ALL initially */
-  border-radius: 50px;
+  border: none !important; /* NO BORDER AT ALL initially */
+  border-radius: 0 !important; /* NO RADIUS initially - completely invisible */
   background: none !important; /* ABSOLUTELY NO BACKGROUND */
   background-color: transparent !important; /* FORCE TRANSPARENT */
-  transition: background 0.3s, border 0.3s, box-shadow 0.3s;
-  outline: none;
-  text-align: center;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  color: #333; /* Text color */
+  background-image: none !important; /* NO BACKGROUND IMAGE */
+  -webkit-box-shadow: none !important; /* NO WEBKIT SHADOW */
+  -moz-box-shadow: none !important; /* NO MOZ SHADOW */
   box-shadow: none !important; /* NO SHADOW */
+  transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+  outline: none !important;
+  text-align: center;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  color: #333; /* Text color */
 }
 
 .name-submit-btn {
@@ -464,7 +467,8 @@ button {
 #name-input:focus {
   background: white !important; /* WHITE BACKGROUND appears after focus */
   background-color: white !important;
-  border: 1px solid #808080; /* BORDER appears on focus */
+  border: 1px solid #808080 !important; /* BORDER appears on focus */
+  border-radius: 50px !important; /* ROUNDED only on focus */
   box-shadow: none !important;
   color: #333;
 }
