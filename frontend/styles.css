@@ -139,11 +139,15 @@ button {
   color: #808080; /* GREY color */
   font-size: 0.9rem; /* SMALL text */
   cursor: pointer;
-  padding: 0;
+  padding: 4px 8px; /* CLICKABLE area */
   margin: 0;
   line-height: 1;
   text-transform: lowercase; /* Ensure lowercase */
   font-weight: 400; /* Normal weight */
+  /* Ensure it's clickable */
+  pointer-events: auto;
+  z-index: 1000;
+  position: relative;
 }
 
 @media screen and (max-width: 768px) {
@@ -760,13 +764,11 @@ button {
 }
 
 .secondary-btn {
-  background: transparent;
-  border: none; /* NO BORDERS - user confirmed */
-  padding: 8px 16px;
-  border-radius: 50px; /* Match website button radius */
-  font-size: 0.9rem;
-  color: #555;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
+  display: none !important; /* HIDDEN - back button in header instead */
+}
+
+#back-to-dashboard {
+  display: none !important; /* HIDDEN - use header back button instead */
 }
 
 .secondary-btn:hover {
