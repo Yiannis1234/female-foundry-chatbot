@@ -109,7 +109,7 @@ button {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0; /* MUCH SMALLER gap - was 20px */
+  padding: 6px 0; /* EVEN SMALLER gap - was 8px */
   flex-shrink: 0;
   z-index: 10;
   visibility: visible !important;
@@ -132,16 +132,18 @@ button {
   color: var(--text-dark);
 }
 
-/* Header back arrow button - SMALLER */
+/* Header back button - GREY lowercase text */
 .header-back-btn {
   background: transparent;
   border: none;
-  color: var(--text-dark);
-  font-size: 1.2rem; /* SMALL arrow */
+  color: #808080; /* GREY color */
+  font-size: 0.9rem; /* SMALL text */
   cursor: pointer;
   padding: 0;
   margin: 0;
   line-height: 1;
+  text-transform: lowercase; /* Ensure lowercase */
+  font-weight: 400; /* Normal weight */
 }
 
 @media screen and (max-width: 768px) {
@@ -544,18 +546,7 @@ button {
 }
 
 .ghost-back-btn {
-  align-self: flex-start;
-  border: none; /* NO BORDERS - user confirmed */
-  background: #606060; /* DARKER GREY */
-  color: white; /* WHITE TEXT for contrast */
-  border-radius: 50px; /* Match website button radius */
-  padding: 14px 24px; /* BIGGER */
-  font-size: 1.1rem; /* BIGGER */
-  font-weight: 600;
-  cursor: pointer;
-  transition: none; /* NO ANIMATIONS - Agata's feedback */
-  box-shadow: none; /* NO SHADOW - Agata's feedback */
-  margin-bottom: 4px; /* SMALLER gap to content - was 10px */
+  display: none !important; /* HIDDEN - no longer needed */
 }
 
 .ghost-back-btn:hover {
@@ -783,23 +774,14 @@ button {
 }
 
 .ghost-btn {
-  background: transparent;
-  border: none;
-  font-size: 2rem; /* BIGGER - was 1.2rem */
-  color: #333; /* DARKER - was #999 */
-  padding: 8px; /* MORE VISIBLE - was 5px */
-  font-weight: 600; /* BOLDER for visibility */
-}
-
-.ghost-btn:hover {
-  color: #111; /* EVEN DARKER on hover */
+  display: none !important; /* HIDDEN - refresh button no longer needed */
 }
 
 .chat-scroll {
   flex: 1 1 auto;
   overflow-y: auto !important;
   overflow-x: hidden;
-  padding: 4px 12px 12px 12px; /* SMALLER top gap - was 8px */
+  padding: 2px 12px 12px 12px; /* EVEN SMALLER top gap - was 4px */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -864,8 +846,8 @@ button {
   font-size: 1rem; /* BIGGER - was 0.9rem */
   line-height: 1.5;
   word-wrap: break-word;
-  border: 1px solid #c0c0c0; /* DARK GREY BORDER */
-  background: white; /* WHITE FILLING */
+  border: none; /* NO BORDERS - user requested */
+  background: white; /* WHITE BACKGROUND */
 }
 
 @media screen and (max-width: 768px) {
