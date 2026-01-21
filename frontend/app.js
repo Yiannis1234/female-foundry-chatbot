@@ -35,6 +35,7 @@ const primaryFooterOptions = document.getElementById("primary-footer-options");
 const backBtn = document.getElementById("back-to-dashboard");
 const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
+const headerBackBtn = document.getElementById("header-back-btn");
 
 // Fallback method if JS navigation is ever needed
 function openExternal(url) {
@@ -54,7 +55,7 @@ const PRIMARY_LIST = [
   "Idea",
   "Fundraising trends",
   "Behind the Index",
-  "About Female Foundry",
+  // "About Female Foundry", // REMOVED per user request
 ];
 
 const DASHBOARD_CARD_META = {
@@ -1336,5 +1337,12 @@ if (restartFlowBtn) {
     // Reset to initial state but keep session
     if (nameInput) nameInput.value = "";
     if (nameInput) nameInput.focus();
+  });
+}
+
+// Header back button - goes to dashboard
+if (headerBackBtn) {
+  headerBackBtn.addEventListener("click", () => {
+    switchView("dashboard");
   });
 }

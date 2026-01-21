@@ -109,7 +109,7 @@ button {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
+  padding: 8px 0; /* MUCH SMALLER gap - was 20px */
   flex-shrink: 0;
   z-index: 10;
   visibility: visible !important;
@@ -124,12 +124,24 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px; /* SMALLER gap - was 10px */
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.05em;
   text-transform: none; /* NO CAPITALS - Agata's feedback */
   color: var(--text-dark);
+}
+
+/* Header back arrow button - SMALLER */
+.header-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dark);
+  font-size: 1.2rem; /* SMALL arrow */
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
 @media screen and (max-width: 768px) {
@@ -543,7 +555,7 @@ button {
   cursor: pointer;
   transition: none; /* NO ANIMATIONS - Agata's feedback */
   box-shadow: none; /* NO SHADOW - Agata's feedback */
-  margin-bottom: 10px;
+  margin-bottom: 4px; /* SMALLER gap to content - was 10px */
 }
 
 .ghost-back-btn:hover {
@@ -553,7 +565,7 @@ button {
 
 .dashboard-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 12px; /* SMALLER gap to cards - was 30px */
 }
 
 .dashboard-header h1 {
@@ -748,7 +760,7 @@ button {
 }
 
 .chat-header-actions {
-  padding: 15px 20px;
+  padding: 6px 12px; /* MUCH SMALLER gap - was 15px 20px */
   border-bottom: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
@@ -787,7 +799,7 @@ button {
   flex: 1 1 auto;
   overflow-y: auto !important;
   overflow-x: hidden;
-  padding: 8px 12px 12px 12px; /* Footer is no longer overlaying */
+  padding: 4px 12px 12px 12px; /* SMALLER top gap - was 8px */
   display: flex;
   flex-direction: column;
   gap: 8px;
