@@ -310,13 +310,13 @@ button {
   /* RED CIRCLE with WHITE SPARKLE */
   position: fixed;
   top: 20px;
-  right: 20px;
+  right: 8px; /* CLOSER to edge - was 20px */
   z-index: 1000;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 60px; /* CIRCLE SIZE */
-  height: 60px; /* CIRCLE SIZE */
+  width: 48px; /* SMALLER - was 60px */
+  height: 48px; /* SMALLER - was 60px */
   padding: 0;
   border-radius: 50%; /* PERFECT CIRCLE */
   border: none;
@@ -627,22 +627,22 @@ button {
 .cards-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important; /* ALWAYS 2 columns */
-  gap: 12px !important; /* Smaller gap for narrow iframes */
+  gap: 8px !important; /* SMALLER gap */
   width: 100%;
   padding: 10px 0 30px;
 }
 
 .card {
-  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
-  padding: 14px;
-  border-radius: 16px; /* SMALLER RADIUS */
-  border: 1px solid #808080; /* DARK GREY BORDER */
+  background: white; /* WHITE BACKGROUND */
+  padding: 12px; /* MORE COMPACT - was 14px */
+  border-radius: 16px;
+  border: none; /* NO BORDER */
   box-shadow: none;
   cursor: pointer;
   transition: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px; /* SMALLER gap - was 8px */
   text-align: left;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -677,7 +677,7 @@ button {
 
 .card-title {
   font-weight: 600;
-  font-size: 0.85rem; /* SMALLER for narrow iframes */
+  font-size: 0.75rem; /* SMALLER - was 0.85rem */
   color: #1f1f33;
   line-height: 1.2;
   letter-spacing: -0.01em;
@@ -699,10 +699,10 @@ button {
 .card-desc {
   margin: 0;
   color: #2b2b2b;
-  font-size: 0.72rem; /* MUCH smaller for narrow iframes */
-  line-height: 1.3;
+  font-size: 0.65rem; /* EVEN SMALLER - was 0.72rem */
+  line-height: 1.25;
   letter-spacing: -0.005em;
-  margin-top: 4px;
+  margin-top: 2px; /* TIGHTER - was 4px */
 }
 
 @media screen and (max-width: 768px) {
