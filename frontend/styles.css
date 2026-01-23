@@ -108,14 +108,15 @@ button {
 .top-bar {
   display: flex !important;
   justify-content: space-between;
-  align-items: center;
-  padding: 6px 0; /* EVEN SMALLER gap - was 8px */
+  align-items: center; /* VERTICAL CENTER alignment */
+  padding: 8px 0; /* Balanced padding */
   flex-shrink: 0;
   z-index: 10;
   visibility: visible !important;
   opacity: 1 !important;
   background: transparent;
   color: var(--text-dark);
+  height: auto; /* Let content determine height */
 }
 .top-bar.hidden {
   display: none !important;
@@ -123,13 +124,14 @@ button {
 
 .brand {
   display: flex;
-  align-items: center;
-  gap: 8px; /* SMALLER gap - was 10px */
+  align-items: center; /* VERTICAL CENTER alignment */
+  gap: 10px; /* Space between arrow and text */
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.05em;
   text-transform: none; /* NO CAPITALS - Agata's feedback */
   color: var(--text-dark);
+  line-height: 1; /* Prevent extra vertical space */
 }
 
 /* Header back button - GREY lowercase text */
@@ -137,17 +139,24 @@ button {
   background: transparent;
   border: none;
   color: #808080; /* GREY color */
-  font-size: 0.9rem; /* SMALL text */
+  font-size: 1.2rem; /* Arrow size */
   cursor: pointer;
-  padding: 4px 8px; /* CLICKABLE area */
+  padding: 4px 6px; /* CLICKABLE area */
   margin: 0;
-  line-height: 1;
-  text-transform: lowercase; /* Ensure lowercase */
+  line-height: 1; /* No extra vertical space */
   font-weight: 400; /* Normal weight */
   /* Ensure it's clickable */
   pointer-events: auto;
   z-index: 1000;
   position: relative;
+  display: flex;
+  align-items: center; /* Center the arrow */
+}
+
+.brand-name {
+  line-height: 1; /* No extra vertical space */
+  display: flex;
+  align-items: center; /* Center text vertically */
 }
 
 @media screen and (max-width: 768px) {
