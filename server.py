@@ -93,8 +93,8 @@ SECONDARY_KEYWORDS: Dict[str, str] = {
 INFO_MAP: Dict[str, str] = {
     # --- BOX 2 FLOW ---
     "Key Insights": (
-        "Fantastic! Sounds like you're on the move— I'll keep it short and sweet.<br>"
-        "Would you like to explore the key findings, or dive into the methodology behind the data?"
+        "Fantastic! Sounds like you're on the move— I'll keep it short and sweet.<br><br>"
+        "Should we jump straight into the key insights, or do you want the behind-the-scenes scoop on the methodology?"
     ),
     "Methodology": (
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
@@ -109,9 +109,10 @@ INFO_MAP: Dict[str, str] = {
 
     # --- BOX 4 FLOW ---
     "Fundraising trends": (
-        "Love it — let’s dig in! I can show you the detailed funding data, break it down by country or sector, "
+        "Love it — let's dig in!<br><br>"
+        "I can show you the detailed funding data, break it down by country or sector, "
         "show you the top 50 funding rounds, walk you through the IPO and exit landscape, "
-        "or give you a tour of some of the most innovative deeptech startups."
+        "or give you a tour of some of the most innovative deeptech startups. What would you like?"
     ),
     "Funding Data": (
         "Based on our 2026 analysis of the Top 50 female-founded companies:\n"
