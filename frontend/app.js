@@ -844,9 +844,11 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     
     if (data.messages && data.messages.length > 0) {
       console.log('[DEBUG] Adding', data.messages.length, 'messages');
+      let maxDelay = 0;
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
-        addMessage(msg.role, msg.content, false);
+        const segmentDelay = addMessage(msg.role, msg.content, false) || 0;
+        maxDelay = Math.max(maxDelay, segmentDelay);
         // Keep user message at top after each bot message when pinTop is active
         if (pinTop && latestUserMessage) {
           const lockUserToTop = () => {
@@ -865,10 +867,10 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
         }
       }
       
-      // CRITICAL: Wait for DOM to update before rendering options
-      await sleep(100);
+      // CRITICAL: Wait for ALL segments to finish rendering
+      await sleep(maxDelay + 100);
       
-      // Now render options AFTER all messages
+      // Now render options AFTER all message segments
       renderChatOptions(data.options);
     } else {
       console.log('[DEBUG] No messages in response');
@@ -982,8 +984,11 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     segments.forEach((segment, index) => {
       setTimeout(() => appendSegment(segment, index), index * 420);
     });
+    // Return the total delay time so caller can wait
+    return (totalSegments - 1) * 420;
   } else {
     appendSegment(segments[0], 0);
+    return 0;
   }
   
   // If this is a user message, store it for scroll targeting
