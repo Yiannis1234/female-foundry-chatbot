@@ -351,8 +351,8 @@ button {
   border: none;
   background: transparent; /* NO BACKGROUND - Agata's feedback */
   color: #111;
-  font-weight: 700;
-  font-size: 20px;
+  font-weight: 300; /* LIGHT weight */
+  font-size: 2.2rem; /* BIGGER X - was 20px */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
