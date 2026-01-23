@@ -1016,32 +1016,24 @@ button {
 
 /* Options grid inside ONE bubble - 3 PER ROW */
 .options-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 COLUMNS per row */
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important; /* 3 COLUMNS per row - FORCE IT */
   gap: 8px;
-  width: 100%;
+  width: 100% !important;
+  flex-wrap: wrap !important;
 }
 
 @media screen and (max-width: 480px) {
   .options-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    padding-right: 20px; /* Extra padding so last chip is partially visible, hinting more content */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
-    width: auto;
-    margin-right: -12px; /* Pull to edge */
-  }
-  .options-grid::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+    display: grid !important; /* GRID not flex */
+    grid-template-columns: repeat(3, 1fr) !important; /* 3 PER ROW even on mobile */
+    gap: 8px;
+    width: 100% !important;
   }
   .options-grid .suggestion-chip {
-    flex: 0 0 auto;
-    white-space: nowrap;
+    white-space: normal; /* Allow text wrap on small screens */
     position: relative;
-    z-index: 0; /* Behind the gradient overlay */
+    z-index: 0;
   }
 }
 
