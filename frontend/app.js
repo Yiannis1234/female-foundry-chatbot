@@ -1097,6 +1097,10 @@ function renderChatOptions(options) {
     if (OPTION_LINKS[opt]) {
       chip = document.createElement("a");
       chip.className = "suggestion-chip";
+      // BLACK BUTTON for Methodology
+      if (opt === "Methodology") {
+        chip.classList.add("suggestion-chip-black");
+      }
       chip.textContent = opt;
       chip.href = OPTION_LINKS[opt];
       chip.target = "_top";

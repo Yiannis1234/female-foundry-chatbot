@@ -215,23 +215,25 @@ button {
 .top-links a {
   text-decoration: none;
   color: var(--text-dark);
-  font-size: 2.5rem; /* BIGGER for envelope visibility */
-  margin-left: 30px;
-  margin-right: 60px;
-  transition: none; /* NO ANIMATIONS */
+  font-size: 1.5rem;
+  margin-left: 20px;
+  margin-right: 10px;
+  transition: none;
   white-space: nowrap;
   visibility: visible !important;
   opacity: 1 !important;
   display: inline-flex;
-  align-items: center;
+  align-items: center; /* ALIGN WITH X */
   gap: 6px;
+  line-height: 1; /* CRITICAL for vertical alignment */
 }
 
 .top-links a svg {
-  width: 32px; /* Size the cursor icon */
-  height: 32px;
+  width: 30px; /* BIGGER envelope */
+  height: 30px; /* BIGGER envelope */
   fill: currentColor;
   stroke: currentColor;
+  display: block; /* Remove inline spacing */
 }
 
 .top-links a:hover {
@@ -949,7 +951,7 @@ button {
   padding: 6px 12px;
   border-radius: 50px;
   border: 1px solid #c0c0c0; /* BORDER for chat suggestions */
-  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
+  background: #F5F5F5; /* LIGHT GREY background - user requested */
   color: var(--text-dark);
   font-size: 0.78rem;
   font-weight: 600;
@@ -990,6 +992,13 @@ button {
   /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
+/* BLACK BUTTON for Methodology */
+.suggestion-chip-black {
+  background: #000000 !important; /* BLACK background */
+  color: white !important; /* WHITE text */
+  border-color: #000000 !important; /* BLACK border */
+}
+
 .bubble-options {
   background: #f7f7f7;
   border: none; /* NO OUTLINE - Agata's feedback */
@@ -1007,10 +1016,10 @@ button {
   }
 }
 
-/* Options grid inside ONE bubble (mobile-friendly, less scrolling) */
+/* Options grid inside ONE bubble - 3 PER ROW */
 .options-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 COLUMNS per row */
   gap: 8px;
   width: 100%;
 }
