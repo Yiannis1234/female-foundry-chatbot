@@ -950,9 +950,9 @@ button {
 .suggestion-chip {
   padding: 6px 12px;
   border-radius: 50px;
-  border: 1px solid #c0c0c0; /* BORDER for chat suggestions */
-  background: #F5F5F5; /* LIGHT GREY background - user requested */
-  color: var(--text-dark);
+  border: 1px solid #000000; /* BLACK border */
+  background: #000000; /* BLACK background - ALL buttons */
+  color: white; /* WHITE text - ALL buttons */
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -992,12 +992,7 @@ button {
   /* NO HOVER ANIMATIONS - Agata's feedback */
 }
 
-/* BLACK BUTTON for Methodology */
-.suggestion-chip-black {
-  background: #000000 !important; /* BLACK background */
-  color: white !important; /* WHITE text */
-  border-color: #000000 !important; /* BLACK border */
-}
+/* Removed - ALL chips are now black */
 
 .bubble-options {
   background: #f7f7f7;
