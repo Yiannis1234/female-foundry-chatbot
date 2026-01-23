@@ -117,6 +117,7 @@ button {
   background: transparent;
   color: var(--text-dark);
   height: auto; /* Let content determine height */
+  position: relative; /* For positioning children */
 }
 .top-bar.hidden {
   display: none !important;
@@ -206,8 +207,8 @@ button {
 
 .top-links {
   display: flex !important;
-  align-items: center;
-  gap: 10px;
+  align-items: center; /* ALIGN envelope and X */
+  gap: 12px; /* Space between envelope and X */
   visibility: visible !important;
   opacity: 1 !important;
 }
@@ -216,21 +217,23 @@ button {
   text-decoration: none;
   color: var(--text-dark);
   font-size: 1.5rem;
-  margin-left: 20px;
-  margin-right: 10px;
+  margin: 0; /* NO margins - use gap instead */
+  padding: 0;
   transition: none;
   white-space: nowrap;
   visibility: visible !important;
   opacity: 1 !important;
-  display: inline-flex;
+  display: flex;
   align-items: center; /* ALIGN WITH X */
-  gap: 6px;
+  justify-content: center;
   line-height: 1; /* CRITICAL for vertical alignment */
+  width: 30px; /* SAME as X */
+  height: 30px; /* SAME as X */
 }
 
 .top-links a svg {
-  width: 30px; /* BIGGER envelope */
-  height: 30px; /* BIGGER envelope */
+  width: 30px; /* SAME as X */
+  height: 30px; /* SAME as X */
   fill: currentColor;
   stroke: currentColor;
   display: block; /* Remove inline spacing */
@@ -950,9 +953,9 @@ button {
 .suggestion-chip {
   padding: 6px 12px;
   border-radius: 50px;
-  border: 1px solid #000000; /* BLACK border */
-  background: #000000; /* BLACK background - ALL buttons */
-  color: white; /* WHITE text - ALL buttons */
+  border: 1px solid #000000 !important; /* BLACK border */
+  background: #000000 !important; /* BLACK background - ALL buttons */
+  color: white !important; /* WHITE text - ALL buttons - FORCE IT */
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -1097,9 +1100,9 @@ button {
 .footer-chip {
   padding: 4px 8px;
   border-radius: 50px;
-  border: 1px solid #c0c0c0; /* BORDER for footer suggestions */
-  background: var(--bg-soft); /* GREY BACKGROUND - same as page */
-  color: var(--text-dark);
+  border: 1px solid #000000 !important; /* BLACK border */
+  background: #000000 !important; /* BLACK background */
+  color: white !important; /* WHITE text - FORCE IT */
   font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
