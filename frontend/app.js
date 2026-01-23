@@ -928,7 +928,8 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     msgDiv.className = `chat-message ${role}`;
     
     // Add staggered animation delay for multiple messages
-    if (!skipLocalHistory && totalSegments > 1) {
+    // Use skipSave (used when replaying local history) to avoid animating old messages.
+    if (!skipSave && totalSegments > 1) {
       msgDiv.style.animationDelay = `${index * 0.1}s`;
     }
 
