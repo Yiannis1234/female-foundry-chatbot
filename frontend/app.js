@@ -1137,11 +1137,7 @@ function renderChatOptions(options) {
   msgDiv.appendChild(bubble);
   chatMessages.appendChild(msgDiv);
 
-  // Scroll to ensure the options are visible
-  // Use "start" so the prompt ("What would you like to explore?") is at the top, and user can scroll down if needed.
-  // "end" was forcing the bottom of options to the bottom of view, which could hide the prompt/top options on small screens.
-  setScrollTarget(promptDiv, "start");
-  forceScrollToTop();
+  // No scrolling needed - natural flow
 }
 
 function renderPrimaryFooterOptions(options) {

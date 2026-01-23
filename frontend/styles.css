@@ -126,13 +126,30 @@ button {
 .brand {
   display: flex;
   align-items: center; /* VERTICAL CENTER alignment */
-  gap: 10px; /* Space between arrow and text */
+  gap: 10px; /* Space between elements */
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.05em;
   text-transform: none; /* NO CAPITALS - Agata's feedback */
   color: var(--text-dark);
   line-height: 1; /* Prevent extra vertical space */
+}
+
+.envelope-link {
+  text-decoration: none;
+  color: var(--brand-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-left: 8px; /* Small gap from "Ask the Index" */
+}
+
+.envelope-link svg {
+  width: 30px;
+  height: 30px;
+  display: block;
 }
 
 /* Header back button - GREY lowercase text */
@@ -205,43 +222,7 @@ button {
   -webkit-mask-position: center;
 }
 
-.top-links {
-  display: flex !important;
-  align-items: flex-end; /* ALIGN BOTTOM - envelope bottom = X bottom */
-  gap: 12px; /* Space between envelope and X */
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.top-links a {
-  text-decoration: none;
-  color: var(--text-dark);
-  font-size: 1.5rem;
-  margin: 0; /* NO margins - use gap instead */
-  padding: 0;
-  transition: none;
-  white-space: nowrap;
-  visibility: visible !important;
-  opacity: 1 !important;
-  display: flex;
-  align-items: center; /* ALIGN WITH X */
-  justify-content: center;
-  line-height: 1; /* CRITICAL for vertical alignment */
-  width: 30px; /* SAME as X */
-  height: 30px; /* SAME as X */
-}
-
-.top-links a svg {
-  width: 30px; /* SAME as X */
-  height: 30px; /* SAME as X */
-  fill: currentColor;
-  stroke: currentColor;
-  display: block; /* Remove inline spacing */
-}
-
-.top-links a:hover {
-  color: var(--brand-red);
-}
+/* .top-links removed - envelope now in .brand */
 
 @media screen and (max-width: 768px) {
   .top-links {
