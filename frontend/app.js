@@ -864,11 +864,16 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
           await sleep(380);
         }
       }
+      
+      // CRITICAL: Wait for DOM to update before rendering options
+      await sleep(100);
+      
+      // Now render options AFTER all messages
+      renderChatOptions(data.options);
     } else {
       console.log('[DEBUG] No messages in response');
+      renderChatOptions(data.options);
     }
-
-    renderChatOptions(data.options);
 
     if (pinTop && latestUserMessage) {
       // Keep user message at top after all messages render
