@@ -826,16 +826,16 @@ button {
 }
 
 .chat-message .avatar {
-  width: 32px;
-  height: 32px;
+  width: 24px; /* SMALLER red dot - was 32px */
+  height: 24px; /* SMALLER red dot - was 32px */
   border-radius: 50%;
   background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0; /* HIDE "You" text */
   font-weight: bold;
-  color: #555;
+  color: transparent; /* HIDE "You" text */
   flex-shrink: 0;
 }
 
@@ -1143,6 +1143,23 @@ button {
 @keyframes popIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fly-in animation for chat messages */
+@keyframes flyIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message {
+  animation: flyIn 0.3s ease-out;
+  animation-fill-mode: both;
 }
 
 .fade-in {

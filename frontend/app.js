@@ -926,6 +926,11 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
   const appendSegment = (segment, index) => {
     const msgDiv = document.createElement("div");
     msgDiv.className = `chat-message ${role}`;
+    
+    // Add staggered animation delay for multiple messages
+    if (!skipLocalHistory && totalSegments > 1) {
+      msgDiv.style.animationDelay = `${index * 0.1}s`;
+    }
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
@@ -935,7 +940,7 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
         avatar.classList.add("avatar-placeholder");
       }
     } else {
-      avatar.textContent = "You";
+      avatar.textContent = ""; // NO "You" label
     }
 
     const bubble = document.createElement("div");
