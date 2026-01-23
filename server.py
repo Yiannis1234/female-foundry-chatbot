@@ -151,8 +151,9 @@ INFO_MAP: Dict[str, str] = {
 
     # --- BOX 5 FLOW ---
     "Behind the Index": (
-        "Ah, going behind the scenes — I like your style. Let’s shine a spotlight on the team, the sponsors, "
-        "the contributors, and the partners who make the Female Innovation Index possible. Grab your popcorn — intros coming up!"
+        "Ah, going behind the scenes — I like your style.<br><br>"
+        "Let's shine a spotlight on the team, the sponsors, the contributors, and the partners who make the Female Innovation Index possible.<br><br>"
+        "Grab your popcorn — intros coming up!"
     ),
     "The Team": (
         "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
