@@ -908,7 +908,7 @@ button {
   border: 1px solid #000000 !important; /* BLACK border */
   background: #000000 !important; /* BLACK background - ALL buttons */
   color: white !important; /* WHITE text - ALL buttons - FORCE IT */
-  font-size: 0.78rem;
+  font-size: 0.70rem; /* SMALLER for compact options */
   font-weight: 600;
   cursor: pointer;
   transition: none; /* NO ANIMATIONS - Agata's feedback */
@@ -1047,7 +1047,7 @@ button {
   border: 1px solid #000000 !important; /* BLACK border */
   background: #000000 !important; /* BLACK background */
   color: white !important; /* WHITE text - FORCE IT */
-  font-size: 0.68rem;
+  font-size: 0.62rem; /* SMALLER for compact options */
   font-weight: 600;
   cursor: pointer;
   transition: none; /* NO ANIMATIONS - Agata's feedback */
