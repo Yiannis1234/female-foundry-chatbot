@@ -224,36 +224,7 @@ button {
 
 /* .top-links removed - envelope now in .brand */
 
-@media screen and (max-width: 768px) {
-  .top-links {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  
-  .top-links a {
-    font-size: 3.5rem !important;
-    margin-left: 12px !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .top-links {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    gap: 8px !important;
-  }
-  
-  .top-links a {
-    font-size: 3rem !important;
-    margin-left: 10px !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-}
+/* .top-links media queries removed - envelope now in .brand */
 
 /* Main Content Area */
 #main-content {
