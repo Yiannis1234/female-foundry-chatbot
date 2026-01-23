@@ -1065,19 +1065,7 @@ function renderChatOptions(options) {
     return;
   }
 
-  // Add a prompt bubble before secondary options
-  const promptDiv = document.createElement("div");
-  promptDiv.className = "chat-message bot options-prompt";
-  const promptAvatar = document.createElement("div");
-  promptAvatar.className = "avatar";
-  promptAvatar.textContent = BOT_AVATAR;
-  const promptBubble = document.createElement("div");
-  promptBubble.className = "bubble";
-  promptBubble.innerHTML = "What would you like to explore?";
-  promptDiv.appendChild(promptAvatar);
-  promptDiv.appendChild(promptBubble);
-  chatMessages.appendChild(promptDiv);
-
+  // NO PROMPT - the server response already includes the intro text (e.g. "Love it — let's dig in!")
   // Render options in ONE bubble (much shorter on mobile, easier to scroll/see all options)
   const msgDiv = document.createElement("div");
   msgDiv.className = "chat-message bot options-bubble options-grid-bubble";

@@ -207,7 +207,7 @@ button {
 
 .top-links {
   display: flex !important;
-  align-items: center; /* ALIGN envelope and X */
+  align-items: flex-end; /* ALIGN BOTTOM - envelope bottom = X bottom */
   gap: 12px; /* Space between envelope and X */
   visibility: visible !important;
   opacity: 1 !important;
