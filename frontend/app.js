@@ -653,8 +653,8 @@ function renderDashboard(options) {
   container.style.display = "grid";
   container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
   container.style.gridAutoRows = "auto";
-  container.style.columnGap = "12px";
-  container.style.rowGap = "12px";
+  container.style.columnGap = "6px";
+  container.style.rowGap = "6px";
   container.style.alignItems = "stretch";
   container.style.justifyItems = "stretch";
   container.style.opacity = "1";
@@ -1088,7 +1088,10 @@ function renderChatOptions(options) {
   bubble.className = "bubble bubble-options";
 
   const grid = document.createElement("div");
-  grid.className = "options-grid";
+  const optionCount = Array.isArray(options) ? options.length : 0;
+  const cols =
+    optionCount <= 2 ? Math.max(1, optionCount) : optionCount === 4 ? 2 : 3;
+  grid.className = `options-grid cols-${cols}`;
 
   options.forEach((opt) => {
     let chip;
