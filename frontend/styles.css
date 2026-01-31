@@ -646,14 +646,13 @@ button {
 
 /* When embedded (Wix iframe), make the grid fill available height so there's no big empty area */
 body.in-iframe #view-dashboard .cards-grid {
-  flex: 1 1 auto;
-  align-content: stretch;
-  grid-auto-rows: minmax(0, 1fr);
+  /* Keep cards scaling with their text (no stretched boxes) */
+  align-content: start;
 }
 
 .card {
   background: white; /* WHITE BACKGROUND */
-  padding: 12px; /* bigger padding for readability */
+  padding: 14px; /* Increase padding (Agata) */
   border-radius: 14px;
   border: none; /* NO BORDER */
   box-shadow: none;
@@ -661,7 +660,7 @@ body.in-iframe #view-dashboard .cards-grid {
   transition: none;
   display: flex;
   flex-direction: column;
-  gap: 6px; /* bigger gap for readability */
+  gap: 4px; /* tighter gap between title/desc */
   text-align: left;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -698,7 +697,7 @@ body.in-iframe #view-dashboard .cards-grid {
 .card-title {
   font-weight: 600;
   font-size: 0.95rem; /* READABLE */
-  color: #1f1f33;
+  color: var(--header-ink);
   line-height: 1.0; /* TIGHT (Agata) */
   letter-spacing: -0.01em;
   margin: 0;
@@ -720,9 +719,9 @@ body.in-iframe #view-dashboard .cards-grid {
 
 .card-desc {
   margin: 0;
-  color: #2b2b2b;
+  color: var(--header-ink);
   font-size: 0.82rem; /* READABLE */
-  line-height: 0.8; /* TIGHT as Agata requested */
+  line-height: 0.9; /* Agata: 0.9 (slightly looser than 0.8) */
   letter-spacing: -0.005em;
   margin-top: 2px;
 }
@@ -730,14 +729,14 @@ body.in-iframe #view-dashboard .cards-grid {
 @media screen and (max-width: 768px) {
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 0.8 !important;
+    line-height: 0.9 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 0.8 !important;
+    line-height: 0.9 !important;
   }
 }
 
@@ -832,11 +831,11 @@ body.in-iframe #view-dashboard .cards-grid {
 .chat-message.user {
   align-self: flex-end;
   flex-direction: row-reverse;
-  animation: slideInFromRight 0.3s ease-out;
+  animation: slideInFromRight 0.45s ease-out;
 }
 
 .chat-message.bot {
-  animation: slideInFromLeft 0.3s ease-out;
+  animation: slideInFromLeft 0.45s ease-out;
 }
 
 .chat-message .avatar {
@@ -965,8 +964,8 @@ body.in-iframe #view-dashboard .cards-grid {
   padding: 3px 6px; /* MUCH tighter padding (Agata) */
   border-radius: 50px;
   border: 1px solid var(--text-dark) !important; /* #313030 */
-  background: var(--text-dark) !important; /* #313030 */
-  color: white !important; /* WHITE text - ALL buttons - FORCE IT */
+  background: transparent !important; /* Match bottom mini-menu */
+  color: var(--text-dark) !important; /* Match bottom mini-menu */
   font-size: 0.62rem; /* smaller text */
   font-weight: 600;
   cursor: pointer;
@@ -1177,7 +1176,7 @@ body.in-iframe #view-dashboard .cards-grid {
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
-    transform: translateX(-14px);
+    transform: translateX(-26px);
   }
   to {
     opacity: 1;
@@ -1188,7 +1187,7 @@ body.in-iframe #view-dashboard .cards-grid {
 @keyframes slideInFromRight {
   from {
     opacity: 0;
-    transform: translateX(14px);
+    transform: translateX(26px);
   }
   to {
     opacity: 1;
@@ -1228,7 +1227,7 @@ body.in-iframe #view-dashboard .cards-grid {
   }
 
   .card {
-    padding: 12px !important;
+    padding: 14px !important;
   }
 
   .card-title {
@@ -1238,7 +1237,7 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 0.8 !important;
+    line-height: 0.9 !important;
   }
   
   .chat-container {
@@ -1293,7 +1292,7 @@ body.in-iframe #view-dashboard .cards-grid {
   }
 
   .card {
-    padding: 12px !important;
+    padding: 14px !important;
   }
 
   .card-title {
@@ -1303,7 +1302,7 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 0.8 !important;
+    line-height: 0.9 !important;
   }
 }
 

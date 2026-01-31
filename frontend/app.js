@@ -65,6 +65,7 @@ const PRIMARY_LIST = [
   "Idea",
   "Fundraising trends",
   "Behind the Index",
+  "About Female Foundry",
 ];
 
 const DASHBOARD_CARD_META = {
@@ -111,6 +112,13 @@ const DASHBOARD_CARD_META = {
       "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
     link: null,
   },
+  "About Female Foundry": {
+    icon: "🏛️",
+    background: "#FF0000",
+    description:
+      "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
+    link: null,
+  },
 };
 
 // Direct links map (dashboard buttons and chat chips)
@@ -119,6 +127,7 @@ const OPTION_LINKS = {
   "The AI Era": "https://www.femaleinnovationindex.com/innovation",
   "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation", // legacy support
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
+  "About Female Foundry": "https://www.femalefoundry.co/",
 
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
@@ -660,7 +669,7 @@ function renderDashboard(options) {
   const optsToRender = Array.from(
     new Set(
       optsToRenderRaw
-        .filter((o) => o && o !== "About Female Foundry")
+        .filter((o) => o)
         .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o))
     )
   );
@@ -861,11 +870,11 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     
     if (data.messages && data.messages.length > 0) {
       console.log('[DEBUG] Adding', data.messages.length, 'messages');
-      let maxDelay = 0;
+      let lastDelay = 0;
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
         const segmentDelay = addMessage(msg.role, msg.content, false) || 0;
-        maxDelay = Math.max(maxDelay, segmentDelay);
+        lastDelay = segmentDelay;
         // Keep user message at top after each bot message when pinTop is active
         if (pinTop && latestUserMessage) {
           const lockUserToTop = () => {
@@ -880,12 +889,14 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
           setTimeout(lockUserToTop, 60);
         }
         if (i < data.messages.length - 1) {
-          await sleep(380);
+          // If this message is split into multiple segments, wait for them to render
+          // so the conversation flows clearly left→right / right→left.
+          await sleep(Math.max(520, segmentDelay + 220));
         }
       }
       
-      // CRITICAL: Wait for ALL segments to finish rendering
-      await sleep(maxDelay + 100);
+      // CRITICAL: Wait for last message segments to finish rendering
+      await sleep(lastDelay + 140);
       
       // Now render options AFTER all message segments
       renderChatOptions(data.options);
@@ -951,14 +962,9 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     const msgDiv = document.createElement("div");
     msgDiv.className = `chat-message ${role}`;
     
-    // Add staggered animation delay for multiple messages
-    // Use skipSave (used when replaying local history) to avoid animating old messages.
-    if (!skipSave && totalSegments > 1) {
-      msgDiv.style.animationDelay = `${index * 0.1}s`;
-    }
-    if (skipSave) {
-      msgDiv.style.animation = "none";
-    }
+    // For restored history, disable animations.
+    // For live messages, we rely on segment scheduling (below) for staggered flow.
+    if (skipSave) msgDiv.style.animation = "none";
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
@@ -1000,12 +1006,13 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     }
   };
 
+  const SEGMENT_STAGGER_MS = 560; // more delay so direction is obvious
   if (role === "bot" && totalSegments > 1) {
     segments.forEach((segment, index) => {
-      setTimeout(() => appendSegment(segment, index), index * 420);
+      setTimeout(() => appendSegment(segment, index), index * SEGMENT_STAGGER_MS);
     });
     // Return the total delay time so caller can wait
-    return (totalSegments - 1) * 420;
+    return (totalSegments - 1) * SEGMENT_STAGGER_MS;
   } else {
     appendSegment(segments[0], 0);
     return 0;
@@ -1076,7 +1083,7 @@ function renderChatOptions(options) {
     ? Array.from(
         new Set(
           options
-            .filter((o) => o && o !== "About Female Foundry")
+            .filter((o) => o)
             .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o))
         )
       )
@@ -1268,9 +1275,8 @@ function isPrimaryOptions(opts) {
 
   // Backwards compatible: older server/UI included:
   // - "The Era of Abundance" (now "The AI Era")
-  // - "About Female Foundry" (now hidden)
   const normalized = opts
-    .filter((o) => o && o !== "About Female Foundry")
+    .filter((o) => o)
     .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o));
 
   if (normalized.length !== PRIMARY_LIST.length) return false;

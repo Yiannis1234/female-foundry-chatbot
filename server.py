@@ -36,6 +36,7 @@ PRIMARY_OPTIONS = [
     "Idea",
     "Fundraising trends",
     "Behind the Index",
+    "About Female Foundry",
 ]
 
 # These are the sub-options for the boxes that lead to a chat flow
