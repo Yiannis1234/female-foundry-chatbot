@@ -117,7 +117,7 @@ button {
   opacity: 1 !important;
   background: transparent;
   color: var(--header-ink);
-  font-size: 0.92rem; /* Slightly smaller to match overall scale */
+  font-size: 1rem; /* Match chat bubble font size */
   height: auto; /* Let content determine height */
   position: relative; /* For positioning children */
 }
@@ -129,9 +129,9 @@ button {
   display: flex;
   align-items: center; /* VERTICAL CENTER alignment */
   gap: 8px; /* Tighter */
-  font-weight: 600;
+  font-weight: 400; /* Match chat bubble weight */
   font-size: inherit;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em; /* Match chat bubble spacing */
   text-transform: none; /* NO CAPITALS - Agata's feedback */
   color: var(--header-ink);
   line-height: 1; /* Prevent extra vertical space */
@@ -146,9 +146,9 @@ button {
 .contact-link {
   color: var(--header-ink);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400; /* Match chat bubble weight */
   font-size: inherit;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em; /* Match chat bubble spacing */
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -198,13 +198,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .top-bar {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important; /* Match chat bubble on mobile */
   }
 }
 
 @media screen and (max-width: 480px) {
   .top-bar {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important; /* Match chat bubble on mobile */
   }
 }
 
@@ -365,20 +365,31 @@ button {
 .close-btn {
   /* Keep X inline next to Contact (no overlap) */
   position: static;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
   border: none;
   background: transparent; /* NO BACKGROUND */
   color: var(--header-ink);
-  font-weight: 300; /* lighter/thinner */
-  font-size: 2.2rem; /* bigger X */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: none;
   transition: none;
+  line-height: 1;
+}
+
+.close-icon {
+  width: 16px;
+  height: 16px;
+  stroke: var(--header-ink);
+  stroke-width: 1.6; /* THIN X */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  display: block;
 }
 
 .close-btn:hover {
