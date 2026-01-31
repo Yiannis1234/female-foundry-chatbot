@@ -522,7 +522,7 @@ button {
   height: 100%;
   display: flex !important;
   flex-direction: column;
-  padding: 2px 0; /* TIGHT gap under header (Agata) */
+  padding: 2px 0 0 0; /* NO bottom padding - remove empty space */
   justify-content: flex-start;
   align-items: center;
   overflow-y: auto;
@@ -633,12 +633,9 @@ button {
 .cards-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important; /* ALWAYS 2 columns */
-  gap: 1px !important; /* No gap — just a hairline divider */
+  gap: 3px !important; /* tiny gap between rounded bubbles */
   width: 100%;
-  padding: 0; /* remove extra whitespace */
-  background: #e9e9e9; /* divider color between tiles */
-  border-radius: 14px;
-  overflow: hidden;
+  padding: 0 0 0 0; /* no bottom padding - no empty space */
   min-height: 0;
 }
 
@@ -656,7 +653,7 @@ body.in-iframe #view-dashboard .cards-grid {
 .card {
   background: white; /* WHITE BACKGROUND */
   padding: 14px; /* Increase padding (Agata) */
-  border-radius: 0; /* so tiles sit flush with no "gap" */
+  border-radius: 14px; /* KEEP ROUNDED BUBBLES */
   border: none; /* NO BORDER */
   box-shadow: none;
   cursor: pointer;
@@ -1232,7 +1229,7 @@ body.in-iframe #view-dashboard .cards-grid {
 
   /* Keep dashboard cards compact on mobile too */
   .cards-grid {
-    gap: 1px !important;
+    gap: 3px !important;
   }
 
   .card {
@@ -1324,7 +1321,7 @@ body.in-iframe #view-dashboard .cards-grid {
   /* FORCE 2 COLUMNS even in narrow iframes */
   .cards-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 1px !important;
+    gap: 3px !important;
   }
   
   .dashboard-header h1 {
