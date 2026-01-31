@@ -37,6 +37,16 @@ const resetBtn = document.getElementById("reset-chat");
 const restartFlowBtn = document.getElementById("restartFlow");
 const headerBackBtn = document.getElementById("header-back-btn");
 
+// Mark when embedded (Wix iframe) so CSS can adapt sizing
+(() => {
+  try {
+    if (window.self !== window.top) document.body.classList.add("in-iframe");
+  } catch (e) {
+    // Cross-origin access can throw — if it does, assume we're in an iframe
+    document.body.classList.add("in-iframe");
+  }
+})();
+
 // Fallback method if JS navigation is ever needed
 function openExternal(url) {
   console.log('[FF-CHATBOT] Attempting JS top navigation to:', url);

@@ -117,7 +117,7 @@ button {
   opacity: 1 !important;
   background: transparent;
   color: var(--header-ink);
-  font-size: 1rem; /* Ensure Contact matches Ask the Index */
+  font-size: 0.92rem; /* Slightly smaller to match overall scale */
   height: auto; /* Let content determine height */
   position: relative; /* For positioning children */
 }
@@ -525,6 +525,7 @@ button {
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 0; /* allow children to flex/scroll properly */
 }
 
 .dashboard-top-row {
@@ -624,6 +625,19 @@ button {
   gap: 6px !important; /* SMALLER gap between boxes */
   width: 100%;
   padding: 6px 0 12px; /* remove extra empty space */
+  min-height: 0;
+}
+
+/* If odd number of cards, make the last one span full row (removes empty half-row gap) */
+.cards-grid > .card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* When embedded (Wix iframe), make the grid fill available height so there's no big empty area */
+body.in-iframe #view-dashboard .cards-grid {
+  flex: 1 1 auto;
+  align-content: stretch;
+  grid-auto-rows: minmax(0, 1fr);
 }
 
 .card {
