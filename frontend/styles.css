@@ -642,7 +642,7 @@ body.in-iframe #view-dashboard .cards-grid {
 
 .card {
   background: white; /* WHITE BACKGROUND */
-  padding: 8px; /* MORE COMPACT */
+  padding: 12px; /* bigger padding for readability */
   border-radius: 14px;
   border: none; /* NO BORDER */
   box-shadow: none;
@@ -650,7 +650,7 @@ body.in-iframe #view-dashboard .cards-grid {
   transition: none;
   display: flex;
   flex-direction: column;
-  gap: 3px; /* tighter gap between lines */
+  gap: 6px; /* bigger gap for readability */
   text-align: left;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -686,45 +686,45 @@ body.in-iframe #view-dashboard .cards-grid {
 
 .card-title {
   font-weight: 600;
-  font-size: 0.64rem; /* SMALLER */
+  font-size: 0.95rem; /* READABLE */
   color: #1f1f33;
-  line-height: 1.05; /* TIGHTER */
+  line-height: 1.2;
   letter-spacing: -0.01em;
   margin: 0;
 }
 
 @media screen and (max-width: 768px) {
   .card-title {
-    font-size: 0.64rem !important;
+    font-size: 0.95rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-title {
-    font-size: 0.64rem !important;
+    font-size: 0.95rem !important;
   }
 }
 
 .card-desc {
   margin: 0;
   color: #2b2b2b;
-  font-size: 0.56rem; /* SMALLER */
-  line-height: 1.1; /* TIGHTER */
+  font-size: 0.82rem; /* READABLE */
+  line-height: 1.3;
   letter-spacing: -0.005em;
-  margin-top: 0; /* TIGHTER */
+  margin-top: 2px;
 }
 
 @media screen and (max-width: 768px) {
   .card-desc {
-    font-size: 0.56rem !important;
-    line-height: 1.1 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.3 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-desc {
-    font-size: 0.56rem !important;
-    line-height: 1.1 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.3 !important;
   }
 }
 
@@ -1208,17 +1208,17 @@ body.in-iframe #view-dashboard .cards-grid {
   }
 
   .card {
-    padding: 8px !important;
+    padding: 12px !important;
   }
 
   .card-title {
-    font-size: 0.64rem !important;
-    line-height: 1.05 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.2 !important;
   }
 
   .card-desc {
-    font-size: 0.56rem !important;
-    line-height: 1.1 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.3 !important;
   }
   
   .chat-container {
@@ -1273,15 +1273,15 @@ body.in-iframe #view-dashboard .cards-grid {
   }
 
   .card {
-    padding: 8px !important;
+    padding: 12px !important;
   }
 
   .card-title {
-    font-size: 0.64rem !important;
+    font-size: 0.95rem !important;
   }
 
   .card-desc {
-    font-size: 0.56rem !important;
+    font-size: 0.82rem !important;
   }
 }
 
