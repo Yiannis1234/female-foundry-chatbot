@@ -148,7 +148,7 @@ button {
   font-size: 1rem;
   letter-spacing: 0.05em;
   line-height: 1;
-  display: flex;
+  display: inline-flex;
   align-items: center;
 }
 
@@ -359,17 +359,16 @@ button {
 }
 
 .close-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  /* Keep X inline next to Contact (no overlap) */
+  position: static;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: none;
-  background: transparent; /* NO BACKGROUND - Agata's feedback */
+  background: transparent; /* NO BACKGROUND */
   color: #111;
-  font-weight: 300; /* LIGHT weight */
-  font-size: 2.2rem; /* BIGGER X - was 20px */
+  font-weight: 300; /* lighter/thinner */
+  font-size: 2.2rem; /* bigger X */
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -676,13 +675,13 @@ button {
 
 @media screen and (max-width: 768px) {
   .card-title {
-    font-size: 1.1rem !important;
+    font-size: 0.68rem !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-title {
-    font-size: 1.1rem !important;
+    font-size: 0.68rem !important;
   }
 }
 
@@ -697,15 +696,15 @@ button {
 
 @media screen and (max-width: 768px) {
   .card-desc {
-    font-size: 0.9rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.6rem !important;
+    line-height: 1.15 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-desc {
-    font-size: 0.9rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.6rem !important;
+    line-height: 1.15 !important;
   }
 }
 
@@ -1155,6 +1154,25 @@ button {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+
+  /* Keep dashboard cards compact on mobile too */
+  .cards-grid {
+    gap: 6px !important;
+  }
+
+  .card {
+    padding: 10px !important;
+  }
+
+  .card-title {
+    font-size: 0.68rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .card-desc {
+    font-size: 0.6rem !important;
+    line-height: 1.15 !important;
+  }
   
   .chat-container {
     height: 100%;
@@ -1229,7 +1247,7 @@ button {
   /* FORCE 2 COLUMNS even in narrow iframes */
   .cards-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    gap: 6px !important;
   }
   
   .dashboard-header h1 {
