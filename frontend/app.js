@@ -956,6 +956,9 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     if (!skipSave && totalSegments > 1) {
       msgDiv.style.animationDelay = `${index * 0.1}s`;
     }
+    if (skipSave) {
+      msgDiv.style.animation = "none";
+    }
 
     const avatar = document.createElement("div");
     avatar.className = "avatar";
