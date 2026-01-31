@@ -50,18 +50,25 @@ function openExternal(url) {
 
 // UPDATED METADATA FOR NEW BOXES
 const PRIMARY_LIST = [
-  "The Era of Abundance",
+  "The AI Era",
   "Key Insights",
   "Idea",
   "Fundraising trends",
   "Behind the Index",
-  // "About Female Foundry", // REMOVED per user request
 ];
 
 const DASHBOARD_CARD_META = {
-  "The Era of Abundance": {
+  "The AI Era": {
     icon: "🌌",
     background: "#FF0000", // EXACT RED from website - Agata's feedback
+    description:
+      "Learn how AI is redefining how female founders build and solve the next generation of problems.",
+    link: null,
+  },
+  // Legacy label support (older sessions)
+  "The Era of Abundance": {
+    icon: "🌌",
+    background: "#FF0000",
     description:
       "Learn how AI is redefining how female founders build and solve the next generation of problems.",
     link: null,
@@ -94,21 +101,14 @@ const DASHBOARD_CARD_META = {
       "See who is behind the Female Innovation Index—meet our team, the sponsors, the contributors, and the partners.",
     link: null,
   },
-  "About Female Foundry": {
-    icon: "🏛️",
-    background: "#FF0000", // EXACT RED from website - Agata's feedback
-    description:
-      "Learn more about Female Foundry, the founding initiative that powers the Female Innovation Index every year.",
-    link: null,
-  },
 };
 
 // Direct links map (dashboard buttons and chat chips)
 const OPTION_LINKS = {
   // Primary (Dashboard)
-  "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation",
+  "The AI Era": "https://www.femaleinnovationindex.com/innovation",
+  "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation", // legacy support
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
-  "About Female Foundry": "https://www.femalefoundry.co/",
 
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
@@ -646,7 +646,14 @@ function renderDashboard(options) {
 
   _attachDashboardCardDelegation();
 
-  const optsToRender = (options && options.length > 0) ? options : PRIMARY_LIST;
+  const optsToRenderRaw = (options && options.length > 0) ? options : PRIMARY_LIST;
+  const optsToRender = Array.from(
+    new Set(
+      optsToRenderRaw
+        .filter((o) => o && o !== "About Female Foundry")
+        .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o))
+    )
+  );
   console.log("[FF-CHATBOT] Rendering dashboard with:", optsToRender);
 
   // FORCE 2 COLUMNS ALWAYS - user wants 2 per row even in narrow iframes
@@ -1052,9 +1059,19 @@ function splitBotContent(content) {
 function renderChatOptions(options) {
   if (!chatMessages) return;
 
+  const cleanedOptions = Array.isArray(options)
+    ? Array.from(
+        new Set(
+          options
+            .filter((o) => o && o !== "About Female Foundry")
+            .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o))
+        )
+      )
+    : [];
+
   // Persist last shown options so they can be restored after page navigation
   try {
-    ffSet("ff_last_options", JSON.stringify(options || []));
+    ffSet("ff_last_options", JSON.stringify(cleanedOptions));
   } catch (e) {
     // ignore
   }
@@ -1066,12 +1083,12 @@ function renderChatOptions(options) {
   const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
   oldOptionBubbles.forEach((el) => el.remove());
 
-  if (!options || options.length === 0) {
+  if (!cleanedOptions || cleanedOptions.length === 0) {
     return;
   }
 
   // If these are the primary 6, show them in the footer and skip inline bubble
-  if (isPrimaryOptions(options)) {
+  if (isPrimaryOptions(cleanedOptions)) {
     return;
   }
 
@@ -1088,16 +1105,16 @@ function renderChatOptions(options) {
   bubble.className = "bubble bubble-options";
 
   const grid = document.createElement("div");
-  const optionCount = Array.isArray(options) ? options.length : 0;
+  const optionCount = cleanedOptions.length;
   const cols =
     optionCount <= 2 ? Math.max(1, optionCount) : optionCount === 4 ? 2 : 3;
   grid.className = `options-grid cols-${cols}`;
 
-  options.forEach((opt) => {
+  cleanedOptions.forEach((opt) => {
     let chip;
     if (OPTION_LINKS[opt]) {
       chip = document.createElement("a");
-      chip.className = "suggestion-chip"; // All buttons black now
+      chip.className = "suggestion-chip"; // styled as dark grey (#313030)
       chip.textContent = opt;
       chip.href = OPTION_LINKS[opt];
       chip.target = "_top";
@@ -1234,16 +1251,18 @@ function renderPrimaryFooterOptions(options) {
 }
 
 function isPrimaryOptions(opts) {
-  const primarySet = new Set([
-    "The Era of Abundance",
-    "Key Insights",
-    "Idea",
-    "Fundraising trends",
-    "Behind the Index",
-    "About Female Foundry",
-  ]);
-  if (!Array.isArray(opts) || opts.length !== 6) return false;
-  return opts.every((o) => primarySet.has(o));
+  if (!Array.isArray(opts)) return false;
+
+  // Backwards compatible: older server/UI included:
+  // - "The Era of Abundance" (now "The AI Era")
+  // - "About Female Foundry" (now hidden)
+  const normalized = opts
+    .filter((o) => o && o !== "About Female Foundry")
+    .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o));
+
+  if (normalized.length !== PRIMARY_LIST.length) return false;
+  const primarySet = new Set(PRIMARY_LIST);
+  return normalized.every((o) => primarySet.has(o));
 }
 
 function isKeyInsightsSecondary(opts) {

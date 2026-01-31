@@ -31,12 +31,11 @@ with DATA_PATH.open("r", encoding="utf-8") as f:
 # --- CONFIGURATION ---
 
 PRIMARY_OPTIONS = [
-    "The Era of Abundance",
+    "The AI Era",
     "Key Insights",
     "Idea",
     "Fundraising trends",
     "Behind the Index",
-    "About Female Foundry",
 ]
 
 # These are the sub-options for the boxes that lead to a chat flow
@@ -63,8 +62,8 @@ SECONDARY_OPTIONS: Dict[str, List[str]] = {
 # Note: "Key Insights" button inside "Key Insights" box might be confusing. Let's stick to the requested "Key Insights" button name.
 
 PRIMARY_KEYWORDS: Dict[str, str] = {
-    "abundance": "The Era of Abundance",
-    "ai": "The Era of Abundance",
+    "abundance": "The AI Era",
+    "ai": "The AI Era",
     "insights": "Key Insights",
     "idea": "Idea",
     "fundraising": "Fundraising trends",
@@ -72,6 +71,7 @@ PRIMARY_KEYWORDS: Dict[str, str] = {
     "behind": "Behind the Index",
     "team": "Behind the Index",
     "partners": "Behind the Index",
+    # Keep "about" as a hidden fallback (not shown in PRIMARY_OPTIONS)
     "about": "About Female Foundry",
 }
 
@@ -173,9 +173,9 @@ INFO_MAP: Dict[str, str] = {
     ),
 
     # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
-    "The Era of Abundance": (
-        "Opening The Era of Abundance in a new tab.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/innovation' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open The Era of Abundance</a>"
+    "The AI Era": (
+        "Opening The AI Era in a new tab.<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/innovation' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open The AI Era</a>"
     ),
     "Idea": (
         "Opening Idea in a new tab.<br><br>"
