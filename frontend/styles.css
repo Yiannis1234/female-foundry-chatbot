@@ -688,7 +688,7 @@ body.in-iframe #view-dashboard .cards-grid {
   font-weight: 600;
   font-size: 0.95rem; /* READABLE */
   color: #1f1f33;
-  line-height: 1.2;
+  line-height: 1.0; /* TIGHT (Agata) */
   letter-spacing: -0.01em;
   margin: 0;
 }
@@ -696,12 +696,14 @@ body.in-iframe #view-dashboard .cards-grid {
 @media screen and (max-width: 768px) {
   .card-title {
     font-size: 0.95rem !important;
+    line-height: 1.0 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-title {
     font-size: 0.95rem !important;
+    line-height: 1.0 !important;
   }
 }
 
@@ -709,7 +711,7 @@ body.in-iframe #view-dashboard .cards-grid {
   margin: 0;
   color: #2b2b2b;
   font-size: 0.82rem; /* READABLE */
-  line-height: 1.3;
+  line-height: 0.8; /* TIGHT as Agata requested */
   letter-spacing: -0.005em;
   margin-top: 2px;
 }
@@ -717,14 +719,14 @@ body.in-iframe #view-dashboard .cards-grid {
 @media screen and (max-width: 768px) {
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 1.3 !important;
+    line-height: 0.8 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 1.3 !important;
+    line-height: 0.8 !important;
   }
 }
 
@@ -942,7 +944,7 @@ body.in-iframe #view-dashboard .cards-grid {
 }
 
 .suggestion-chip {
-  padding: 4px 8px; /* more compact like footer mini-menu */
+  padding: 3px 6px; /* MUCH tighter padding (Agata) */
   border-radius: 50px;
   border: 1px solid var(--text-dark) !important; /* #313030 */
   background: var(--text-dark) !important; /* #313030 */
@@ -953,7 +955,7 @@ body.in-iframe #view-dashboard .cards-grid {
   transition: none; /* NO ANIMATIONS - Agata's feedback */
   box-shadow: none; /* NO SHADOW - Agata's feedback */
   text-align: center;
-  line-height: 1.15;
+  line-height: 1.0;
   white-space: normal;
   text-decoration: none !important;
   display: inline-flex;
@@ -968,18 +970,18 @@ body.in-iframe #view-dashboard .cards-grid {
 @media screen and (max-width: 768px) {
   .suggestion-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
-    line-height: 1.15 !important;
+    line-height: 1.0 !important;
   }
 }
 
 @media screen and (max-width: 480px) {
   .suggestion-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
-    line-height: 1.15 !important;
+    line-height: 1.0 !important;
   }
 }
 
@@ -1104,7 +1106,7 @@ body.in-iframe #view-dashboard .cards-grid {
 }
 
 .footer-chip {
-  padding: 4px 8px;
+  padding: 3px 6px; /* MUCH tighter (Agata) */
   border-radius: 50px;
   border: 1px solid var(--text-dark) !important; /* #313030 */
   background: transparent !important; /* Transparent (Agata) */
@@ -1213,12 +1215,12 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .card-title {
     font-size: 0.95rem !important;
-    line-height: 1.2 !important;
+    line-height: 1.0 !important;
   }
 
   .card-desc {
     font-size: 0.82rem !important;
-    line-height: 1.3 !important;
+    line-height: 0.8 !important;
   }
   
   .chat-container {
@@ -1262,13 +1264,13 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .suggestion-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
   }
 
   .footer-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
   }
 
@@ -1278,10 +1280,12 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .card-title {
     font-size: 0.95rem !important;
+    line-height: 1.0 !important;
   }
 
   .card-desc {
     font-size: 0.82rem !important;
+    line-height: 0.8 !important;
   }
 }
 
@@ -1352,13 +1356,13 @@ body.in-iframe #view-dashboard .cards-grid {
 
   .suggestion-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
   }
 
   .footer-chip {
     font-size: 0.62rem !important;
-    padding: 4px 8px !important;
+    padding: 3px 6px !important;
     min-height: auto !important;
   }
 
