@@ -622,9 +622,9 @@ button {
 .cards-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important; /* ALWAYS 2 columns */
-  gap: 6px !important; /* SMALLER gap between boxes */
+  gap: 4px !important; /* TIGHT gap for perfect fit */
   width: 100%;
-  padding: 6px 0 12px; /* remove extra empty space */
+  padding: 4px 0 8px; /* minimal spacing */
   min-height: 0;
 }
 
@@ -1204,7 +1204,7 @@ body.in-iframe #view-dashboard .cards-grid {
 
   /* Keep dashboard cards compact on mobile too */
   .cards-grid {
-    gap: 6px !important;
+    gap: 4px !important;
   }
 
   .card {
@@ -1294,7 +1294,7 @@ body.in-iframe #view-dashboard .cards-grid {
   /* FORCE 2 COLUMNS even in narrow iframes */
   .cards-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px !important;
+    gap: 4px !important;
   }
   
   .dashboard-header h1 {

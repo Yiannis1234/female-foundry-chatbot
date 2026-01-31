@@ -670,8 +670,8 @@ function renderDashboard(options) {
   container.style.display = "grid";
   container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
   container.style.gridAutoRows = "auto";
-  container.style.columnGap = "6px";
-  container.style.rowGap = "6px";
+  container.style.columnGap = "4px";
+  container.style.rowGap = "4px";
   container.style.alignItems = "stretch";
   container.style.justifyItems = "stretch";
   container.style.opacity = "1";
