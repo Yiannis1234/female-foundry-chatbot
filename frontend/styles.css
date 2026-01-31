@@ -135,6 +135,19 @@ button {
   line-height: 1; /* Prevent extra vertical space */
 }
 
+.contact-link {
+  margin-left: auto;
+  margin-right: 12px;
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
 .envelope-link {
   text-decoration: none;
   color: var(--brand-red);
@@ -600,14 +613,14 @@ button {
 .cards-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important; /* ALWAYS 2 columns */
-  gap: 8px !important; /* SMALLER gap */
+  gap: 6px !important; /* SMALLER gap between boxes */
   width: 100%;
-  padding: 10px 0 30px;
+  padding: 8px 0 24px; /* TIGHTER spacing */
 }
 
 .card {
   background: white; /* WHITE BACKGROUND */
-  padding: 12px; /* MORE COMPACT - was 14px */
+  padding: 10px; /* MORE COMPACT */
   border-radius: 16px;
   border: none; /* NO BORDER */
   box-shadow: none;
@@ -615,7 +628,7 @@ button {
   transition: none;
   display: flex;
   flex-direction: column;
-  gap: 6px; /* SMALLER gap - was 8px */
+  gap: 4px; /* SMALLER gap between lines */
   text-align: left;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -650,9 +663,9 @@ button {
 
 .card-title {
   font-weight: 600;
-  font-size: 0.75rem; /* SMALLER - was 0.85rem */
+  font-size: 0.68rem; /* SMALLER */
   color: #1f1f33;
-  line-height: 1.2;
+  line-height: 1.1; /* TIGHTER */
   letter-spacing: -0.01em;
   margin: 0;
 }
@@ -672,10 +685,10 @@ button {
 .card-desc {
   margin: 0;
   color: #2b2b2b;
-  font-size: 0.65rem; /* EVEN SMALLER - was 0.72rem */
-  line-height: 1.25;
+  font-size: 0.6rem; /* SMALLER */
+  line-height: 1.15; /* TIGHTER */
   letter-spacing: -0.005em;
-  margin-top: 2px; /* TIGHTER - was 4px */
+  margin-top: 1px; /* TIGHTER */
 }
 
 @media screen and (max-width: 768px) {
