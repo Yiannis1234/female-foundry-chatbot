@@ -49,13 +49,11 @@ const headerBackBtn = document.getElementById("header-back-btn");
 
 // Fallback method if JS navigation is ever needed
 function openExternal(url) {
-  console.log('[FF-CHATBOT] Attempting JS top navigation to:', url);
-  try {
-    window.top.location.href = url;
-  } catch (e) {
-    console.log('[FF-CHATBOT] top.location blocked, trying regular open', e);
-    window.open(url, '_top');
-  }
+  console.log('[FF-CHATBOT] Requesting navigation to:', url);
+  // Send message to parent (Wix) to handle navigation/anchors
+  window.parent.postMessage({ type: 'openLink', url: url }, '*');
+  // Fallback for non-Wix environments
+  // setTimeout(() => window.open(url, '_top'), 100);
 }
 
 // UPDATED METADATA FOR NEW BOXES
@@ -124,10 +122,11 @@ const DASHBOARD_CARD_META = {
 // Direct links map (dashboard buttons and chat chips)
 const OPTION_LINKS = {
   // Primary (Dashboard)
-  "The AI Era": "https://www.femaleinnovationindex.com/innovation",
-  "The Era of Abundance": "https://www.femaleinnovationindex.com/innovation", // legacy support
+  "The AI Era": "https://www.aivisionaries.co/",
+  "The Era of Abundance": "https://www.aivisionaries.co/", // legacy support
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
   "About Female Foundry": "https://www.femalefoundry.co/",
+  "Fundraising trends": "https://www.femaleinnovationindex.com/2024-funding-overview",
 
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
@@ -136,6 +135,14 @@ const OPTION_LINKS = {
   "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=partners",
   "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
+
+  // Fundraising submenu links
+  "Funding data": "https://www.femaleinnovationindex.com/2024-funding-overview",
+  "By country analysis": "https://www.femaleinnovationindex.com/location",
+  "By sector analysis": "https://www.femaleinnovationindex.com/sector",
+  "Top funding rounds": "https://www.femaleinnovationindex.com/impact#section-135",
+  "IPOs and Exits": "https://www.femaleinnovationindex.com/impact#section-133",
+  "Focus on DEEPTECH": "https://www.femaleinnovationindex.com/deeptech",
 };
 
 // --- Session Management ---
@@ -590,10 +597,10 @@ function _attachDashboardCardDelegation() {
   if (!container) return;
 
   // Tap-only touch handling (prevents "scrolling triggers taps" on mobile)
-  container.addEventListener(
+    container.addEventListener(
     "touchstart",
     (e) => {
-      const card = e.target && e.target.closest ? e.target.closest(".card[data-opt]") : null;
+      const card = e.target && e.target.closest ? e.target.closest(".card") : null;
       if (!card) {
         _dashboardActiveCard = null;
         return;
@@ -621,7 +628,7 @@ function _attachDashboardCardDelegation() {
     { passive: true }
   );
 
-  container.addEventListener(
+    container.addEventListener(
     "touchend",
     (e) => {
       if (!_dashboardActiveCard) return;
@@ -631,7 +638,12 @@ function _attachDashboardCardDelegation() {
       _dashboardLastTouchTs = Date.now();
       if (e.cancelable) e.preventDefault();
       e.stopPropagation();
-      handleDashboardSelection(card.dataset.opt);
+      
+      if (card.dataset.link) {
+        openExternal(card.dataset.link);
+      } else if (card.dataset.opt) {
+        handleDashboardSelection(card.dataset.opt);
+      }
     },
     { passive: false }
   );
@@ -642,15 +654,21 @@ function _attachDashboardCardDelegation() {
   });
 
   container.addEventListener("click", (e) => {
-    const card = e.target && e.target.closest ? e.target.closest('.card[data-opt]') : null;
+    const card = e.target && e.target.closest ? e.target.closest('.card') : null;
     if (!card) return;
+    
     // Ignore ghost click after touch
     if (Date.now() - _dashboardLastTouchTs < 700) {
       e.preventDefault();
       return;
     }
     e.preventDefault();
-    handleDashboardSelection(card.dataset.opt);
+
+    if (card.dataset.link) {
+      openExternal(card.dataset.link);
+    } else if (card.dataset.opt) {
+      handleDashboardSelection(card.dataset.opt);
+    }
   });
 
   _dashboardCardDelegationAttached = true;
@@ -702,10 +720,10 @@ function renderDashboard(options) {
       const url = OPTION_LINKS && OPTION_LINKS[opt];
       if (url) {
         html += `
-          <a class="card" href="${url}" target="_top" rel="noopener noreferrer">
+          <div class="card" data-link="${url}">
             <div class="card-title">${opt}</div>
             <p class="card-desc">${meta.description}</p>
-          </a>
+          </div>
         `;
       } else {
         html += `
@@ -1133,12 +1151,10 @@ function renderChatOptions(options) {
   cleanedOptions.forEach((opt) => {
     let chip;
     if (OPTION_LINKS[opt]) {
-      chip = document.createElement("a");
+      chip = document.createElement("button");
       chip.className = "suggestion-chip"; // styled as dark grey (#313030)
       chip.textContent = opt;
-      chip.href = OPTION_LINKS[opt];
-      chip.target = "_top";
-      chip.rel = "noopener noreferrer";
+      chip.onclick = () => openExternal(OPTION_LINKS[opt]);
     } else {
       chip = document.createElement("button");
       chip.className = "suggestion-chip";
@@ -1202,22 +1218,15 @@ function renderPrimaryFooterOptions(options) {
   primaryFooterOptions.style.display = "flex";
 
   options.forEach((opt) => {
-    // If it's a link, use Method 1: <a target="_top">
+    // If it's a link, use Method 1: JS PostMessage
     if (OPTION_LINKS[opt]) {
-      const       link = document.createElement("a");
+      const link = document.createElement("button");
       link.className = "footer-chip";
       link.textContent = opt;
-      link.href = OPTION_LINKS[opt];
-      link.target = "_top"; // Breaks out of iframe and navigates top window
-      
-      // Styling to match buttons
-      link.style.textDecoration = "none"; 
-      link.style.display = "inline-flex";
-      link.style.alignItems = "center";
       
       link.onclick = (e) => {
-        // Let the anchor tag do its job natively
-        console.log('[DEBUG] Footer link clicked with target=_top:', opt);
+        e.preventDefault();
+        openExternal(OPTION_LINKS[opt]);
       };
       primaryFooterOptions.appendChild(link);
     } else {
