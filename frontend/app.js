@@ -52,8 +52,11 @@ function openExternal(url) {
   console.log('[FF-CHATBOT] Requesting navigation to:', url);
   // Send message to parent (Wix) to handle navigation/anchors
   window.parent.postMessage({ type: 'openLink', url: url }, '*');
-  // Fallback for non-Wix environments
-  // setTimeout(() => window.open(url, '_top'), 100);
+  
+  // Fallback for non-Wix environments (Standalone link)
+  if (window.self === window.top) {
+     setTimeout(() => window.location.href = url, 100);
+  }
 }
 
 // UPDATED METADATA FOR NEW BOXES
@@ -137,11 +140,18 @@ const OPTION_LINKS = {
   "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
 
   // Fundraising submenu links
+  "Funding Data": "https://www.femaleinnovationindex.com/2024-funding-overview",
+  "By Country Analysis": "https://www.femaleinnovationindex.com/location",
+  "By Sector Analysis": "https://www.femaleinnovationindex.com/sector",
+  "Top Funding Rounds": "https://www.femaleinnovationindex.com/impact#section-135",
+  "IPOs and Exits": "https://www.femaleinnovationindex.com/impact#section-133",
+  "Focus on Deeptech": "https://www.femaleinnovationindex.com/deeptech",
+
+  // Lowercase fallbacks (just in case)
   "Funding data": "https://www.femaleinnovationindex.com/2024-funding-overview",
   "By country analysis": "https://www.femaleinnovationindex.com/location",
   "By sector analysis": "https://www.femaleinnovationindex.com/sector",
   "Top funding rounds": "https://www.femaleinnovationindex.com/impact#section-135",
-  "IPOs and Exits": "https://www.femaleinnovationindex.com/impact#section-133",
   "Focus on DEEPTECH": "https://www.femaleinnovationindex.com/deeptech",
 };
 
