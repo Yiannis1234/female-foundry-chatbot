@@ -120,17 +120,20 @@ INFO_MAP: Dict[str, str] = {
         "• The average company age is 7.62 years.\n"
         "• 98% of these companies were built by founding teams, with only 2% being solo founders.\n"
         "• 91% of the teams are gender-mixed, while 9% are female-only teams.\n"
-        "• Education levels are high: 38% of founders hold a Masters degree and 34% hold a PhD."
+        "• Education levels are high: 38% of founders hold a Masters degree and 34% hold a PhD.<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/2024-funding-overview' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Funding Data</a>"
     ),
     "By Country Analysis": (
         "The United Kingdom leads the pack, home to 26% of the Top 50 companies (13 companies).\n"
         "France follows with 16% (8 companies), then Germany and Sweden with 10% each (5 companies).\n"
-        "Spain accounts for 8% (4 companies)."
+        "Spain accounts for 8% (4 companies).<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/location' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Country Analysis</a>"
     ),
     "By Sector Analysis": (
         "Health is the dominant sector, representing 40% of the Top 50 list (20 companies).\n"
         "Fintech follows at 14% (7 companies) and Food at 12% (6 companies).\n"
-        "Other notable sectors include Energy (8%) and Transportation (4%)."
+        "Other notable sectors include Energy (8%) and Transportation (4%).<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/sector' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Sector Analysis</a>"
     ),
     "Top Funding Rounds": (
         "Some of the largest rounds in our 2026 dataset include:\n"
@@ -138,16 +141,19 @@ INFO_MAP: Dict[str, str] = {
         "• Quantexa (UK, AI): €206M (Series E)\n"
         "• GlycoEra (Switzerland, Biotech): €153M (Series B)\n"
         "• Dexory (UK, Robotics): €143M (Series B)\n"
-        "• SpliceBio (Spain, Biotech): €118M (Series B)"
+        "• SpliceBio (Spain, Biotech): €118M (Series B)<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/impact#section-135' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Top Rounds</a>"
     ),
     "IPOs and Exits": (
-        "Exit activity has been muted across the board, but we saw several high-profile acquisitions in the biotech sector."
+        "Exit activity has been muted across the board, but we saw several high-profile acquisitions in the biotech sector.<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/impact#section-133' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Exits</a>"
     ),
     "Focus on Deeptech": (
         "Deep tech is a major driver of innovation in 2026:\n"
         "• 48% of the Top 50 companies are leveraging AI, with 22% citing AI as their core value.\n"
         "• 81% of female founders on the list have a scientific education.\n"
-        "• Key deep tech categories include AI (24%), Medical (22%), and Digital Infrastructure (14%)."
+        "• Key deep tech categories include AI (24%), Medical (22%), and Digital Infrastructure (14%).<br><br>"
+        "<a href='https://www.femaleinnovationindex.com/deeptech' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Deeptech</a>"
     ),
 
     # --- BOX 5 FLOW ---
