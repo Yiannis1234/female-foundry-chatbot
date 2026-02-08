@@ -164,7 +164,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "The Team": (
         "Sure, every year it takes a village to get the Index in place. Meet the people behind this edition.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=team' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Team</a>"
+        "<a href='https://www.femaleinnovationindex.com/?target=team' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Team</a>"
     ),
     "The Sponsors": (
         "Our sponsors provide the critical support needed to keep this research independent and open-source.<br><br>"
@@ -172,7 +172,7 @@ INFO_MAP: Dict[str, str] = {
     ),
     "The Contributors": (
         "Over 100 industry experts contributed their data and perspectives to this year's Index.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/test?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Contributors</a>"
+        "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Contributors</a>"
     ),
     "The Partners": (
         "Our partners help amplify the reach of the Index across the European ecosystem.<br><br>"
