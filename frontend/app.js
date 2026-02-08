@@ -140,7 +140,7 @@ const OPTION_LINKS = {
   "Key Findings": "https://www.femaleinnovationindex.com/innovation",
   "The Team": "https://www.femaleinnovationindex.com/?target=team",
   "The Sponsors": "https://www.femaleinnovationindex.com/?target=partners",
-  "The Contributors": "https://www.femaleinnovationindex.com/?target=team",
+  "The Contributors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Partners": "https://www.femaleinnovationindex.com/?target=partners",
 
   // Fundraising submenu links
