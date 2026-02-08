@@ -139,9 +139,9 @@ const OPTION_LINKS = {
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
   "Key Findings": "https://www.femaleinnovationindex.com/innovation",
   "The Team": "https://www.femaleinnovationindex.com/test?target=team",
-  "The Sponsors": "https://www.femaleinnovationindex.com/test?target=partners",
+  "The Sponsors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/test?target=partners",
-  "The Partners": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Partners": "https://www.femaleinnovationindex.com/?target=partners",
 
   // Fundraising submenu links
   "Funding Data": "https://www.femaleinnovationindex.com/2024-funding-overview",
