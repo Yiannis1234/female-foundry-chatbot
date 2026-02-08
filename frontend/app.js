@@ -128,9 +128,9 @@ const OPTION_LINKS = {
   "The AI Era": "https://www.aivisionaries.co/",
   "The Era of Abundance": "https://www.aivisionaries.co/", // legacy support
   Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
-  "About Female Foundry": "https://www.femalefoundry.co/",
-  "Fundraising trends": "https://www.femaleinnovationindex.com/2024-funding-overview",
-
+  // Fundraising trends (Opens Sub-menu, NO LINK)
+  // "Fundraising trends": "https://www.femaleinnovationindex.com/2024-funding-overview",
+  
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
   "Key Findings": "https://www.femaleinnovationindex.com/innovation",
