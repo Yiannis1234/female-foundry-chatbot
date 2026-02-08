@@ -49,21 +49,18 @@ const headerBackBtn = document.getElementById("header-back-btn");
 
 function openExternal(url) {
   console.log('[FF-CHATBOT] Requesting navigation to:', url);
-  // 1) Try native open in a new tab (works in most iframes when popups allowed)
-  try {
-    const newWin = window.open(url, '_blank');
-    if (newWin) return; // success
-  } catch (e) { /* ignore */ }
-
-  // 2) Send message to parent (Wix) to handle navigation/anchors
+  // 1) Ask parent (Wix) to navigate in the SAME TAB
   try {
     window.parent.postMessage({ type: 'openLink', url }, '*');
   } catch (e) { /* ignore */ }
 
-  // 3) Fallback for non-Wix environments
-  if (window.self === window.top) {
-    setTimeout(() => window.location.href = url, 100);
-  }
+  // 2) Fallback: try top navigation (same tab) if allowed
+  try {
+    window.top.location.href = url;
+  } catch (e) { /* ignore */ }
+
+  // 3) Last resort: same-tab navigation
+  setTimeout(() => { window.location.href = url; }, 100);
 }
 
 // UPDATED METADATA FOR NEW BOXES
