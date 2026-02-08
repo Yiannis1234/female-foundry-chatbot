@@ -47,15 +47,22 @@ const headerBackBtn = document.getElementById("header-back-btn");
   }
 })();
 
-// Fallback method if JS navigation is ever needed
 function openExternal(url) {
   console.log('[FF-CHATBOT] Requesting navigation to:', url);
-  // Send message to parent (Wix) to handle navigation/anchors
-  window.parent.postMessage({ type: 'openLink', url: url }, '*');
-  
-  // Fallback for non-Wix environments (Standalone link)
+  // 1) Try native open in a new tab (works in most iframes when popups allowed)
+  try {
+    const newWin = window.open(url, '_blank');
+    if (newWin) return; // success
+  } catch (e) { /* ignore */ }
+
+  // 2) Send message to parent (Wix) to handle navigation/anchors
+  try {
+    window.parent.postMessage({ type: 'openLink', url }, '*');
+  } catch (e) { /* ignore */ }
+
+  // 3) Fallback for non-Wix environments
   if (window.self === window.top) {
-     setTimeout(() => window.location.href = url, 100);
+    setTimeout(() => window.location.href = url, 100);
   }
 }
 
