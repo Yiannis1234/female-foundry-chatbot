@@ -138,7 +138,7 @@ const OPTION_LINKS = {
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
   "Key Findings": "https://www.femaleinnovationindex.com/innovation",
-  "The Team": "https://www.femaleinnovationindex.com/?target=team",
+  "The Team": "https://www.femaleinnovationindex.com/test?target=team",
   "The Sponsors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Partners": "https://www.femaleinnovationindex.com/?target=partners",
