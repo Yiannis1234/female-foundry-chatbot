@@ -147,15 +147,15 @@ const OPTION_LINKS = {
   "Funding Data": "https://www.femaleinnovationindex.com/2024-funding-overview",
   "By Country Analysis": "https://www.femaleinnovationindex.com/location",
   "By Sector Analysis": "https://www.femaleinnovationindex.com/sector",
-  "Top Funding Rounds": "https://www.femaleinnovationindex.com/impact#section-135",
-  "IPOs and Exits": "https://www.femaleinnovationindex.com/impact#section-133",
+  "Top Funding Rounds": "https://www.femaleinnovationindex.com/impact?target=top-funding-rounds",
+  "IPOs and Exits": "https://www.femaleinnovationindex.com/impact?target=ipos-exits",
   "Focus on Deeptech": "https://www.femaleinnovationindex.com/deeptech",
 
   // Lowercase fallbacks (just in case)
   "Funding data": "https://www.femaleinnovationindex.com/2024-funding-overview",
   "By country analysis": "https://www.femaleinnovationindex.com/location",
   "By sector analysis": "https://www.femaleinnovationindex.com/sector",
-  "Top funding rounds": "https://www.femaleinnovationindex.com/impact#section-135",
+  "Top funding rounds": "https://www.femaleinnovationindex.com/impact?target=top-funding-rounds",
   "Focus on DEEPTECH": "https://www.femaleinnovationindex.com/deeptech",
 };
 

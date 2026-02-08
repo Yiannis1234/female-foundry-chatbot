@@ -142,11 +142,11 @@ INFO_MAP: Dict[str, str] = {
         "• GlycoEra (Switzerland, Biotech): €153M (Series B)\n"
         "• Dexory (UK, Robotics): €143M (Series B)\n"
         "• SpliceBio (Spain, Biotech): €118M (Series B)<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/impact#section-135' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Top Rounds</a>"
+        "<a href='https://www.femaleinnovationindex.com/impact?target=top-funding-rounds' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Top Rounds</a>"
     ),
     "IPOs and Exits": (
         "Exit activity has been muted across the board, but we saw several high-profile acquisitions in the biotech sector.<br><br>"
-        "<a href='https://www.femaleinnovationindex.com/impact#section-133' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Exits</a>"
+        "<a href='https://www.femaleinnovationindex.com/impact?target=ipos-exits' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Exits</a>"
     ),
     "Focus on Deeptech": (
         "Deep tech is a major driver of innovation in 2026:\n"
