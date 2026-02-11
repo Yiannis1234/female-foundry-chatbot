@@ -131,14 +131,15 @@ const OPTION_LINKS = {
   // Primary (Dashboard)
   "The AI Era": "https://www.aivisionaries.co/",
   "The Era of Abundance": "https://www.aivisionaries.co/", // legacy support
-  Idea: "https://www.femaleinnovationindex.com/idea?target=section100",
+  Idea: "https://www.femaleinnovationindex.com/idea",
+  "About Female Foundry": "https://www.femalefoundry.co/",
   // Fundraising trends (Opens Sub-menu, NO LINK)
   // "Fundraising trends": "https://www.femaleinnovationindex.com/2024-funding-overview",
   
   // Secondary (Chat buttons)
   "Methodology": "https://www.femaleinnovationindex.com/methodology",
   "Key Findings": "https://www.femaleinnovationindex.com/innovation",
-  "The Team": "https://www.femaleinnovationindex.com/test?target=team",
+  "The Team": "https://www.femaleinnovationindex.com/?target=team",
   "The Sponsors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Contributors": "https://www.femaleinnovationindex.com/?target=partners",
   "The Partners": "https://www.femaleinnovationindex.com/?target=partners",
@@ -225,6 +226,9 @@ async function restoreSession() {
     if (savedId && savedName) {
       console.log('[FF-CHATBOT] Found saved session:', savedId);
       
+      // Hide "Ask the Index" button since we have a saved session
+      if (askIndexBtn) askIndexBtn.classList.add("hidden");
+      
       // Verify session with server
       const res = await fetch(`${API_BASE}/session/${savedId}`);
       if (res.ok) {
@@ -287,6 +291,8 @@ async function restoreSession() {
         console.log('[FF-CHATBOT] Saved session expired, creating new one for:', savedName);
         userName = savedName;
         if (userNameDisplay) userNameDisplay.textContent = userName;
+        // Keep "Ask the Index" button hidden since we have a saved name
+        if (askIndexBtn) askIndexBtn.classList.add("hidden");
         
         try {
           await startSession();
@@ -475,6 +481,10 @@ function switchView(viewName) {
   } else {
     if (topBar) topBar.classList.remove("hidden");
     document.body.classList.add("show-bg");
+    // CRITICAL: Keep "Ask the Index" button hidden when not on welcome view
+    if (askIndexBtn && userName) {
+      askIndexBtn.classList.add("hidden");
+    }
   }
 
   // Persist last view so we can restore UX after navigating between Wix pages
