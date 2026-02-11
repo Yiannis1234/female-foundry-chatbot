@@ -483,11 +483,15 @@ function switchView(viewName) {
   if (viewName === "welcome") {
     if (topBar) topBar.classList.add("hidden");
     document.body.classList.remove("show-bg");
+    // Only show the button if user hasn't entered name yet
+    if (askIndexBtn && !userName) {
+      askIndexBtn.classList.remove("hidden");
+    }
   } else {
     if (topBar) topBar.classList.remove("hidden");
     document.body.classList.add("show-bg");
-    // CRITICAL: Keep "Ask the Index" button hidden when not on welcome view
-    if (askIndexBtn && userName) {
+    // CRITICAL: ALWAYS hide "Ask the Index" button when not on welcome view
+    if (askIndexBtn) {
       askIndexBtn.classList.add("hidden");
     }
   }
@@ -1396,7 +1400,11 @@ if (chatInput) {
 
 // Navigation Handlers
 if (backBtn) {
-  backBtn.addEventListener("click", () => switchView("dashboard"));
+  backBtn.addEventListener("click", () => {
+    // Ensure red button stays hidden
+    if (askIndexBtn) askIndexBtn.classList.add("hidden");
+    switchView("dashboard");
+  });
 }
 
 if (resetBtn) {
@@ -1411,6 +1419,7 @@ if (restartFlowBtn) {
   restartFlowBtn.addEventListener("click", () => {
     // Go back to name input view, don't restart everything
     if (nameForm) nameForm.classList.remove("hidden");
+    // CRITICAL: Keep button hidden since user already has a session
     if (askIndexBtn) askIndexBtn.classList.add("hidden");
     switchView("welcome");
     // Reset to initial state but keep session
@@ -1422,6 +1431,8 @@ if (restartFlowBtn) {
 // Header back button - goes to dashboard
 if (headerBackBtn) {
   headerBackBtn.addEventListener("click", () => {
+    // Ensure red button stays hidden
+    if (askIndexBtn) askIndexBtn.classList.add("hidden");
     switchView("dashboard");
   });
 }
