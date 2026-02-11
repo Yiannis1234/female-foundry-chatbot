@@ -49,18 +49,23 @@ const headerBackBtn = document.getElementById("header-back-btn");
 
 function openExternal(url) {
   console.log('[FF-CHATBOT] Requesting navigation to:', url);
-  // 1) Ask parent (Wix) to navigate in the SAME TAB
+  
+  // 1) Ask parent (Wix) to navigate via postMessage
   try {
     window.parent.postMessage({ type: 'openLink', url }, '*');
   } catch (e) { /* ignore */ }
 
-  // 2) Fallback: try top navigation (same tab) if allowed
+  // 2) Try navigating the top window (if allowed)
   try {
+    // If we can access top, navigate it
     window.top.location.href = url;
-  } catch (e) { /* ignore */ }
-
-  // 3) Last resort: same-tab navigation
-  setTimeout(() => { window.location.href = url; }, 100);
+  } catch (e) {
+    // 3) Security Error (Cross-Origin): We cannot navigate the parent page.
+    // FALBACK: Open in a NEW TAB. 
+    // CRITICAL: Do NOT use window.location.href here, or the site loads INSIDE the widget!
+    console.log('[FF-CHATBOT] Cross-origin block, opening in new tab');
+    window.open(url, '_blank');
+  }
 }
 
 // UPDATED METADATA FOR NEW BOXES
