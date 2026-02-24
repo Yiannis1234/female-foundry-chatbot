@@ -1,13 +1,17 @@
+// Version: 108
+
+// === CONSTANTS & CONFIG ===
+
 const API_BASE = "/api";
 const BOT_AVATAR = "IX";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// State
+// === STATE ===
 let sessionId = null;
 let userName = "";
 let currentView = "welcome"; // welcome, dashboard, chat
 
-// DOM Elements
+// === DOM ELEMENTS ===
 const views = {
   welcome: document.getElementById("view-welcome"),
   dashboard: document.getElementById("view-dashboard"),
@@ -47,9 +51,12 @@ const headerBackBtn = document.getElementById("header-back-btn");
   }
 })();
 
+/**
+ * Navigate the top-level page (or Wix parent) to a URL.
+ * Falls back to window.open() when cross-origin restrictions block top-frame navigation.
+ * @param {string} url - The URL to open.
+ */
 function openExternal(url) {
-  console.log('[FF-CHATBOT] Requesting navigation to:', url);
-  
   // 1) Ask parent (Wix) to navigate via postMessage
   try {
     window.parent.postMessage({ type: 'openLink', url }, '*');
@@ -61,14 +68,13 @@ function openExternal(url) {
     window.top.location.href = url;
   } catch (e) {
     // 3) Security Error (Cross-Origin): We cannot navigate the parent page.
-    // FALBACK: Open in a NEW TAB. 
+    // FALBACK: Open in a NEW TAB.
     // CRITICAL: Do NOT use window.location.href here, or the site loads INSIDE the widget!
-    console.log('[FF-CHATBOT] Cross-origin block, opening in new tab');
     window.open(url, '_blank');
   }
 }
 
-// UPDATED METADATA FOR NEW BOXES
+// === DASHBOARD CARD DATA ===
 const PRIMARY_LIST = [
   "The AI Era",
   "Key Insights",
@@ -131,7 +137,7 @@ const DASHBOARD_CARD_META = {
   },
 };
 
-// Direct links map (dashboard buttons and chat chips)
+// === OPTION LINKS ===
 const OPTION_LINKS = {
   // Primary (Dashboard)
   "The AI Era": "https://www.aivisionaries.co/",
@@ -165,7 +171,7 @@ const OPTION_LINKS = {
   "Focus on DEEPTECH": "https://www.femaleinnovationindex.com/deeptech",
 };
 
-// --- Session Management ---
+// === SESSION PERSISTENCE ===
 let localHistory = []; // Local cache of chat history
 
 // IMPORTANT: Use sessionStorage (per-tab/per-device) so progress is NOT shared across devices.
@@ -181,6 +187,7 @@ const FF_PERSIST = (() => {
   }
 })();
 
+/** @param {string} key @returns {string|null} */
 function ffGet(key) {
   try {
     return FF_PERSIST ? FF_PERSIST.getItem(key) : null;
@@ -189,6 +196,7 @@ function ffGet(key) {
   }
 }
 
+/** @param {string} key @param {string} value */
 function ffSet(key, value) {
   try {
     if (FF_PERSIST) FF_PERSIST.setItem(key, value);
@@ -197,6 +205,7 @@ function ffSet(key, value) {
   }
 }
 
+/** @param {string} key */
 function ffRemove(key) {
   try {
     if (FF_PERSIST) FF_PERSIST.removeItem(key);
@@ -205,6 +214,7 @@ function ffRemove(key) {
   }
 }
 
+/** Clears all persisted session keys from sessionStorage (and legacy localStorage). */
 function ffClearPersistedSession() {
   ["ff_session_id", "ff_user_name", "ff_chat_history", "ff_last_options", "ff_last_view"].forEach((k) => {
     ffRemove(k);
@@ -213,6 +223,11 @@ function ffClearPersistedSession() {
   });
 }
 
+/**
+ * On page load, check sessionStorage for a saved session.
+ * If found, verify it with the server and replay chat history.
+ * If the server session has expired, create a new one and replay local history.
+ */
 async function restoreSession() {
   try {
     // Clear legacy localStorage keys (pre-v97) so progress doesn't sync across devices.
@@ -229,8 +244,6 @@ async function restoreSession() {
     const savedLastView = ffGet("ff_last_view") || "";
     
     if (savedId && savedName) {
-      console.log('[FF-CHATBOT] Found saved session:', savedId);
-      
       // Hide "Ask the Index" button since we have a saved session
       if (askIndexBtn) askIndexBtn.classList.add("hidden");
       
@@ -241,9 +254,7 @@ async function restoreSession() {
         sessionId = savedId;
         userName = (state && state.visitor_name) ? state.visitor_name : savedName;
         if (userNameDisplay) userNameDisplay.textContent = userName;
-        
-        console.log('[FF-CHATBOT] Session restored successfully');
-        
+
         // If server session is still in ask_name, prime it with the saved name.
         if (state && state.stage === "ask_name") {
           try {
@@ -274,7 +285,6 @@ async function restoreSession() {
           const localHasSecondary = savedLastOptions && savedLastOptions.length > 0 && !isPrimaryOptions(savedLastOptions);
           
           if (serverIsGeneric && localHasSecondary) {
-             console.log('[FF-CHATBOT] Server returned generic menu, restoring local secondary menu');
              optsToRestore = savedLastOptions;
           } else if (!optsToRestore || optsToRestore.length === 0) {
              optsToRestore = savedLastOptions;
@@ -293,7 +303,6 @@ async function restoreSession() {
         
         renderDashboard(PRIMARY_LIST);
       } else {
-        console.log('[FF-CHATBOT] Saved session expired, creating new one for:', savedName);
         userName = savedName;
         if (userNameDisplay) userNameDisplay.textContent = userName;
         // Keep "Ask the Index" button hidden since we have a saved name
@@ -306,7 +315,6 @@ async function restoreSession() {
           
           // REPLAY LOCAL HISTORY if available!
           if (savedHistory && savedHistory.length > 0) {
-             console.log('[FF-CHATBOT] Replaying local history for new session');
              localHistory = savedHistory;
              saveSession(sessionId, userName); // Sync new ID with old history
              
@@ -339,18 +347,21 @@ async function restoreSession() {
   }
 }
 
+/**
+ * Persist the current session ID, username, and chat history to sessionStorage.
+ * @param {string} id - The session ID returned by the server.
+ * @param {string} name - The visitor's name.
+ */
 function saveSession(id, name) {
   if (id && name) {
     ffSet("ff_session_id", id);
     ffSet("ff_user_name", name);
     // Also save current localHistory
     ffSet("ff_chat_history", JSON.stringify(localHistory));
-    console.log('[FF-CHATBOT] Session & History saved');
   }
 }
 
-// --- Initialization ---
-console.log('[FF-CHATBOT] Version 108 - mobile options: visual scroll indicator (fade on right edge)');
+// === INITIALISATION ===
 
 // Store reference to the latest user message for scrolling
 let latestUserMessage = null;
@@ -456,7 +467,13 @@ function setInitialView() {
   }
 }
 
-// --- View Management ---
+// === VIEW ROUTING ===
+
+/**
+ * Switch the visible view (welcome | dashboard | chat).
+ * Handles header visibility, background, and "Ask the Index" button state.
+ * @param {string} viewName - One of "welcome", "dashboard", or "chat".
+ */
 function switchView(viewName) {
   if (!views[viewName]) {
     console.error(`View ${viewName} not found`);
@@ -509,7 +526,7 @@ function switchView(viewName) {
   }
 }
 
-// --- Welcome Flow ---
+// === WELCOME FLOW ===
 function attachWelcomeListeners() {
   if (nameForm) {
     nameForm.addEventListener("submit", (e) => {
@@ -561,6 +578,9 @@ function attachWelcomeListeners() {
   }
 }
 
+/**
+ * Read the name input, create a server session, and navigate to the dashboard.
+ */
 async function submitName() {
   const name = nameInput ? nameInput.value.trim() : "";
   if (!name) return;
@@ -583,7 +603,6 @@ async function submitName() {
   }
 }
 
-// --- Session Logic ---
 async function startSession() {
   const res = await fetch(`${API_BASE}/session`, { method: "POST" });
   if (!res.ok) throw new Error("Network error");
@@ -616,7 +635,7 @@ async function resetSession() {
   switchView("dashboard");
 }
 
-// --- Dashboard Logic ---
+// === DASHBOARD ===
 let _dashboardCardDelegationAttached = false;
 let _dashboardLastTouchTs = 0;
 let _dashboardTouchStartX = 0;
@@ -707,6 +726,11 @@ function _attachDashboardCardDelegation() {
   _dashboardCardDelegationAttached = true;
 }
 
+/**
+ * Render the topic cards in the dashboard grid.
+ * Cards with a URL in OPTION_LINKS navigate externally; others enter the chat flow.
+ * @param {string[]} options - List of topic names to render.
+ */
 function renderDashboard(options) {
   const container = document.getElementById("dashboard-options");
   if (!container) {
@@ -724,8 +748,6 @@ function renderDashboard(options) {
         .map((o) => (o === "The Era of Abundance" ? "The AI Era" : o))
     )
   );
-  console.log("[FF-CHATBOT] Rendering dashboard with:", optsToRender);
-
   // FORCE 2 COLUMNS ALWAYS - user wants 2 per row even in narrow iframes
   container.style.display = "grid";
   container.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
@@ -873,10 +895,16 @@ if (dashboardSearch) {
   });
 }
 
-// --- Chat Logic ---
+// === CHAT FLOW ===
+
+/**
+ * Send a user message to the backend and render the bot's response.
+ * @param {string} text - The message text.
+ * @param {Object} [opts]
+ * @param {boolean} [opts.pinTop=false] - When true, keep the user's message pinned
+ *   to the top of the viewport while bot replies animate in below.
+ */
 async function sendMessageToApi(text, { pinTop = false } = {}) {
-  console.log('[DEBUG] sendMessageToApi called with:', text, 'sessionId:', sessionId);
-  
   if (!sessionId) {
     console.error('[DEBUG] No sessionId! Cannot send message.');
     addMessage("bot", "Session not started. Please refresh and try again.", false);
@@ -888,7 +916,6 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
 
   showTyping();
   try {
-    console.log('[DEBUG] Fetching API...');
     const res = await fetch(`${API_BASE}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -900,7 +927,6 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     }
     
     const data = await res.json();
-    console.log('[DEBUG] API response:', data);
     hideTyping();
 
     if (pinTop && latestUserMessage) {
@@ -920,7 +946,6 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
     }
     
     if (data.messages && data.messages.length > 0) {
-      console.log('[DEBUG] Adding', data.messages.length, 'messages');
       let lastDelay = 0;
       for (let i = 0; i < data.messages.length; i++) {
         const msg = data.messages[i];
@@ -952,7 +977,6 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
       // Now render options AFTER all message segments
       renderChatOptions(data.options);
     } else {
-      console.log('[DEBUG] No messages in response');
       renderChatOptions(data.options);
     }
 
@@ -988,9 +1012,16 @@ async function sendMessageToApi(text, { pinTop = false } = {}) {
   }
 }
 
+/**
+ * Append a chat message bubble to the chat window.
+ * Bot messages with multiple sentences are split into staggered segments.
+ * @param {string} role - "user" or "bot".
+ * @param {string} content - HTML content for the bubble.
+ * @param {boolean} [shouldScroll=false] - Scroll to bottom after adding.
+ * @param {boolean} [skipSave=false] - Skip saving to localHistory (used when replaying).
+ * @returns {number} Total stagger delay in ms (0 for user messages).
+ */
 function addMessage(role, content, shouldScroll = false, skipSave = false) {
-  console.log('[DEBUG] addMessage called:', role, content?.substring(0, 50));
-  
   if (!skipSave) {
     localHistory.push({ role, content });
     saveSession(sessionId, userName);
@@ -1003,8 +1034,6 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
 
   const segments =
     role === "bot" ? splitBotContent(content) : [content];
-
-  console.log('[DEBUG] Adding', segments.length, 'message segments');
 
   let firstMsgDiv = null;
 
@@ -1035,8 +1064,7 @@ function addMessage(role, content, shouldScroll = false, skipSave = false) {
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(bubble);
     chatMessages.appendChild(msgDiv);
-    console.log('[DEBUG] Message appended to chatMessages');
-    
+
     // Store reference to first message of this batch
     if (index === 0) {
       firstMsgDiv = msgDiv;
@@ -1127,6 +1155,12 @@ function splitBotContent(content) {
   return [content];
 }
 
+/**
+ * Render suggestion chips for the available options.
+ * Primary options (the 6 main topics) go to the footer; secondary options render
+ * inline as a grid bubble in the chat window.
+ * @param {string[]} options - Option labels returned by the API.
+ */
 function renderChatOptions(options) {
   if (!chatMessages) return;
 
@@ -1268,8 +1302,6 @@ function renderPrimaryFooterOptions(options) {
       btn.textContent = opt;
       
       const clickHandler = () => {
-        console.log('[DEBUG] Footer button clicked:', opt);
-        
         // Clear any pending prompts/bubbles when switching primary via footer
         if (chatMessages) {
           const oldOptionBubbles = chatMessages.querySelectorAll(".options-bubble, .options-prompt");
@@ -1359,6 +1391,7 @@ function clearChat() {
   if (chatOptions) chatOptions.innerHTML = "";
 }
 
+// === UTILITIES ===
 function scrollToBottom() {
   if (chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;

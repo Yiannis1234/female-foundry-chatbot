@@ -1,3 +1,19 @@
+"""
+Female Foundry Chatbot — FastAPI backend.
+
+Entry point: `uvicorn server:app --reload`
+Default port: 8000
+
+Architecture
+------------
+- No LLM is used. All responses are served from the hard-coded INFO_MAP dict.
+- Sessions are stored in the in-memory SESSIONS dict (see note there).
+- The conversation flow is a simple state machine with three stages:
+    ask_name → menu_primary → menu_secondary
+- The frontend (frontend/) is served as static files mounted at "/".
+- The four REST endpoints are defined at the bottom of this file.
+"""
+
 from __future__ import annotations
 
 import html
@@ -12,11 +28,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+# === CONFIGURATION ===
+
 DATA_PATH = Path("data/index.json")
 # Create data directory if it doesn't exist
 if not DATA_PATH.parent.exists():
     DATA_PATH.parent.mkdir(parents=True)
-    
+
 # Create empty index.json if it doesn't exist
 if not DATA_PATH.exists():
     with DATA_PATH.open("w", encoding="utf-8") as f:
@@ -28,8 +46,7 @@ with DATA_PATH.open("r", encoding="utf-8") as f:
     except json.JSONDecodeError:
         CONTENT = {}
 
-# --- CONFIGURATION ---
-
+# The six top-level topics shown on the dashboard.
 PRIMARY_OPTIONS = [
     "The AI Era",
     "Key Insights",
@@ -39,7 +56,7 @@ PRIMARY_OPTIONS = [
     "About Female Foundry",
 ]
 
-# These are the sub-options for the boxes that lead to a chat flow
+# Sub-options for topics that have a second level of navigation.
 SECONDARY_OPTIONS: Dict[str, List[str]] = {
     "Key Insights": ["Methodology", "Key Findings"],
     "Fundraising trends": [
@@ -58,10 +75,7 @@ SECONDARY_OPTIONS: Dict[str, List[str]] = {
     ],
 }
 
-# Mapping user friendly names to internal logic or just straight text
-# We can allow the user to click "Key Insights" (Box 2) -> Bot says text -> User sees buttons "Methodology", "Key Insights"
-# Note: "Key Insights" button inside "Key Insights" box might be confusing. Let's stick to the requested "Key Insights" button name.
-
+# Maps loose keyword matches to primary topic names (used for free-text chat input).
 PRIMARY_KEYWORDS: Dict[str, str] = {
     "abundance": "The AI Era",
     "ai": "The AI Era",
@@ -76,6 +90,7 @@ PRIMARY_KEYWORDS: Dict[str, str] = {
     "about": "About Female Foundry",
 }
 
+# Maps loose keyword matches to secondary topic names.
 SECONDARY_KEYWORDS: Dict[str, str] = {
     # Fundraising
     "country": "By Country Analysis",
@@ -85,11 +100,19 @@ SECONDARY_KEYWORDS: Dict[str, str] = {
     "exits": "IPOs and Exits",
     "deeptech": "Focus on Deeptech",
     "deep tech": "Focus on Deeptech",
-    
+
     # Behind the Index
     "sponsors": "The Sponsors",
     "contributors": "The Contributors",
 }
+
+# === DATA ===
+#
+# INFO_MAP is the entire content layer of the chatbot.
+# To change a response: edit the value for the matching key.
+# To add a new topic: add it to PRIMARY_OPTIONS or SECONDARY_OPTIONS, then add an entry here.
+# HTML is supported (e.g. <br>, <a>, <ul>/<li>).
+# Bullet lists starting with "•" are converted to <ul> by format_bot_message().
 
 INFO_MAP: Dict[str, str] = {
     # --- BOX 2 FLOW ---
@@ -101,8 +124,7 @@ INFO_MAP: Dict[str, str] = {
         "Our methodology involves a rigorous analysis of public and private data sources to map the landscape of female entrepreneurship.<br><br>"
         "<a href='https://www.femaleinnovationindex.com/methodology' target='_top' rel='noopener noreferrer' class='chat-link-btn'>View Full Methodology</a>"
     ),
-    "Key Findings": ( 
-        # This corresponds to the "Key Findings" button inside the Key Insights flow.
+    "Key Findings": (
         "• €5.76B raised by female-founded startups in Europe during 2024.\n"
         "• Represents roughly 12% of all European VC.\n"
         "• Deep tech companies capture roughly one-third of the capital."
@@ -179,7 +201,7 @@ INFO_MAP: Dict[str, str] = {
         "<a href='https://www.femaleinnovationindex.com/?target=partners' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Meet the Partners</a>"
     ),
 
-    # --- DIRECT LINKS (Handled by Frontend mostly, but fallback here) ---
+    # --- DIRECT LINKS (handled by the frontend; these are fallbacks) ---
     "The AI Era": (
         "Opening The AI Era in a new tab.<br><br>"
         "<a href='https://www.femaleinnovationindex.com/innovation' target='_top' rel='noopener noreferrer' class='chat-link-btn'>Open The AI Era</a>"
@@ -194,19 +216,25 @@ INFO_MAP: Dict[str, str] = {
     ),
 }
 
-# --- MODELS ---
+# === DATA MODELS ===
+
 
 class ChatRequest(BaseModel):
+    """Payload for POST /api/chat."""
     session_id: str
     message: str
 
+
 class SessionResponse(BaseModel):
+    """Returned after every chat interaction."""
     session_id: str
     messages: List[Dict[str, str]]
     options: List[str]
     stage: str
 
+
 class SessionSnapshot(BaseModel):
+    """Full session state, returned by GET /api/session/{session_id}."""
     session_id: str
     visitor_name: str | None
     stage: str
@@ -214,9 +242,83 @@ class SessionSnapshot(BaseModel):
     history: List[Tuple[str, str]]
     options: List[str]
 
-# --- HELPERS ---
+
+# === SESSION MANAGEMENT ===
+
+# In-memory session store. All sessions are lost on server restart.
+# For persistence across restarts, replace this dict with Redis or a database.
+SESSIONS: Dict[str, "SessionState"] = {}
+
+
+class SessionState:
+    """Holds all mutable state for one visitor's conversation."""
+
+    def __init__(self, session_id: str):
+        self.session_id = session_id
+        # Stages: "ask_name" → "menu_primary" → "menu_secondary"
+        self.stage = "ask_name"
+        self.visitor_name: str | None = None
+        self.primary_choice: str | None = None
+        self.history: List[Tuple[str, str]] = []
+
+    def to_initial_response(self) -> SessionResponse:
+        """Return the empty SessionResponse sent right after session creation."""
+        return SessionResponse(
+            session_id=self.session_id,
+            messages=[],
+            options=[],
+            stage=self.stage,
+        )
+
+
+def create_session() -> SessionState:
+    """Create a new session, store it, and return it."""
+    session_id = uuid4().hex
+    state = SessionState(session_id)
+    SESSIONS[session_id] = state
+    return state
+
+
+def get_session(session_id: str) -> SessionState:
+    """
+    Look up an existing session by ID.
+
+    Raises:
+        HTTPException: 404 if the session does not exist.
+    """
+    state = SESSIONS.get(session_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return state
+
+
+def reset_session(state: SessionState) -> SessionResponse:
+    """
+    Replace the session with a fresh one (same ID) and return its initial response.
+
+    Args:
+        state: The existing session to reset.
+    """
+    SESSIONS[state.session_id] = SessionState(state.session_id)
+    return SESSIONS[state.session_id].to_initial_response()
+
+
+# === MESSAGE HANDLING ===
+
 
 def format_bot_message(text: str) -> str:
+    """
+    Convert plain-text bot copy into display-ready HTML.
+
+    Bullet lines (starting with •, -, or *) become a <ul> list.
+    Multi-line non-bullet text is joined with <br>.
+
+    Args:
+        text: Raw text from INFO_MAP or a fallback string.
+
+    Returns:
+        HTML string safe to inject into the frontend bubble.
+    """
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     if not lines:
         return ""
@@ -234,40 +336,17 @@ def format_bot_message(text: str) -> str:
     # Join with <br> for non-bullet multi-line responses
     return "<br>".join(lines)
 
-class SessionState:
-    def __init__(self, session_id: str):
-        self.session_id = session_id
-        self.stage = "ask_name"
-        self.visitor_name: str | None = None
-        self.primary_choice: str | None = None
-        self.history: List[Tuple[str, str]] = []
-        # Initial greeting happens on frontend now, or we can send it. 
-        # But frontend "Hey what's your name" is a static view. 
-        # So the first interaction is User sending Name.
-        
-    def to_initial_response(self) -> SessionResponse:
-        return SessionResponse(
-            session_id=self.session_id,
-            messages=[],
-            options=[],
-            stage=self.stage,
-        )
-
-SESSIONS: Dict[str, SessionState] = {}
-
-def create_session() -> SessionState:
-    session_id = uuid4().hex
-    state = SessionState(session_id)
-    SESSIONS[session_id] = state
-    return state
-
-def get_session(session_id: str) -> SessionState:
-    state = SESSIONS.get(session_id)
-    if not state:
-        raise HTTPException(status_code=404, detail="Session not found")
-    return state
 
 def keyword_match(text: str, mapping: Dict[str, str]) -> str | None:
+    """
+    Return the mapped value for the first keyword found in text, or None.
+
+    Uses whole-word regex matching (re.search with escaped keyword).
+
+    Args:
+        text: User input to search within.
+        mapping: Dict of keyword → canonical name.
+    """
     text_lower = text.lower()
     for keyword, value in mapping.items():
         pattern = re.escape(keyword.lower())
@@ -275,23 +354,49 @@ def keyword_match(text: str, mapping: Dict[str, str]) -> str | None:
             return value
     return None
 
+
+def respond(state: SessionState, responses: List[str], options: List[str]) -> SessionResponse:
+    """
+    Append bot messages to history and return a SessionResponse.
+
+    Args:
+        state: Current session.
+        responses: List of HTML strings to send as bot messages.
+        options: Clickable option labels to display after the messages.
+    """
+    for response in responses:
+        state.history.append(("bot", response))
+    return SessionResponse(
+        session_id=state.session_id,
+        messages=[{"role": "bot", "content": response} for response in responses],
+        options=options,
+        stage=state.stage,
+    )
+
+
 def deliver_info(state: SessionState, choice: str) -> SessionResponse:
+    """
+    Look up the INFO_MAP entry for choice, format it, and return it as a response.
+
+    If choice is a secondary option, the session stays in menu_secondary so the
+    sub-options remain visible. Otherwise the session returns to menu_primary.
+
+    Args:
+        state: Current session.
+        choice: The option label the user selected.
+    """
     info = INFO_MAP.get(choice)
-    
-    # Special handling for "Key Findings" button inside "Key Insights" flow
-    if choice == "Key Findings" and state.stage == "menu_secondary":
-         info = INFO_MAP.get("Key Findings")
 
     if not info:
-        return respond(state, [format_bot_message("I don’t have that snippet yet—try another option.")], [])
-    
+        return respond(state, [format_bot_message("I don't have that snippet yet—try another option.")], [])
+
     formatted = format_bot_message(info)
     follow_up = format_bot_message("Anything else you'd like to explore?")
-    
+
     state.history.append(("bot", formatted))
     state.history.append(("bot", follow_up))
-    
-    # If they selected a SECONDARY option, keep them in the secondary menu so the 6 options remain visible.
+
+    # If they selected a secondary option, keep them in the secondary menu.
     current_primary = state.primary_choice
     secondary_opts = SECONDARY_OPTIONS.get(current_primary, []) if current_primary else []
     is_secondary_choice = bool(current_primary and choice in secondary_opts)
@@ -305,7 +410,7 @@ def deliver_info(state: SessionState, choice: str) -> SessionResponse:
             stage=state.stage,
         )
 
-    # Otherwise (primary info), reset to primary menu after delivering info
+    # Otherwise (primary info), reset to primary menu after delivering info.
     state.stage = "menu_primary"
     state.primary_choice = None
 
@@ -318,6 +423,16 @@ def deliver_info(state: SessionState, choice: str) -> SessionResponse:
 
 
 def _process_primary_selection(state: SessionState, match: str | None) -> SessionResponse:
+    """
+    Handle a validated primary-menu selection.
+
+    If the topic has secondary options, send the intro text and return sub-options.
+    Otherwise, deliver the info directly and return to the primary menu.
+
+    Args:
+        state: Current session.
+        match: Canonical primary topic name, or None if no match was found.
+    """
     if not match:
         fallback = format_bot_message("I'm not sure about that. Pick a topic from the dashboard or menu.")
         return respond(state, [fallback], PRIMARY_OPTIONS)
@@ -330,25 +445,39 @@ def _process_primary_selection(state: SessionState, match: str | None) -> Sessio
         formatted_intro = format_bot_message(intro_text)
         return respond(state, [formatted_intro], sub_opts)
 
-    # no secondary options: deliver info and return to primary menu
+    # No secondary options: deliver info and return to primary menu.
     state.stage = "menu_primary"
     return deliver_info(state, match)
 
-def respond(state: SessionState, responses: List[str], options: List[str]) -> SessionResponse:
-    for response in responses:
-        state.history.append(("bot", response))
-    return SessionResponse(
-        session_id=state.session_id,
-        messages=[{"role": "bot", "content": response} for response in responses],
-        options=options,
-        stage=state.stage,
-    )
 
-def reset_session(state: SessionState) -> SessionResponse:
-    SESSIONS[state.session_id] = SessionState(state.session_id)
-    return SESSIONS[state.session_id].to_initial_response()
+def _current_options(state: SessionState) -> List[str]:
+    """
+    Return the options that are currently active for this session stage.
+
+    Used when building a SessionSnapshot.
+    """
+    if state.stage == "menu_primary":
+        return PRIMARY_OPTIONS
+    if state.stage == "menu_secondary" and state.primary_choice:
+        return SECONDARY_OPTIONS.get(state.primary_choice, [])
+    return []
+
 
 def handle_message(state: SessionState, message: str) -> SessionResponse:
+    """
+    Route an incoming user message through the conversation state machine.
+
+    Stages:
+        ask_name      — first message is treated as the visitor's name.
+        menu_primary  — message is matched against PRIMARY_OPTIONS / PRIMARY_KEYWORDS.
+        menu_secondary — message is matched against the active topic's sub-options.
+
+    Special inputs "reset", "start over", and "restart" always reset the session.
+
+    Args:
+        state: Current session state.
+        message: Raw text sent by the user.
+    """
     trimmed = message.strip()
     if not trimmed:
         return respond(state, [format_bot_message("Say something or choose one of the suggestions below.")], _current_options(state))
@@ -358,7 +487,8 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
 
     state.history.append(("user", trimmed))
 
-    # Global primary override: if user clicks any primary option, always treat it as a primary selection
+    # Global primary override: clicking any primary option always re-enters the primary flow,
+    # regardless of the current stage.
     if state.stage != "ask_name":
         global_primary_match = None
         for opt in PRIMARY_OPTIONS:
@@ -377,27 +507,22 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
         safe_name = html.escape(trimmed.title())
         state.visitor_name = safe_name
         state.stage = "menu_primary"
-        
-        # We don't send a message here necessarily, because the Frontend will show the Dashboard.
-        # But if they are in chat mode, we might want to say something.
-        # However, the requirement is: Name -> Dashboard.
-        # So we just return the PRIMARY_OPTIONS.
+        # The frontend switches to the dashboard view on this response.
         return SessionResponse(
             session_id=state.session_id,
-            messages=[], 
+            messages=[],
             options=PRIMARY_OPTIONS,
             stage=state.stage
         )
 
-    # 2. HANDLE PRIMARY SELECTION (From Dashboard or Chat)
+    # 2. HANDLE PRIMARY SELECTION (from dashboard or chat)
     if state.stage == "menu_primary":
-        # Exact match check
         match = None
         for opt in PRIMARY_OPTIONS:
             if trimmed.lower() == opt.lower():
                 match = opt
                 break
-        
+
         if not match:
             match = keyword_match(trimmed, PRIMARY_KEYWORDS)
 
@@ -405,12 +530,12 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
 
     # 3. HANDLE SECONDARY SELECTION
     if state.stage == "menu_secondary":
-        # If no current primary_choice, treat this message as a primary selection
+        # If no current primary_choice, treat as a primary selection.
         if not state.primary_choice:
             state.stage = "menu_primary"
             return _process_primary_selection(state, keyword_match(trimmed, PRIMARY_KEYWORDS) or trimmed)
 
-        # If user selects a different primary while in secondary, switch context first
+        # If user selects a different primary while in secondary, switch context first.
         primary_match = None
         for opt in PRIMARY_OPTIONS:
             if trimmed.lower() == opt.lower():
@@ -420,12 +545,11 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             primary_match = keyword_match(trimmed, PRIMARY_KEYWORDS)
 
         if primary_match:
-            # reset to primary flow before processing the new primary choice
             state.stage = "menu_primary"
             state.primary_choice = None
             return _process_primary_selection(state, primary_match)
 
-        # Otherwise stay in current primary secondary flow
+        # Otherwise stay in the current secondary flow.
         primary = state.primary_choice
         options = SECONDARY_OPTIONS.get(primary, [])
 
@@ -434,14 +558,14 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
             if trimmed.lower() == opt.lower():
                 match = opt
                 break
-                
+
         if not match:
             match = keyword_match(trimmed, SECONDARY_KEYWORDS)
 
         if match:
             return deliver_info(state, match)
-            
-        # If no match at all, fall back to primary menu to avoid getting stuck
+
+        # No match: fall back to primary menu to avoid getting stuck.
         state.stage = "menu_primary"
         state.primary_choice = None
         return respond(state, [format_bot_message("Please choose one of the available options.")], PRIMARY_OPTIONS)
@@ -450,13 +574,7 @@ def handle_message(state: SessionState, message: str) -> SessionResponse:
     return respond(state, ["Let's start over."], PRIMARY_OPTIONS)
 
 
-def _current_options(state: SessionState) -> List[str]:
-    if state.stage == "menu_primary":
-        return PRIMARY_OPTIONS
-    if state.stage == "menu_secondary" and state.primary_choice:
-        return SECONDARY_OPTIONS.get(state.primary_choice, [])
-    return []
-
+# === API ROUTES ===
 
 app = FastAPI(title="Female Foundry Chatbot")
 
@@ -467,13 +585,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.post("/api/session", response_model=SessionResponse)
 def start_session() -> SessionResponse:
+    """
+    Create a new session.
+
+    Returns:
+        A SessionResponse with an empty message list and no options.
+        The frontend uses the returned session_id for all subsequent calls.
+    """
     state = create_session()
     return state.to_initial_response()
 
+
 @app.get("/api/session/{session_id}", response_model=SessionSnapshot)
 def get_session_snapshot(session_id: str) -> SessionSnapshot:
+    """
+    Return a full snapshot of an existing session.
+
+    Used by the frontend to verify that a persisted session_id is still alive
+    and to restore conversation history after a page reload.
+
+    Args:
+        session_id: The hex session ID.
+
+    Returns:
+        SessionSnapshot with full history and current options.
+    """
     state = get_session(session_id)
     return SessionSnapshot(
         session_id=state.session_id,
@@ -484,16 +623,38 @@ def get_session_snapshot(session_id: str) -> SessionSnapshot:
         options=_current_options(state),
     )
 
+
 @app.post("/api/session/{session_id}/reset", response_model=SessionResponse)
 def reset(session_id: str) -> SessionResponse:
+    """
+    Reset a session back to the ask_name stage.
+
+    Args:
+        session_id: The hex session ID.
+
+    Returns:
+        An empty SessionResponse (same as a freshly created session).
+    """
     state = get_session(session_id)
     return reset_session(state)
 
+
 @app.post("/api/chat", response_model=SessionResponse)
 def chat(request: ChatRequest) -> SessionResponse:
+    """
+    Process a user message and return the bot's reply.
+
+    Args:
+        request: Contains session_id and the user's message text.
+
+    Returns:
+        SessionResponse with bot messages and the next set of clickable options.
+    """
     state = get_session(request.session_id)
     return handle_message(state, request.message)
 
+
+# Serve the frontend as static files at the root path.
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 if __name__ == "__main__":

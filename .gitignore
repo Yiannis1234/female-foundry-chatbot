@@ -1,15 +1,12 @@
-# Dependencies
-node_modules/
-
 # Environment variables
 .env
 .env.local
 
-# Streamlit secrets (NEVER commit this!)
-.streamlit/secrets.toml
-
 # Logs
-data/logs.json
+*.log
+
+# Runtime-generated data (auto-created by server.py on startup)
+data/
 
 # Python
 __pycache__/
@@ -28,4 +25,3 @@ ENV/
 # IDE
 .vscode/
 .idea/
-

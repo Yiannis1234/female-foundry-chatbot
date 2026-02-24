@@ -1,4 +1,14 @@
-/* Global Reset & Typography */
+/* === VARIABLES & RESET ===
+ *
+ * Brand colour palette
+ * --------------------
+ * --brand-red       #FF0000   Primary red (buttons, avatars, icons)
+ * --text-dark       #313030   Body text, user bubbles, suggestion chips
+ * --header-ink      #474747   Header text, card titles, close button
+ * --text-muted      #4a4a4a   Secondary text
+ * --bg-soft         #f5f5f5   Page background, chat container
+ */
+
 * {
   box-sizing: border-box;
 }
@@ -61,7 +71,8 @@ button {
   cursor: pointer;
 }
 
-/* Layout Containers */
+/* === LAYOUT === */
+
 .app-container {
   width: 100%;
   height: 100%;
@@ -105,7 +116,8 @@ button {
   }
 }
 
-/* Header */
+/* === HEADER === */
+
 .top-bar {
   display: flex !important;
   justify-content: space-between;
@@ -287,7 +299,8 @@ button {
   pointer-events: none;
 }
 
-/* VIEW 1: Welcome / Name */
+/* === WELCOME VIEW === */
+
 #view-welcome {
   justify-content: center;
 }
@@ -308,6 +321,8 @@ button {
   margin-bottom: 40px;
   color: #1a1a1a;
 }
+
+/* === ASK INDEX BUTTON === */
 
 .ask-index-btn {
   /* RED CIRCLE with WHITE SPARKLE */
@@ -517,7 +532,8 @@ button {
   transform: translateY(-50%);
 }
 
-/* VIEW 2: Dashboard */
+/* === DASHBOARD VIEW === */
+
 #view-dashboard {
   height: 100%;
   display: flex !important;
@@ -746,7 +762,8 @@ body.in-iframe #view-dashboard .cards-grid {
   }
 }
 
-/* VIEW 3: Chat Interface */
+/* === CHAT VIEW === */
+
 #view-chat {
   height: 100%;
   width: 100%;
@@ -822,6 +839,8 @@ body.in-iframe #view-dashboard .cards-grid {
 .chat-scroll * {
   overflow-anchor: none;
 }
+
+/* === MESSAGES === */
 
 .chat-message {
   display: flex;
@@ -957,6 +976,8 @@ body.in-iframe #view-dashboard .cards-grid {
   background: transparent;
   display: none; /* Hidden since we don't use text input */
 }
+
+/* === SUGGESTION CHIPS === */
 
 .chat-suggestions {
   display: flex;
@@ -1178,7 +1199,8 @@ body.in-iframe #view-dashboard .cards-grid {
   display: none; /* User requested removal */
 }
 
-/* Animations */
+/* === ANIMATIONS === */
+
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
@@ -1212,7 +1234,8 @@ body.in-iframe #view-dashboard .cards-grid {
   to { opacity: 1; }
 }
 
-/* Responsive */
+/* === RESPONSIVE === */
+
 @media screen and (max-width: 768px) {
   .app-container {
     padding: 0 16px;
